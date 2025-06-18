@@ -104,9 +104,9 @@ class BooleanParameter(Parameter):
 
 
 class FileParameter(Parameter):
-    def __init__(self, label, description, output_format, file_open = True, mandatory = True, enabled = True):
+    def __init__(self, label, description, output_format, file_mode = "Read", mandatory = True, enabled = True):
         super().__init__(label, description, output_format, mandatory, enabled)
-        self.file_open = file_open # else save
+        self.file_mode = file_mode # else save
 
     def get_value(self):
         return self.value
@@ -144,14 +144,16 @@ class FileParameter(Parameter):
                     'File Parameter: {} value: {} is not in domain values: {}'
                     .format(self.label, str_value, domain))
                 return str_error
-        if self.file_open:
+        if self.file_mode == defs_pars.FILE_MODE_READ or self.file_mode == defs_pars.FILE_MODE_APPEND:
             if not os.path.isfile(file_path):
                 str_error = ('File Parameter: {} not exists file for input:\n{}'.format(self.label, file_path))
                 return str_error
         else:
             if os.path.isfile(file_path):
-                str_error = ('File Parameter: {} exists file for output:\n{}'.format(self.label, file_path))
-                return str_error
+                os.remove(file_path)
+                if os.path.isfile(file_path):
+                    str_error = ('File Parameter: {} error removing existing file for write:\n{}'.format(self.label, file_path))
+                    return str_error
         self.value = file_path
         if domain:
             self.domain = domain

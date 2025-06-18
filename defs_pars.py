@@ -1,7 +1,7 @@
 # authors:
 # David Hernandez Lopez, david.hernandez@uclm.es
 
-PARAMETERS_TAG = "parameters"
+PARAMETERS = "parameters"
 PARAMETER_FIELD_LABEL = "label"
 PARAMETER_FIELD_DESCRIPTION = "description"
 PARAMETER_FIELD_TYPE = "type"
@@ -18,39 +18,54 @@ parameter_common_fields.append(PARAMETER_FIELD_TYPE)
 parameter_common_fields.append(PARAMETER_FIELD_VALUE)
 parameter_common_fields.append(PARAMETER_FIELD_OUTPUT_FORMAT)
 
-PARAMETER_TYPE_REAL_TAG = 'real'
-PARAMETER_TYPE_INTEGER_TAG = 'integer'
-PARAMETER_TYPE_DATE_TAG = 'date'
-PARAMETER_TYPE_STRING_TAG = 'string'
-PARAMETER_TYPE_BOOLEAN_TAG = 'boolean'
-PARAMETER_TYPE_OPEN_FILE_TAG = 'open_file'
-PARAMETER_TYPE_SAVE_FILE_TAG = 'save_file'
-PARAMETER_TYPE_FILE_TAG = 'file' # open or save, only one
+PARAMETER_TYPE_REAL = 'real'
+PARAMETER_TYPE_INTEGER = 'integer'
+PARAMETER_TYPE_DATE = 'date'
+PARAMETER_TYPE_STRING = 'string'
+PARAMETER_TYPE_BOOLEAN = 'boolean'
+PARAMETER_TYPE_FILE_READ = 'file_read'
+PARAMETER_TYPE_FILE_WRITE = 'file_write'
+PARAMETER_TYPE_FILE_APPEND = 'file_append'
+PARAMETER_TYPE_FILE = 'file'
+
+FILE_MODE_READ = "read"
+FILE_MODE_WRITE = "write"
+FILE_MODE_APPEND = "append"
+
+types_group = {}
+types_group[PARAMETER_TYPE_FILE] = []
+types_group[PARAMETER_TYPE_FILE].append(PARAMETER_TYPE_FILE_READ)
+types_group[PARAMETER_TYPE_FILE].append(PARAMETER_TYPE_FILE_WRITE)
+types_group[PARAMETER_TYPE_FILE].append(PARAMETER_TYPE_FILE_APPEND)
+type_group_by_type = {}
+type_group_by_type[PARAMETER_TYPE_FILE_READ] = PARAMETER_TYPE_FILE
+type_group_by_type[PARAMETER_TYPE_FILE_WRITE] = PARAMETER_TYPE_FILE
+type_group_by_type[PARAMETER_TYPE_FILE_APPEND] = PARAMETER_TYPE_FILE
 
 parameter_fields_by_type = {}
-parameter_fields_by_type[PARAMETER_TYPE_REAL_TAG] = []
-parameter_fields_by_type[PARAMETER_TYPE_REAL_TAG].append(PARAMETER_FIELD_DOMAIN)
-parameter_fields_by_type[PARAMETER_TYPE_INTEGER_TAG] = []
-parameter_fields_by_type[PARAMETER_TYPE_INTEGER_TAG].append(PARAMETER_FIELD_DOMAIN)
-parameter_fields_by_type[PARAMETER_TYPE_DATE_TAG] = []
-parameter_fields_by_type[PARAMETER_TYPE_STRING_TAG] = []
-parameter_fields_by_type[PARAMETER_TYPE_BOOLEAN_TAG] = []
+parameter_fields_by_type[PARAMETER_TYPE_REAL] = []
+parameter_fields_by_type[PARAMETER_TYPE_REAL].append(PARAMETER_FIELD_DOMAIN)
+parameter_fields_by_type[PARAMETER_TYPE_INTEGER] = []
+parameter_fields_by_type[PARAMETER_TYPE_INTEGER].append(PARAMETER_FIELD_DOMAIN)
+parameter_fields_by_type[PARAMETER_TYPE_DATE] = []
+parameter_fields_by_type[PARAMETER_TYPE_STRING] = []
+parameter_fields_by_type[PARAMETER_TYPE_BOOLEAN] = []
 # parameter_fields_by_type[PARAMETER_TYPE_OPEN_FILE_TAG] = []
 # parameter_fields_by_type[PARAMETER_TYPE_SAVE_FILE_TAG] = []
-parameter_fields_by_type[PARAMETER_TYPE_FILE_TAG] = []
+parameter_fields_by_type[PARAMETER_TYPE_FILE] = []
 
 parameter_optional_fields_by_type = {}
-parameter_optional_fields_by_type[PARAMETER_TYPE_REAL_TAG] = []
-parameter_optional_fields_by_type[PARAMETER_TYPE_REAL_TAG].append(PARAMETER_FIELD_TOLERANCE)
-parameter_optional_fields_by_type[PARAMETER_TYPE_INTEGER_TAG] = []
-parameter_optional_fields_by_type[PARAMETER_TYPE_DATE_TAG] = []
-parameter_optional_fields_by_type[PARAMETER_TYPE_STRING_TAG] = []
-parameter_optional_fields_by_type[PARAMETER_TYPE_STRING_TAG].append(PARAMETER_FIELD_DOMAIN)
-parameter_optional_fields_by_type[PARAMETER_TYPE_BOOLEAN_TAG] = []
+parameter_optional_fields_by_type[PARAMETER_TYPE_REAL] = []
+parameter_optional_fields_by_type[PARAMETER_TYPE_REAL].append(PARAMETER_FIELD_TOLERANCE)
+parameter_optional_fields_by_type[PARAMETER_TYPE_INTEGER] = []
+parameter_optional_fields_by_type[PARAMETER_TYPE_DATE] = []
+parameter_optional_fields_by_type[PARAMETER_TYPE_STRING] = []
+parameter_optional_fields_by_type[PARAMETER_TYPE_STRING].append(PARAMETER_FIELD_DOMAIN)
+parameter_optional_fields_by_type[PARAMETER_TYPE_BOOLEAN] = []
 # parameter_optional_fields_by_type[PARAMETER_TYPE_OPEN_FILE_TAG] = []
 # parameter_optional_fields_by_type[PARAMETER_TYPE_OPEN_FILE_TAG].append(PARAMETER_FIELD_DOMAIN)
 # parameter_optional_fields_by_type[PARAMETER_TYPE_SAVE_FILE_TAG] = []
 # parameter_optional_fields_by_type[PARAMETER_TYPE_SAVE_FILE_TAG].append(PARAMETER_FIELD_DOMAIN)
-parameter_optional_fields_by_type[PARAMETER_TYPE_FILE_TAG] = []
-parameter_optional_fields_by_type[PARAMETER_TYPE_FILE_TAG].append(PARAMETER_FIELD_DOMAIN)
+parameter_optional_fields_by_type[PARAMETER_TYPE_FILE] = []
+parameter_optional_fields_by_type[PARAMETER_TYPE_FILE].append(PARAMETER_FIELD_DOMAIN)
 

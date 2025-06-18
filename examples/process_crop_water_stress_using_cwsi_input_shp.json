@@ -58,8 +58,8 @@
 			"label": "Input vector layer file",
 			"description": "Input vector layer file, plants frames",
 			"value": "D:/PAFyCToolsGui/20230825_Tarazona_Thermal_CWSI/input/Shape_cepas.shp",
-			"type": "open_file",
-			"domain": [".shp, .gpkg"],
+			"type": "file_read",
+			"domain": [".shp", ".gpkg"],
 			"output_format": "{:s}"		
 		},
 		{
@@ -112,8 +112,8 @@
 			"label": "Output vector layer file",
 			"description": "Output vector layer file",
 			"value": "D:/PAFyCToolsGui/20230825_Tarazona_Thermal_CWSI/output/cepas_cwsi.gpkg",
-			"type": "file",
-			"domain": [".shp, .gpkg"],
+			"type": "file_write",
+			"domain": [".shp", ".gpkg"],
 			"output_format": "{:s}"		
 		},
 		{
@@ -143,7 +143,7 @@
 			"label": "Input raster layer file",
 			"description": "Input raster layer file, thermal orthomosaic",
 			"value": "D:/PAFyCToolsGui/20230825_Tarazona_Thermal_CWSI/input/ORT_FTA_Tarazona_P001_20230825_4258_5782_66_mm.tif",
-			"type": "open_file",
+			"type": "file_read",
 			"domain": [".tif"],
 			"output_format": "{:s}"		
 		},
