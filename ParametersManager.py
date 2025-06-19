@@ -66,13 +66,15 @@ class ParametersManager:
                     return str_error
             parameter = None
             parameter_label = parameter_fields[defs_pars.PARAMETER_FIELD_LABEL]
+            parameter_argparser = parameter_fields[defs_pars.PARAMETER_FIELD_ARGPARSER]
             parameter_description = parameter_fields[defs_pars.PARAMETER_FIELD_DESCRIPTION]
             parameter_output_format = parameter_fields[defs_pars.PARAMETER_FIELD_OUTPUT_FORMAT]
             relative_tolerance = defs_pars.REAL_RELATIVE_TOLERANCE_DEFAULT_VALUE
             if defs_pars.PARAMETER_FIELD_TOLERANCE in parameter_fields:
                 relative_tolerance = parameter_fields[defs_pars.PARAMETER_FIELD_TOLERANCE]
             if parameter_type.casefold() == defs_pars.PARAMETER_TYPE_BOOLEAN.casefold():
-                parameter = BooleanParameter(parameter_label, parameter_description, parameter_output_format)
+                parameter = BooleanParameter(parameter_label, parameter_argparser, parameter_description,
+                                             parameter_output_format)
                 parameter_value = parameter_fields[defs_pars.PARAMETER_FIELD_VALUE]
                 str_aux_error = parameter.initialize(parameter_value)
                 if str_aux_error:
@@ -85,7 +87,8 @@ class ParametersManager:
                     file_mode = defs_pars.FILE_MODE_WRITE
                 elif original_parameter_type.casefold() == defs_pars.PARAMETER_TYPE_FILE_APPEND.casefold():
                     file_mode = defs_pars.FILE_MODE_APPEND
-                parameter = FileParameter(parameter_label, parameter_description, parameter_output_format,
+                parameter = FileParameter(parameter_label, parameter_argparser, parameter_description,
+                                          parameter_output_format,
                                           file_mode)
                 parameter_value = parameter_fields[defs_pars.PARAMETER_FIELD_VALUE]
                 parameter_domain = None
@@ -97,7 +100,8 @@ class ParametersManager:
                     str_error += str_aux_error
                     return str_error
             elif parameter_type.casefold() == defs_pars.PARAMETER_TYPE_INTEGER.casefold():
-                parameter = IntegerParameter(parameter_label, parameter_description, parameter_output_format)
+                parameter = IntegerParameter(parameter_label, parameter_argparser, parameter_description,
+                                             parameter_output_format)
                 parameter_value = parameter_fields[defs_pars.PARAMETER_FIELD_VALUE]
                 parameter_domain = parameter_fields[defs_pars.PARAMETER_FIELD_DOMAIN]
                 str_aux_error = parameter.initialize(parameter_value, parameter_domain)
@@ -106,7 +110,8 @@ class ParametersManager:
                     str_error += str_aux_error
                     return str_error
             elif parameter_type.casefold() == defs_pars.PARAMETER_TYPE_REAL.casefold():
-                parameter = RealParameter(parameter_label, parameter_description, parameter_output_format)
+                parameter = RealParameter(parameter_label, parameter_argparser, parameter_description,
+                                          parameter_output_format)
                 parameter_value = parameter_fields[defs_pars.PARAMETER_FIELD_VALUE]
                 parameter_domain = parameter_fields[defs_pars.PARAMETER_FIELD_DOMAIN]
                 str_aux_error = parameter.initialize(parameter_value, parameter_domain, relative_tolerance)
@@ -115,7 +120,8 @@ class ParametersManager:
                     str_error += str_aux_error
                     return str_error
             elif parameter_type.casefold() == defs_pars.PARAMETER_TYPE_STRING.casefold():
-                parameter = StringParameter(parameter_label, parameter_description, parameter_output_format)
+                parameter = StringParameter(parameter_label, parameter_argparser, parameter_description,
+                                            parameter_output_format)
                 parameter_value = parameter_fields[defs_pars.PARAMETER_FIELD_VALUE]
                 parameter_domain = None
                 if defs_pars.PARAMETER_FIELD_DOMAIN in parameter_fields:

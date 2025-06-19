@@ -32,8 +32,8 @@ def test_1(input_file_name):
 
 
 def main():
-    input_file_name = 'E:/dev/python/lib/pyLibParameters/examples/process_crop_water_stress_using_cwsi_input_shp.json'
-    # input_file_name = 'E:/dev/python/lib/pyLibParameters/examples/process_crop_water_stress_using_cwsi_input_gpkg.json'
+    # input_file_name = 'E:/dev/python/lib/pyLibParameters/examples/process_crop_water_stress_using_cwsi_input_shp.json'
+    input_file_name = 'E:/dev/python/lib/pyLibParameters/examples/process_crop_water_stress_using_cwsi_input_gpkg.json'
     str_error = test_1(input_file_name)
     if str_error:
         print(f"Processing test_1: error:\n\t{str_error}")

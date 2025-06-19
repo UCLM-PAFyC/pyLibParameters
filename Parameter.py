@@ -7,8 +7,9 @@ import defs_pars
 import pathlib
 
 class Parameter:
-    def __init__(self, label, description, output_format, mandatory = True, enabled = True):
+    def __init__(self, label, argparser, description, output_format, mandatory = True, enabled = True):
         self.label = label
+        self.argparser = argparser
         self.description = description
         self.output_format = output_format
         self.value = None

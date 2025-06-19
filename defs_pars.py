@@ -9,10 +9,12 @@ PARAMETER_FIELD_VALUE = "value"
 PARAMETER_FIELD_OUTPUT_FORMAT = "output_format"
 PARAMETER_FIELD_DOMAIN = "domain"
 PARAMETER_FIELD_TOLERANCE = "tolerance"
+PARAMETER_FIELD_ARGPARSER = "argparser"
 REAL_RELATIVE_TOLERANCE_DEFAULT_VALUE = 1e-9
 
 parameter_common_fields = []
 parameter_common_fields.append(PARAMETER_FIELD_LABEL)
+parameter_common_fields.append(PARAMETER_FIELD_ARGPARSER)
 parameter_common_fields.append(PARAMETER_FIELD_DESCRIPTION)
 parameter_common_fields.append(PARAMETER_FIELD_TYPE)
 parameter_common_fields.append(PARAMETER_FIELD_VALUE)
