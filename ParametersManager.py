@@ -4,12 +4,12 @@ import math
 import random
 import re
 
-import defs_pars
 
 here = os.path.dirname(__file__)
-sys.path.append(os.path.join(here, '..'))
+sys.path.append(os.path.join(here, '.'))
 
 import json
+import defs_pars
 from Parameter import *
 
 class ParametersManager:
