@@ -15,8 +15,16 @@ from ParametersManager import ParametersManager
 
 def test_1(input_file_name):
     str_error = ''
-    with open(input_file_name, 'r') as file:
-        json_content = json.load(file)
+    try:
+        with open(input_file_name, 'r') as file:
+            try:
+                json_content = json.load(file)
+            except:
+                str_error = ('Error loading file:\n{}'.format(input_file_name))
+                return str_error
+    except:
+        str_error = ('Error opening file:\n{}'.format(input_file_name))
+        return str_error
     if not defs_pars.PARAMETERS in json_content:
         str_error = ("No {} in json project file:\n{}".format(defs_pars.PARAMETERS,
                                                               input_file_name))
