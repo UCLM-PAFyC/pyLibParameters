@@ -71,3 +71,17 @@ parameter_optional_fields_by_type[PARAMETER_TYPE_BOOLEAN] = []
 parameter_optional_fields_by_type[PARAMETER_TYPE_FILE] = []
 parameter_optional_fields_by_type[PARAMETER_TYPE_FILE].append(PARAMETER_FIELD_DOMAIN)
 
+PARAMETERS_MANAGER_DIALOG_TITLE = "Parameters Manager"
+PARAMETER_FIELD_LABEL_TAG = "Label"
+PARAMETER_FIELD_DESCRIPTION_TAG = "Description"
+PARAMETER_FIELD_LABEL_TOOLTIP = "Label"
+PARAMETER_FIELD_DESCRIPTION_TOOLTIP = "Description"
+parameters_manager_dialog_field_by_header_tag = {}
+parameters_manager_dialog_header=[PARAMETER_FIELD_LABEL_TAG,
+                                  PARAMETER_FIELD_DESCRIPTION_TAG]
+parameters_manager_dialog_field_by_header_tag = {}
+parameters_manager_dialog_field_by_header_tag[PARAMETER_FIELD_LABEL_TAG] = PARAMETER_FIELD_LABEL
+parameters_manager_dialog_field_by_header_tag[PARAMETER_FIELD_DESCRIPTION_TAG] = PARAMETER_FIELD_DESCRIPTION
+parameters_manager_dialog_tooltip_by_header_tag = {}
+parameters_manager_dialog_tooltip_by_header_tag[PARAMETER_FIELD_LABEL_TAG] = PARAMETER_FIELD_LABEL_TOOLTIP
+parameters_manager_dialog_tooltip_by_header_tag[PARAMETER_FIELD_DESCRIPTION_TAG] = PARAMETER_FIELD_DESCRIPTION_TOOLTIP
