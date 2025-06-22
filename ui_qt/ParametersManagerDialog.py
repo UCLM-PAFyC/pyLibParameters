@@ -18,6 +18,7 @@ from PyQt5.QtCore import QDir, QFileInfo, QFile, QSize, Qt
 import defs_pars
 from ParametersManager import ParametersManager
 from Parameter import *
+from .ParameterDialog import ParameterDialog
 
 
 from .Tools import SimpleTextEditDialog
@@ -65,16 +66,19 @@ class ParametersManagerDialog(QDialog):
         parameter_label =  self.tableWidget.item(row, 0).text()
         label = self.tableWidget.horizontalHeaderItem(column).text()
         tool_tip_text = self.tableWidget.horizontalHeaderItem(column).toolTip()
-        title = "Parameter: " + parameter_label
-        current_text = label.replace('\n', ' ') + ':\n\n' + current_text
-        dialog = SimpleTextEditDialog(title, current_text, True)
-        ret = dialog.exec()
-        # if ret == QDialog.Accepted:
-        #     text = dialog.get_text()
-        #     self.descriptionLineEdit.setText(text)
-        # text = dialog.get_text()
-        # if text != current_text:
-        #     self.descriptionLineEdit.setText(text)
+        dialog = ParameterDialog(self.parameters_manager, parameter_label, self)
+        dialog_result = dialog.exec()
+
+        # title = "Parameter: " + parameter_label
+        # current_text = label.replace('\n', ' ') + ':\n\n' + current_text
+        # dialog = SimpleTextEditDialog(title, current_text, True)
+        # ret = dialog.exec()
+        # # if ret == QDialog.Accepted:
+        # #     text = dialog.get_text()
+        # #     self.descriptionLineEdit.setText(text)
+        # # text = dialog.get_text()
+        # # if text != current_text:
+        # #     self.descriptionLineEdit.setText(text)
         return
 
     def update_gui(self):

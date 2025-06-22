@@ -76,6 +76,7 @@ PARAMETER_FIELD_LABEL_TAG = "Label"
 PARAMETER_FIELD_DESCRIPTION_TAG = "Description"
 PARAMETER_FIELD_LABEL_TOOLTIP = "Label"
 PARAMETER_FIELD_DESCRIPTION_TOOLTIP = "Description"
+PARAMETER_FIELD_ARGPARSE_TAG = "argparse"
 parameters_manager_dialog_field_by_header_tag = {}
 parameters_manager_dialog_header=[PARAMETER_FIELD_LABEL_TAG,
                                   PARAMETER_FIELD_DESCRIPTION_TAG]
