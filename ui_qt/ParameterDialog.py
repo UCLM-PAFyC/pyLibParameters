@@ -54,19 +54,28 @@ class ParameterDialog(QDialog):
             return
         self.parameter = self.parameters_manager.parameters[self.parameter_label]
 
+        grid_layout = QGridLayout()
+        grid_layout.setColumnStretch(1, 1)
+
         parameter_label = self.parameter.label
         self.label_button = QPushButton(defs_pars.PARAMETER_FIELD_LABEL_TAG)
         self.label_button.clicked.connect(self.set_label)
         self.label_line_edit = QLineEdit()
         self.label_line_edit.setText(parameter_label)
         self.label_line_edit.setReadOnly(True)
+        row = 0
+        grid_layout.addWidget(self.label_button, row, 0)
+        grid_layout.addWidget(self.label_line_edit, row, 1)
 
-        parameter_argparser = self.parameter.argparser
-        self.argparse_button = QPushButton(defs_pars.PARAMETER_FIELD_ARGPARSE_TAG)
-        self.argparse_button.clicked.connect(self.set_argparse)
-        self.argparse_line_edit = QLineEdit()
-        self.argparse_line_edit.setText(parameter_argparser)
-        self.argparse_line_edit.setReadOnly(True)
+        parameter_value = str(self.parameter)
+        self.value_button = QPushButton(defs_pars.PARAMETER_FIELD_VALUE_TAG)
+        self.value_button.clicked.connect(self.set_value)
+        self.value_line_edit = QLineEdit()
+        self.value_line_edit.setText(parameter_value)
+        self.value_line_edit.setReadOnly(True)
+        row += 1
+        grid_layout.addWidget(self.value_button, row, 0)
+        grid_layout.addWidget(self.value_line_edit, row, 1)
 
         parameter_description = self.parameter.description
         self.description_button = QPushButton(defs_pars.PARAMETER_FIELD_DESCRIPTION_TAG)
@@ -74,25 +83,29 @@ class ParameterDialog(QDialog):
         self.description_line_edit = QLineEdit()
         self.description_line_edit.setText(parameter_description)
         self.description_line_edit.setReadOnly(True)
-
-        # self.description = description
-        # self.output_format = output_format
-        # self.value = None
-        # self.mandatory = mandatory
-        # self.enabled = enabled
-
-        grid_layout = QGridLayout()
-        grid_layout.setColumnStretch(1, 1)
-        # grid_layout.setColumnMinimumWidth(1, 250)
-        row = 0
-        grid_layout.addWidget(self.label_button, row, 0)
-        grid_layout.addWidget(self.label_line_edit, row, 1)
-        row += 1
-        grid_layout.addWidget(self.argparse_button, row, 0)
-        grid_layout.addWidget(self.argparse_line_edit, row, 1)
         row += 1
         grid_layout.addWidget(self.description_button, row, 0)
         grid_layout.addWidget(self.description_line_edit, row, 1)
+
+        parameter_output_format = self.parameter.output_format
+        self.output_format_button = QPushButton(defs_pars.PARAMETER_FIELD_OUTPUT_FORMAT_TAG)
+        self.output_format_button.clicked.connect(self.set_output_format)
+        self.output_format_line_edit = QLineEdit()
+        self.output_format_line_edit.setText(parameter_output_format)
+        self.output_format_line_edit.setReadOnly(True)
+        row += 1
+        grid_layout.addWidget(self.output_format_button, row, 0)
+        grid_layout.addWidget(self.output_format_line_edit, row, 1)
+
+        parameter_argparser = self.parameter.argparser
+        self.argparse_button = QPushButton(defs_pars.PARAMETER_FIELD_ARGPARSE_TAG)
+        self.argparse_button.clicked.connect(self.set_argparse)
+        self.argparse_line_edit = QLineEdit()
+        self.argparse_line_edit.setText(parameter_argparser)
+        self.argparse_line_edit.setReadOnly(True)
+        row += 1
+        grid_layout.addWidget(self.argparse_button, row, 0)
+        grid_layout.addWidget(self.argparse_line_edit, row, 1)
 
         self.button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.button_box.accepted.connect(self.accept)
@@ -113,7 +126,7 @@ class ParameterDialog(QDialog):
         title = "Input " + defs_pars.PARAMETER_FIELD_ARGPARSE_TAG
         text, ok = QInputDialog.getText(self, title, defs_pars.PARAMETER_FIELD_ARGPARSE_TAG,
                                         QLineEdit.Normal, self.argparse_line_edit.text())
-        if ok and text != '' and text != self.parameter_label:
+        if ok and text != '' and text != self.argparse_line_edit.text():
             self.argparse_line_edit.setText(text)
         return
 
@@ -135,6 +148,52 @@ class ParameterDialog(QDialog):
         title = "Input " + defs_pars.PARAMETER_FIELD_LABEL_TAG
         text, ok = QInputDialog.getText(self, title, defs_pars.PARAMETER_FIELD_LABEL_TAG,
                                         QLineEdit.Normal, self.argparse_line_edit.text())
-        if ok and text != '' and text != self.parameter_label:
+        if ok and text != '' and text != self.label_line_edit.text():
             self.label_line_edit.setText(text)
         return
+
+    def set_output_format(self):
+        title = "Input " + defs_pars.PARAMETER_FIELD_OUTPUT_FORMAT_TAG
+        text, ok = QInputDialog.getText(self, title, defs_pars.PARAMETER_FIELD_OUTPUT_FORMAT_TAG,
+                                        QLineEdit.Normal, self.output_format_line_edit.text())
+        if ok and text != '' and text != self.output_format_edit.text():
+            self.output_format_line_edit.setText(text)
+        return
+
+    def set_value(self):
+        title = "Input " + defs_pars.PARAMETER_FIELD_VALUE_TAG
+        if isinstance(self.parameter, BooleanParameter):
+            items = ['True', 'False']
+            current_pos = 0
+            if self.value_line_edit.text().casefold() == ('False').casefold():
+                pos = 1
+            item, ok = QInputDialog.getItem(self, title, defs_pars.PARAMETER_FIELD_VALUE_TAG, items, current_pos, False)
+            if ok and item:
+                self.value_line_edit.setText(item)
+        elif isinstance(self.parameter, IntegerParameter):
+            current_value = int(self.value_line_edit.text())
+            domain = self.parameter.domain
+            if len(domain) == 2:
+                int_value, ok = QInputDialog.getInt(self, title, defs_pars.PARAMETER_FIELD_VALUE_TAG,
+                                                           current_value, domain[0], domain[1], 1)
+                if ok:
+                    str_value = str(eval(self.parameter.output_format.format(int_value)))
+                    self.value_line_edit.setText(str_value)
+            else:
+                items = []
+                for i in range(len(domain)):
+                    str_value = str(eval(self.parameter.output_format.format(domain[i])))
+                    items.append(str_value)
+                current_pos = 0
+                if self.value_line_edit.text() in items:
+                    current_pos = items.index(self.value_line_edit)
+                item, ok = QInputDialog.getItem(self, title, defs_pars.PARAMETER_FIELD_VALUE_TAG, items, current_pos, False)
+                if ok and item:
+                    self.value_line_edit.setText(item)
+        else:
+            text, ok = QInputDialog.getText(self, title, defs_pars.PARAMETER_FIELD_VALUE_TAG,
+                                            QLineEdit.Normal, self.value_line_edit.text())
+            # if ok and text != '' and text != self.output_format_edit.text():
+            #     self.output_format_line_edit.setText(text)
+        return
+

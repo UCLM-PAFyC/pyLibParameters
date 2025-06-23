@@ -73,16 +73,22 @@ parameter_optional_fields_by_type[PARAMETER_TYPE_FILE].append(PARAMETER_FIELD_DO
 
 PARAMETERS_MANAGER_DIALOG_TITLE = "Parameters Manager"
 PARAMETER_FIELD_LABEL_TAG = "Label"
+PARAMETER_FIELD_VALUE_TAG = "Value"
 PARAMETER_FIELD_DESCRIPTION_TAG = "Description"
 PARAMETER_FIELD_LABEL_TOOLTIP = "Label"
+PARAMETER_FIELD_VALUE_TOOLTIP = "Value"
 PARAMETER_FIELD_DESCRIPTION_TOOLTIP = "Description"
 PARAMETER_FIELD_ARGPARSE_TAG = "argparse"
+PARAMETER_FIELD_OUTPUT_FORMAT_TAG = "Output format"
 parameters_manager_dialog_field_by_header_tag = {}
 parameters_manager_dialog_header=[PARAMETER_FIELD_LABEL_TAG,
+                                  PARAMETER_FIELD_VALUE_TAG,
                                   PARAMETER_FIELD_DESCRIPTION_TAG]
 parameters_manager_dialog_field_by_header_tag = {}
 parameters_manager_dialog_field_by_header_tag[PARAMETER_FIELD_LABEL_TAG] = PARAMETER_FIELD_LABEL
+parameters_manager_dialog_field_by_header_tag[PARAMETER_FIELD_VALUE_TAG] = PARAMETER_FIELD_VALUE
 parameters_manager_dialog_field_by_header_tag[PARAMETER_FIELD_DESCRIPTION_TAG] = PARAMETER_FIELD_DESCRIPTION
 parameters_manager_dialog_tooltip_by_header_tag = {}
 parameters_manager_dialog_tooltip_by_header_tag[PARAMETER_FIELD_LABEL_TAG] = PARAMETER_FIELD_LABEL_TOOLTIP
+parameters_manager_dialog_tooltip_by_header_tag[PARAMETER_FIELD_VALUE_TAG] = PARAMETER_FIELD_VALUE_TOOLTIP
 parameters_manager_dialog_tooltip_by_header_tag[PARAMETER_FIELD_DESCRIPTION_TAG] = PARAMETER_FIELD_DESCRIPTION_TOOLTIP

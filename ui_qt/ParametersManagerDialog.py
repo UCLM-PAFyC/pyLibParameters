@@ -86,12 +86,17 @@ class ParametersManagerDialog(QDialog):
         for parameter_label in self.parameters_manager.parameters:
             parameter = self.parameters_manager.parameters[parameter_label]
             parameter_description = parameter.description
+            parameter_value = str(parameter)
             rowPosition = self.tableWidget.rowCount()
             self.tableWidget.insertRow(rowPosition)
             label_item = QTableWidgetItem(parameter_label)
             label_item.setTextAlignment(Qt.AlignCenter)
             column_pos = 0
             self.tableWidget.setItem(rowPosition, column_pos, label_item)
+            value_item = QTableWidgetItem(parameter_value)
+            value_item.setTextAlignment(Qt.AlignCenter)
+            column_pos += 1
+            self.tableWidget.setItem(rowPosition, column_pos, value_item)
             description_item = QTableWidgetItem(parameter_description)
             description_item.setTextAlignment(Qt.AlignCenter)
             column_pos += 1
