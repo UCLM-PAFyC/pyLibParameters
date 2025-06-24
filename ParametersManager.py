@@ -131,6 +131,16 @@ class ParametersManager:
                     str_error = ('ParametersManager.initialize\n')
                     str_error += str_aux_error
                     return str_error
+            elif parameter_type.casefold() == defs_pars.PARAMETER_TYPE_DATE.casefold():
+                parameter = DateParameter(parameter_label, parameter_argparser, parameter_description,
+                                            parameter_output_format)
+                parameter_value = parameter_fields[defs_pars.PARAMETER_FIELD_VALUE]
+                parameter_date_format = parameter_fields[defs_pars.PARAMETER_FIELD_DATE_FORMAT]
+                str_aux_error = parameter.initialize(parameter_value, parameter_date_format)
+                if str_aux_error:
+                    str_error = ('ParametersManager.initialize\n')
+                    str_error += str_aux_error
+                    return str_error
             str_value = str(parameter)
             parameters[parameter_label] = parameter
             parameters_count += 1

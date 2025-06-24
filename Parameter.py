@@ -5,6 +5,7 @@ import os
 import math
 import defs_pars
 import pathlib
+import datetime
 
 class Parameter:
     def __init__(self, label, argparser, description, output_format, mandatory = True, enabled = True):
@@ -101,6 +102,95 @@ class BooleanParameter(Parameter):
         str_value = 'True'
         if not self.value:
             str_value = 'False'
+        return str(eval(self.output_format.format(str_value)))
+
+
+class DateParameter(Parameter):
+    def __init__(self, label, description, output_format, mandatory = True, enabled = True):
+        super().__init__(label, description, output_format, mandatory, enabled)
+
+    def get_value(self):
+        return self.value
+
+    def initialize(self, value, date_format):
+        str_error = ''
+        str_date_format = date_format
+        if str_date_format:
+            if not isinstance(str_date_format, str):
+                try:
+                    str_date_format = str(str_date_format)
+                except ValueError:
+                    str_error = (
+                        'Date Parameter: {} date format must be a string and is: {}'.format(self.label, str(type(date_format))))
+                    return str_error
+        date_value = None
+        str_value = value
+        if str_value:
+            if not isinstance(str_value, str):
+                try:
+                    str_value = str(str_value)
+                except ValueError:
+                    str_error = (
+                        'Date Parameter: {} value must be a string and is: {}'.format(self.label, str(type(value))))
+                    return str_error
+            try:
+                date_value = datetime.datetime.strptime(str_value, str_date_format).date()
+            except ValueError:
+                str_error = ('Date Parameter: {} value: {} is not valid for date format: {}'.format(self.label,value, date_format))
+                return str_error
+        self.value = date_value
+        self.date_format = str_date_format
+        return str_error
+
+    def set_value(self, value, date_format = None):
+        str_error = ''
+        str_date_format = self.date_format
+        if date_format:
+            str_date_format = date_format
+            if str_date_format:
+                if not isinstance(str_date_format, str):
+                    try:
+                        str_date_format = str(str_date_format)
+                    except ValueError:
+                        str_error = (
+                            'Date Parameter: {} date format must be a string and is: {}'
+                            .format(self.label, str(type(date_format))))
+                        return str_error
+        date_value = None
+        str_value = value
+        if str_value:
+            if not isinstance(str_value, str):
+                try:
+                    str_value = str(str_value)
+                except ValueError:
+                    str_error = (
+                        'Date Parameter: {} value must be a string and is: {}'.format(self.label, str(type(value))))
+                    return str_error
+            try:
+                date_value = datetime.datetime.strptime(str_value, str_date_format).date()
+            except ValueError:
+                str_error = ('Date Parameter: {} value: {} is not valid for date format: {}'.format(self.label,value, date_format))
+                return str_error
+        self.value = date_value
+        # self.date_format = str_date_format
+        return str_error
+
+    def __str__(self):
+        str_value = 'None'
+        if self.value:
+            str_value = self.value.strftime(self.date_format)
+        return str(eval(self.output_format.format(str_value)))
+
+    def __unicode__(self):
+        str_value = 'None'
+        if self.value:
+            str_value = self.value.strftime(self.date_format)
+        return str(eval(self.output_format.format(str_value)))
+
+    def __repr__(self):
+        str_value = 'None'
+        if self.value:
+            str_value = self.value.strftime(self.date_format)
         return str(eval(self.output_format.format(str_value)))
 
 
@@ -315,7 +405,7 @@ class RealParameter(Parameter):
     def get_value(self):
         return self.value
 
-    def initialize(self, value, domain, rel_tol=1e-9):
+    def initialize(self, value, domain, tol=1e-9):
         str_error = ''
         if value is None:
             str_error = ('Real Parameter value is None')
@@ -362,7 +452,7 @@ class RealParameter(Parameter):
         else:
             valid_value = False
             for i in range(len(float_domain)):
-                if math.isclose(float_value, float_domain[i], rel_tol):
+                if math.isclose(float_value, float_domain[i], rel_tol = tol):
                     valid_value = True
                     break
             if not valid_value:
@@ -371,7 +461,7 @@ class RealParameter(Parameter):
                     'Real Parameter: {} value: {} is different from domain values'
                     .format(self.label, str_value))
                 return str_error
-        self.rel_tol = rel_tol
+        self.tol = tol
         self.value = float_value
         self.domain = float_domain
         return str_error

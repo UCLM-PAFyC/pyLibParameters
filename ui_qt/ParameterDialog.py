@@ -13,10 +13,10 @@ from PyQt5.uic import loadUi
 from PyQt5.QtWidgets import (QApplication, QMessageBox, QDialog, QInputDialog,
                              QFileDialog, QPushButton, QComboBox, QPlainTextEdit, QLineEdit,
                              QDialogButtonBox, QVBoxLayout, QTableWidget, QTableWidgetItem,
-                             QFrame, QLabel, QPushButton, QGridLayout)
+                             QFrame, QLabel, QPushButton, QGridLayout, QSizePolicy)
 from PyQt5.QtCore import QDir, QFileInfo, QFile, QSize, Qt
 from PyQt5.QtCore import QDir, Qt
-from PyQt5.QtGui import QFont, QPalette
+from PyQt5.QtGui import QFont, QPalette, QFontMetrics, QFont
 
 import defs_pars
 from ParametersManager import ParametersManager
@@ -45,16 +45,16 @@ class ParameterDialog(QDialog):
 
     def initialize(self,
                    title):
-        self.setWindowTitle(title)
-
-        # frameStyle = QFrame.Sunken | QFrame.Panel
-
         if not self.parameter_label in self.parameters_manager.parameters:
             str_error = ('Parameter: {} not found in parameters manager'.format(self.parameter_label))
             return
         self.parameter = self.parameters_manager.parameters[self.parameter_label]
+        parameter_label = self.parameter.label
+        title = title + parameter_label
+        self.setWindowTitle(title)
 
         grid_layout = QGridLayout()
+        # grid_layout.setColumnStretch(0, 1)
         grid_layout.setColumnStretch(1, 1)
 
         parameter_label = self.parameter.label
@@ -66,6 +66,7 @@ class ParameterDialog(QDialog):
         row = 0
         grid_layout.addWidget(self.label_button, row, 0)
         grid_layout.addWidget(self.label_line_edit, row, 1)
+        # self.label_line_edit.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         parameter_value = str(self.parameter)
         self.value_button = QPushButton(defs_pars.PARAMETER_FIELD_VALUE_TAG)
@@ -115,6 +116,10 @@ class ParameterDialog(QDialog):
         vertical_layout.addWidget(self.button_box)
 
         self.setLayout(vertical_layout)
+        # self.label_line_edit.adjustSize()
+        # metrics = QFontMetrics(QFont())
+        # self.setMinimumWidth(metrics.horizontalAdvance(title))
+        # self.setMinimumWidth(200)
         return
 
     def reject(self):
@@ -186,10 +191,48 @@ class ParameterDialog(QDialog):
                     items.append(str_value)
                 current_pos = 0
                 if self.value_line_edit.text() in items:
-                    current_pos = items.index(self.value_line_edit)
+                    current_pos = items.index(self.value_line_edit.text())
                 item, ok = QInputDialog.getItem(self, title, defs_pars.PARAMETER_FIELD_VALUE_TAG, items, current_pos, False)
                 if ok and item:
                     self.value_line_edit.setText(item)
+        elif isinstance(self.parameter, RealParameter):
+            current_value = float(self.value_line_edit.text())
+            domain = self.parameter.domain
+            if len(domain) == 2:
+                str_min_value = str(eval(self.parameter.output_format.format(domain[0])))
+                str_max_value = str(eval(self.parameter.output_format.format(domain[1])))
+                msg = ("Input a value in domain: [{}, {}]:".format(str_min_value, str_max_value))
+                text, ok = QInputDialog.getText(self, title, msg,
+                                                QLineEdit.Normal, self.value_line_edit.text())
+                if ok:
+                    real_value = None
+                    try:
+                        real_value = float(text)
+                    except ValueError:
+                        msg = ('Value must be a real number in domain: [{}, {}]'
+                               .format(str_min_value, str_max_value))
+                        QMessageBox.information(self, 'Information', msg)
+                        return
+                    if real_value < domain[0] or real_value > domain[1]:
+                        msg = ('Value must be a real number in domain: [{}, {}]'
+                               .format(str_min_value, str_max_value))
+                        QMessageBox.information(self, 'Information', msg)
+                        return
+                    str_value = str(eval(self.parameter.output_format.format(real_value)))
+                    self.value_line_edit.setText(str_value)
+            else:
+                items = []
+                for i in range(len(domain)):
+                    str_value = str(eval(self.parameter.output_format.format(domain[i])))
+                    items.append(str_value)
+                current_pos = 0
+                if self.value_line_edit.text() in items:
+                    current_pos = items.index(self.value_line_edit.text())
+                item, ok = QInputDialog.getItem(self, title, defs_pars.PARAMETER_FIELD_VALUE_TAG, items, current_pos, False)
+                if ok and item:
+                    self.value_line_edit.setText(item)
+        elif isinstance(self.parameter, DateParameter):
+            yo = 1
         else:
             text, ok = QInputDialog.getText(self, title, defs_pars.PARAMETER_FIELD_VALUE_TAG,
                                             QLineEdit.Normal, self.value_line_edit.text())

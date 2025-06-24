@@ -10,6 +10,7 @@ PARAMETER_FIELD_OUTPUT_FORMAT = "output_format"
 PARAMETER_FIELD_DOMAIN = "domain"
 PARAMETER_FIELD_TOLERANCE = "tolerance"
 PARAMETER_FIELD_ARGPARSER = "argparser"
+PARAMETER_FIELD_DATE_FORMAT = "date_format"
 REAL_RELATIVE_TOLERANCE_DEFAULT_VALUE = 1e-9
 
 parameter_common_fields = []
@@ -50,6 +51,7 @@ parameter_fields_by_type[PARAMETER_TYPE_REAL].append(PARAMETER_FIELD_DOMAIN)
 parameter_fields_by_type[PARAMETER_TYPE_INTEGER] = []
 parameter_fields_by_type[PARAMETER_TYPE_INTEGER].append(PARAMETER_FIELD_DOMAIN)
 parameter_fields_by_type[PARAMETER_TYPE_DATE] = []
+parameter_fields_by_type[PARAMETER_TYPE_DATE].append(PARAMETER_FIELD_DATE_FORMAT)
 parameter_fields_by_type[PARAMETER_TYPE_STRING] = []
 parameter_fields_by_type[PARAMETER_TYPE_BOOLEAN] = []
 # parameter_fields_by_type[PARAMETER_TYPE_OPEN_FILE_TAG] = []
