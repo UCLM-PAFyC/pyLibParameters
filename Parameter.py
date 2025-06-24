@@ -195,17 +195,30 @@ class DateParameter(Parameter):
 
 
 class FileParameter(Parameter):
-    def __init__(self, label, description, output_format, file_mode = "Read", mandatory = True, enabled = True):
+    def __init__(self, label, description, output_format, mandatory = True, enabled = True):
         super().__init__(label, description, output_format, mandatory, enabled)
-        self.file_mode = file_mode # else save
 
     def get_value(self):
         return self.value
 
-    def initialize(self, value, domain = None):
+    def initialize(self, value, file_mode, domain = None):
         str_error = ''
         if value is None:
             str_error = ('File Parameter value is None')
+            return str_error
+        str_file_mode = file_mode
+        if not isinstance(file_mode, str):
+            try:
+                str_file_mode = str(file_mode)
+            except ValueError:
+                str_error = ('File Parameter: {} file mode must be a string and is: {}'
+                             .format(self.label, str(type(file_mode))))
+                return str_error
+        if (str_file_mode.casefold() != defs_pars.FILE_MODE_READ.casefold()
+                and str_file_mode.casefold() != defs_pars.FILE_MODE_WRITE.casefold()
+                and str_file_mode.casefold() != defs_pars.FILE_MODE_APPEND.casefold()):
+            str_error = ('File Parameter: {} invalid file mode value: {}'
+                         .format(self.label, str(type(file_mode))))
             return str_error
         if domain:
             if not isinstance(domain, list):
@@ -235,17 +248,21 @@ class FileParameter(Parameter):
                     'File Parameter: {} value: {} is not in domain values: {}'
                     .format(self.label, str_value, domain))
                 return str_error
-        if self.file_mode == defs_pars.FILE_MODE_READ or self.file_mode == defs_pars.FILE_MODE_APPEND:
+        if (str_file_mode.casefold() == defs_pars.FILE_MODE_READ.casefold()
+                or str_file_mode.casefold() == defs_pars.FILE_MODE_APPEND.casefold()):
             if not os.path.isfile(file_path):
-                str_error = ('File Parameter: {} not exists file for input:\n{}'.format(self.label, file_path))
+                str_error = ('File Parameter: {} not exists file for read/append:\n{}'
+                             .format(self.label, file_path))
                 return str_error
         else:
             if os.path.isfile(file_path):
                 os.remove(file_path)
                 if os.path.isfile(file_path):
-                    str_error = ('File Parameter: {} error removing existing file for write:\n{}'.format(self.label, file_path))
+                    str_error = ('File Parameter: {} error removing existing file for write:\n{}'
+                                 .format(self.label, file_path))
                     return str_error
         self.value = file_path
+        self.file_mode = str_file_mode.casefold()
         if domain:
             self.domain = domain
         return str_error

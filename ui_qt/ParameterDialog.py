@@ -4,6 +4,7 @@
 import os
 import sys
 import math
+import datetime
 
 current_path = os.path.dirname(__file__)
 sys.path.append(os.path.join(current_path, '..'))
@@ -13,8 +14,8 @@ from PyQt5.uic import loadUi
 from PyQt5.QtWidgets import (QApplication, QMessageBox, QDialog, QInputDialog,
                              QFileDialog, QPushButton, QComboBox, QPlainTextEdit, QLineEdit,
                              QDialogButtonBox, QVBoxLayout, QTableWidget, QTableWidgetItem,
-                             QFrame, QLabel, QPushButton, QGridLayout, QSizePolicy)
-from PyQt5.QtCore import QDir, QFileInfo, QFile, QSize, Qt
+                             QFrame, QLabel, QPushButton, QGridLayout, QSizePolicy, QDateEdit)
+from PyQt5.QtCore import QDir, QFileInfo, QFile, QSize, Qt, QDate
 from PyQt5.QtCore import QDir, Qt
 from PyQt5.QtGui import QFont, QPalette, QFontMetrics, QFont
 
@@ -175,6 +176,77 @@ class ParameterDialog(QDialog):
             item, ok = QInputDialog.getItem(self, title, defs_pars.PARAMETER_FIELD_VALUE_TAG, items, current_pos, False)
             if ok and item:
                 self.value_line_edit.setText(item)
+        elif isinstance(self.parameter, DateParameter):
+            dialog = QDialog()
+            dialog.setWindowTitle(title)
+            dialog_button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+            dialog_button_box.accepted.connect(dialog.accept)
+            dialog_button_box.rejected.connect(dialog.reject)
+            layout = QVBoxLayout()
+            message = QLabel("Input a date")
+            layout.addWidget(message)
+            str_parameter_date = self.value_line_edit.text()
+            parameter_date = datetime.datetime.strptime(str_parameter_date, self.parameter.date_format).date()
+            # parameter_date = self.parameter.value
+            parameter_date_year = parameter_date.year
+            parameter_date_month = parameter_date.month
+            parameter_date_day = parameter_date.day
+            qdate = QDate()
+            qdate.setDate(parameter_date_year, parameter_date_month, parameter_date_day)
+            dialog_date = QDateEdit(qdate, dialog)
+            layout.addWidget(dialog_date)
+            layout.addWidget(dialog_button_box)
+            dialog.setLayout(layout)
+            dialog_result = dialog.exec()
+            if dialog_result == QDialog.Accepted:
+                new_qdate = dialog_date.date()
+                new_year = new_qdate.year()
+                new_month = new_qdate.month()
+                new_day = new_qdate.day()
+                new_date = datetime.date(new_year, new_month, new_day)
+                self.parameter.value = new_date
+                str_value = str(self.parameter)
+                self.value_line_edit.setText(str_value)
+        elif isinstance(self.parameter, FileParameter):
+            previous_file = self.value_line_edit.text()
+            path = QDir.currentPath()
+            if os.path.isfile(previous_file):
+                path = os.path.dirname(previous_file)
+            str_files = '(*.*)'
+            if self.parameter.domain:
+                str_files = 'Files ('
+                for i in range(len(self.parameter.domain)):
+                    if i > 0:
+                        str_files += ' '
+                    str_files += ("*" + self.parameter.domain[i])
+                str_files += ')'
+            file_name = None
+            if self.parameter.file_mode == defs_pars.FILE_MODE_READ:
+                file_name, aux = QFileDialog.getOpenFileName(self, title, path, str_files)
+            elif self.parameter.file_mode == defs_pars.FILE_MODE_APPEND:
+                file_name, aux = QFileDialog.getOpenFileName(self, title, path, str_files)
+            elif self.parameter.file_mode == defs_pars.FILE_MODE_WRITE:
+                file_name, aux = QFileDialog.getSaveFileName(self, title, path, str_files)
+            if file_name and file_name.casefold() != previous_file.casefold():
+                str_value = file_name
+                self.value_line_edit.setText(str_value)
+            # dlg = QFileDialog()
+            # # dlg.setDirectory(self.last_path)
+            # if self.parameter.file_mode == defs_pars.FILE_MODE_READ:
+            #     dlg.setFileMode(QFileDialog.AnyFile)
+            # elif self.parameter.file_mode == defs_pars.FILE_MODE_READ:
+            #     dlg.setFileMode(QFileDialog.AnyFile)
+            # elif self.parameter.file_mode == defs_pars.FILE_MODE_WRITE:
+            #     dlg.setFileMode(QFileDialog.AnyFile)
+            # if self.parameter.domain:
+            #     str_files = '('
+            #     str_files = ')'
+            #     dlg.setNameFilter(str_files)
+            # if dlg.exec_():
+            #     file_names = dlg.selectedFiles()
+            #     file_name = file_names[0]
+            # else:
+            #     return
         elif isinstance(self.parameter, IntegerParameter):
             current_value = int(self.value_line_edit.text())
             domain = self.parameter.domain
@@ -231,8 +303,6 @@ class ParameterDialog(QDialog):
                 item, ok = QInputDialog.getItem(self, title, defs_pars.PARAMETER_FIELD_VALUE_TAG, items, current_pos, False)
                 if ok and item:
                     self.value_line_edit.setText(item)
-        elif isinstance(self.parameter, DateParameter):
-            yo = 1
         else:
             text, ok = QInputDialog.getText(self, title, defs_pars.PARAMETER_FIELD_VALUE_TAG,
                                             QLineEdit.Normal, self.value_line_edit.text())

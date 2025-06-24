@@ -39,10 +39,10 @@ class ParametersManager:
                     return str_error
                 parameter_fields[common_field] = parameter_dict[common_field]
             parameter_type = parameter_fields[defs_pars.PARAMETER_FIELD_TYPE].lower()
-            original_parameter_type = None
-            if parameter_type in defs_pars.type_group_by_type:
-                original_parameter_type = parameter_type
-                parameter_type = defs_pars.type_group_by_type[parameter_type]
+            # original_parameter_type = None
+            # if parameter_type in defs_pars.type_group_by_type:
+            #     original_parameter_type = parameter_type
+            #     parameter_type = defs_pars.type_group_by_type[parameter_type]
             if not parameter_type in defs_pars.parameter_fields_by_type:
                 str_error = ('ParametersManager.initialize\n')
                 str_error += ("Invalid type: {} parameter: {}".
@@ -82,19 +82,14 @@ class ParametersManager:
                     str_error += str_aux_error
                     return str_error
             elif parameter_type == defs_pars.PARAMETER_TYPE_FILE:
-                file_mode = defs_pars.FILE_MODE_READ
-                if original_parameter_type.casefold() == defs_pars.PARAMETER_TYPE_FILE_WRITE.casefold():
-                    file_mode = defs_pars.FILE_MODE_WRITE
-                elif original_parameter_type.casefold() == defs_pars.PARAMETER_TYPE_FILE_APPEND.casefold():
-                    file_mode = defs_pars.FILE_MODE_APPEND
+                parameter_file_mode = parameter_fields[defs_pars.PARAMETER_FIELD_FILE_MODE]
                 parameter = FileParameter(parameter_label, parameter_argparser, parameter_description,
-                                          parameter_output_format,
-                                          file_mode)
+                                          parameter_output_format)
                 parameter_value = parameter_fields[defs_pars.PARAMETER_FIELD_VALUE]
                 parameter_domain = None
                 if defs_pars.PARAMETER_FIELD_DOMAIN in parameter_fields:
                     parameter_domain = parameter_fields[defs_pars.PARAMETER_FIELD_DOMAIN]
-                str_aux_error = parameter.initialize(parameter_value, parameter_domain)
+                str_aux_error = parameter.initialize(parameter_value, parameter_file_mode, parameter_domain)
                 if str_aux_error:
                     str_error = ('ParametersManager.initialize\n')
                     str_error += str_aux_error

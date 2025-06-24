@@ -11,6 +11,7 @@ PARAMETER_FIELD_DOMAIN = "domain"
 PARAMETER_FIELD_TOLERANCE = "tolerance"
 PARAMETER_FIELD_ARGPARSER = "argparser"
 PARAMETER_FIELD_DATE_FORMAT = "date_format"
+PARAMETER_FIELD_FILE_MODE = "file_mode"
 REAL_RELATIVE_TOLERANCE_DEFAULT_VALUE = 1e-9
 
 parameter_common_fields = []
@@ -26,24 +27,25 @@ PARAMETER_TYPE_INTEGER = 'integer'
 PARAMETER_TYPE_DATE = 'date'
 PARAMETER_TYPE_STRING = 'string'
 PARAMETER_TYPE_BOOLEAN = 'boolean'
-PARAMETER_TYPE_FILE_READ = 'file_read'
-PARAMETER_TYPE_FILE_WRITE = 'file_write'
-PARAMETER_TYPE_FILE_APPEND = 'file_append'
 PARAMETER_TYPE_FILE = 'file'
+# PARAMETER_TYPE_FILE_READ = 'file_read'
+# PARAMETER_TYPE_FILE_WRITE = 'file_write'
+# PARAMETER_TYPE_FILE_APPEND = 'file_append'
+PARAMETER_TYPE_FILE_MODE = 'file_mode'
 
 FILE_MODE_READ = "read"
 FILE_MODE_WRITE = "write"
 FILE_MODE_APPEND = "append"
 
-types_group = {}
-types_group[PARAMETER_TYPE_FILE] = []
-types_group[PARAMETER_TYPE_FILE].append(PARAMETER_TYPE_FILE_READ)
-types_group[PARAMETER_TYPE_FILE].append(PARAMETER_TYPE_FILE_WRITE)
-types_group[PARAMETER_TYPE_FILE].append(PARAMETER_TYPE_FILE_APPEND)
-type_group_by_type = {}
-type_group_by_type[PARAMETER_TYPE_FILE_READ] = PARAMETER_TYPE_FILE
-type_group_by_type[PARAMETER_TYPE_FILE_WRITE] = PARAMETER_TYPE_FILE
-type_group_by_type[PARAMETER_TYPE_FILE_APPEND] = PARAMETER_TYPE_FILE
+# types_group = {}
+# types_group[PARAMETER_TYPE_FILE] = []
+# types_group[PARAMETER_TYPE_FILE].append(PARAMETER_TYPE_FILE_READ)
+# types_group[PARAMETER_TYPE_FILE].append(PARAMETER_TYPE_FILE_WRITE)
+# types_group[PARAMETER_TYPE_FILE].append(PARAMETER_TYPE_FILE_APPEND)
+# type_group_by_type = {}
+# type_group_by_type[PARAMETER_TYPE_FILE_READ] = PARAMETER_TYPE_FILE
+# type_group_by_type[PARAMETER_TYPE_FILE_WRITE] = PARAMETER_TYPE_FILE
+# type_group_by_type[PARAMETER_TYPE_FILE_APPEND] = PARAMETER_TYPE_FILE
 
 parameter_fields_by_type = {}
 parameter_fields_by_type[PARAMETER_TYPE_REAL] = []
@@ -57,6 +59,7 @@ parameter_fields_by_type[PARAMETER_TYPE_BOOLEAN] = []
 # parameter_fields_by_type[PARAMETER_TYPE_OPEN_FILE_TAG] = []
 # parameter_fields_by_type[PARAMETER_TYPE_SAVE_FILE_TAG] = []
 parameter_fields_by_type[PARAMETER_TYPE_FILE] = []
+parameter_fields_by_type[PARAMETER_TYPE_FILE].append(PARAMETER_TYPE_FILE_MODE)
 
 parameter_optional_fields_by_type = {}
 parameter_optional_fields_by_type[PARAMETER_TYPE_REAL] = []
