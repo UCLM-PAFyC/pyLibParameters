@@ -7,6 +7,10 @@ import defs_pars
 import pathlib
 import datetime
 
+from pint import UnitRegistry
+ureg = UnitRegistry()
+
+
 class Parameter:
     def __init__(self, label, argparser, description, output_format, mandatory = True, enabled = True):
         self.label = label
@@ -417,7 +421,7 @@ class RealParameter(Parameter):
     def __init__(self, label, description, output_format, mandatory = True, enabled = True):
         super().__init__(label, description, output_format, mandatory, enabled)
         self.domain = None
-        self.rel_tol = defs_pars.REAL_RELATIVE_TOLERANCE_DEFAULT_VALUE
+        self.tol = defs_pars.REAL_RELATIVE_TOLERANCE_DEFAULT_VALUE
 
     def get_value(self):
         return self.value
@@ -508,7 +512,7 @@ class RealParameter(Parameter):
         else:
             valid_value = False
             for i in range(len(self.domain)):
-                if math.isclose(float_value, self.domain[i], self.rel_tol):
+                if math.isclose(float_value, self.domain[i], rel_tol = self.tol):
                     valid_value = True
                     break
             if not valid_value:
@@ -524,6 +528,7 @@ class RealParameter(Parameter):
 class StringParameter(Parameter):
     def __init__(self, label, description, output_format, mandatory = True, enabled = True):
         super().__init__(label, description, output_format, mandatory, enabled)
+        self.domain = None
 
     def get_value(self):
         return self.value
@@ -567,7 +572,7 @@ class StringParameter(Parameter):
     def set_value(self, value):
         str_error = ''
         if value is None:
-            str_error = ('Real Parameter value is None')
+            str_error = ('String Parameter value is None')
             return str_error
         if not isinstance(value, str):
             str_value = None
@@ -592,3 +597,250 @@ class StringParameter(Parameter):
                 return str_error
         self.value = value
         return str_error
+
+class PhysicalQuantityParameter(RealParameter):
+    def __init__(self, label, description, output_format, mandatory = True, enabled = True):
+        super().__init__(label, description, output_format, mandatory, enabled)
+        self.domain = None
+        self.tol = defs_pars.REAL_RELATIVE_TOLERANCE_DEFAULT_VALUE
+        self.quantity = ureg.Quantity
+        self.ui_unit = None
+        self.computation_unit = None
+        self.output_format_unit = None
+        self.compatible_units = None
+
+    def get_compatible_units(self):
+        return self.compatible_units
+
+    def get_value(self, unit = '', to_ui_unit = True ):
+        if not unit:
+            if to_ui_unit:
+                unit = self.ui_unit
+            else:
+                unit = self.computation_unit
+        quantity_unit = None
+        try:
+            quantity_unit = self.quantity.to(unit)
+        except Exception as quantity_error:
+            str_error = (
+                'Physical Quantity Parameter: {} converting to unit error:\n{}'.
+                format(self.label, quantity_error))
+            return str_error
+        value = quantity_unit.magnitude
+        return value
+
+    def initialize(self, value, domain,
+                   ui_unit, computation_unit, output_format_unit,
+                   tol=1e-9):
+        str_error = ''
+        if value is None:
+            str_error = ('Physical Quantity Parameter value is None')
+            return str_error
+        if domain is None:
+            str_error = ('Physical Quantity Parameter domain is None')
+            return str_error
+        if not isinstance(domain, list):
+            str_error = ('Physical Quantity Parameter: {} domain must be a list and is: {}'.
+                         format(self.label, str(type(domain))))
+            return str_error
+        if len(domain) < 2:
+            str_error = ('Physical Quantity Parameter: {} domain must be a list with at least two values'.
+                         format(self.label))
+            return str_error
+        float_domain = []
+        for i in range(len(domain)):
+            float_value = None
+            try:
+                float_value = float(domain[i])
+            except ValueError:
+                str_error = (
+                    'Physical Quantity Parameter: {} domain value: {} must be a real number and is: {}'.
+                    format(self.label, str(i+1), str(type(domain[i]))))
+                return str_error
+            float_domain.append(float_value)
+        float_domain.sort()
+        float_value = None
+        try:
+            float_value = float(value)
+        except ValueError:
+            str_error = ('Physical Quantity Parameter: {} value must be a real number and is: {}'.
+                         format(self.label, str(type(value))))
+            return str_error
+        if len(float_domain) == 2:
+            if float_value < float_domain[0] or float_value > float_domain[1]:
+                str_value = eval(self.output_format.format(float_value))
+                str_min_value = eval(self.output_format.format(float_domain[0]))
+                str_max_value = eval(self.output_format.format(float_domain[1]))
+                str_error = (
+                    'Physical Quantity Parameter: {} value: {} is out of domain: [{}, {}]'
+                    .format(self.label, str_value, str_min_value, str_max_value))
+                return str_error
+        else:
+            valid_value = False
+            for i in range(len(float_domain)):
+                if math.isclose(float_value, float_domain[i], rel_tol = tol):
+                    valid_value = True
+                    break
+            if not valid_value:
+                str_value = eval(self.output_format.format(float_value))
+                str_error = (
+                    'Physical Quantity Parameter: {} value: {} is different from domain values'
+                    .format(self.label, str_value))
+                return str_error
+        if ui_unit is None:
+            str_error = ('Physical Quantity Parameter ui unit is None')
+            return str_error
+        if not isinstance(ui_unit, str):
+            str_error = (
+                    'Physical Quantity Parameter: {} ui unit must be a string and is: {}'.
+                    format(self.label, str(type(ui_unit))))
+            return str_error
+        quantity_ui_unit = None
+        try:
+            quantity_ui_unit = self.quantity(float_value, ui_unit)
+        except Exception as quantity_error:
+            str_error = (
+                    'Physical Quantity Parameter: {} initializing error:\n{}'.
+                    format(self.label, quantity_error))
+            return str_error
+        if computation_unit is None:
+            str_error = ('Physical Quantity Parameter computation unit is None')
+            return str_error
+        if not isinstance(computation_unit, str):
+            str_error = (
+                    'Physical Quantity Parameter: {} computation unit must be a string and is: {}'.
+                    format(self.label, str(type(computation_unit))))
+            return str_error
+        quantity_computation_unit = None
+        try:
+            quantity_computation_unit = quantity_ui_unit.to(computation_unit)
+        except Exception as quantity_error:
+            str_error = (
+                    'Physical Quantity Parameter: {} converting to computation unit error:\n{}'.
+                    format(self.label, quantity_error))
+            return str_error
+        str_compatible_units = []
+        compatible_units = ureg.get_compatible_units(quantity_ui_unit.dimensionality)
+        for unit in compatible_units:
+            str_compatible_units.append(str(unit))
+        if output_format_unit is None:
+            str_error = ('Physical Quantity Parameter output format unit is None')
+            return str_error
+        if not isinstance(output_format_unit, str):
+            str_error = (
+                    'Physical Quantity Parameter: {} output format unit must be a string and is: {}'.
+                    format(self.label, str(type(output_format_unit))))
+            return str_error
+        self.tol = tol
+        self.quantity = quantity_computation_unit
+        self.domain = float_domain
+        self.ui_unit = ui_unit
+        self.computation_unit = computation_unit
+        self.output_format_unit = output_format_unit
+        self.compatible_units = compatible_units
+        return str_error
+
+    def set_value(self, value, unit = '', from_ui_unit = True ):
+        str_error = ''
+        if value is None:
+            str_error = ('Physical Quantity Parameter value is None')
+            return str_error
+        float_value = None
+        try:
+            float_value = float(value)
+        except ValueError:
+            str_error = ('Physical Quantity Parameter: {} value must be a real number and is: {}'.
+                         format(self.label, str(type(value))))
+            return str_error
+        value = float_value
+        if not unit:
+            if from_ui_unit:
+                unit = self.ui_unit
+            else:
+                unit = self.computation_unit
+        quantity_unit = None
+        try:
+            quantity_unit = self.quantity(float_value, unit)
+        except Exception as quantity_error:
+            str_error = (
+                    'Physical Quantity Parameter: {} setting value error:\n{}'.
+                    format(self.label, quantity_error))
+            return str_error
+        quantity_ui_unit = quantity_unit
+        if unit != self.ui_unit:
+            try:
+                quantity_ui_unit = quantity_unit.to(self.ui_unit)
+            except Exception as quantity_error:
+                str_error = (
+                    'Physical Quantity Parameter: {} converting to ui unit error:\n{}'.
+                    format(self.label, quantity_error))
+                return str_error
+        float_value = float(quantity_ui_unit.magnitude)
+        if len(self.domain) == 2:
+            if float_value < self.domain[0] or float_value > self.domain[1]:
+                str_value = eval(self.output_format.format(float_value))
+                str_min_value = eval(self.output_format.format(self.domain[0]))
+                str_max_value = eval(self.output_format.format(self.domain[1]))
+                str_error = (
+                    'Physical Quantity Parameter: {} value: {} is out of domain: [{}, {}]'
+                    .format(self.label, str_value, str_min_value, str_max_value))
+                return str_error
+        else:
+            valid_value = False
+            for i in range(len(self.domain)):
+                if math.isclose(float_value, self.domain[i], rel_tol = self.tol):
+                    valid_value = True
+                    break
+            if not valid_value:
+                str_value = eval(self.output_format.format(float_value))
+                str_error = (
+                    'Physical Quantity Parameter: {} value: {} is different from domain values'
+                    .format(self.label, str_value))
+                return str_error
+        quantity_computation_unit = quantity_unit
+        if unit != self.computation_unit:
+            try:
+                quantity_computation_unit = quantity_unit.to(self.computation_unit)
+            except Exception as quantity_error:
+                str_error = (
+                    'Physical Quantity Parameter: {} converting to computation unit error:\n{}'.
+                    format(self.label, quantity_error))
+                return str_error
+        self.quantity = quantity_computation_unit
+        return str_error
+
+    def __str__(self):
+        str_value = 'None'
+        if self.quantity == None:
+            return str_value
+        computation_unit = self.quantity
+        ui_unit = computation_unit.to(self.ui_unit)
+        str_value = str(eval(self.output_format.format(ui_unit.magnitude)))
+        if self.output_format_unit:
+            str_unit = self.output_format_unit.format(ui_unit.units)
+            str_value += " " + str_unit
+        return str_value
+
+    def __unicode__(self):
+        str_value = 'None'
+        if self.quantity == None:
+            return str_value
+        computation_unit = self.quantity
+        ui_unit = computation_unit.to(self.ui_unit)
+        str_value = str(eval(self.output_format.format(ui_unit.magnitude)))
+        if self.output_format_unit:
+            str_unit = self.output_format_unit.format(ui_unit.units)
+            str_value += " " + str_unit
+        return str_value
+
+    def __repr__(self):
+        str_value = 'None'
+        if self.quantity == None:
+            return str_value
+        computation_unit = self.quantity
+        ui_unit = computation_unit.to(self.ui_unit)
+        str_value = str(eval(self.output_format.format(ui_unit.magnitude)))
+        if self.output_format_unit:
+            str_unit = self.output_format_unit.format(ui_unit.units)
+            str_value += " " + str_unit
+        return str_value

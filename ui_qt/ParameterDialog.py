@@ -172,7 +172,7 @@ class ParameterDialog(QDialog):
             items = ['True', 'False']
             current_pos = 0
             if self.value_line_edit.text().casefold() == ('False').casefold():
-                pos = 1
+                current_pos = 1
             item, ok = QInputDialog.getItem(self, title, defs_pars.PARAMETER_FIELD_VALUE_TAG, items, current_pos, False)
             if ok and item:
                 self.value_line_edit.setText(item)
@@ -267,6 +267,56 @@ class ParameterDialog(QDialog):
                 item, ok = QInputDialog.getItem(self, title, defs_pars.PARAMETER_FIELD_VALUE_TAG, items, current_pos, False)
                 if ok and item:
                     self.value_line_edit.setText(item)
+        elif isinstance(self.parameter, PhysicalQuantityParameter):
+            str_values = self.value_line_edit.text().split()
+            str_value = str_values[0]
+            current_value = float(str_value)
+            domain = self.parameter.domain
+            str_unit = ''
+            if self.parameter.output_format_unit:
+                str_unit = self.parameter.output_format_unit.format(self.parameter.quantity.units)
+            if len(domain) == 2:
+                str_min_value = str(eval(self.parameter.output_format.format(domain[0])))
+                if str_unit:
+                    str_min_value += " " + str_unit
+                str_max_value = str(eval(self.parameter.output_format.format(domain[1])))
+                if self.parameter.output_format_unit:
+                    str_max_value += " " + str_unit
+                msg = ("Input a value in domain: [{}, {}]:".format( str_min_value, str_max_value))
+                text, ok = QInputDialog.getText(self, title, msg,
+                                                QLineEdit.Normal, str_value)
+                if ok:
+                    real_value = None
+                    try:
+                        real_value = float(text)
+                    except ValueError:
+                        msg = ('Value must be a real number in domain: [{}, {}]'
+                               .format(str_min_value, str_max_value))
+                        QMessageBox.information(self, 'Information', msg)
+                        return
+                    if real_value < domain[0] or real_value > domain[1]:
+                        msg = ('Value must be a real number in domain: [{}, {}]'
+                               .format(str_min_value, str_max_value))
+                        QMessageBox.information(self, 'Information', msg)
+                        return
+                    str_value = str(eval(self.parameter.output_format.format(real_value)))
+                    if str_unit:
+                        str_value += " " + str_unit
+                    self.value_line_edit.setText(str_value)
+            else:
+                items = []
+                for i in range(len(domain)):
+                    str_value = str(eval(self.parameter.output_format.format(domain[i])))
+                    if str_unit:
+                        str_value += " " + str_unit
+                    items.append(str_value)
+                current_pos = 0
+                if self.value_line_edit.text() in items:
+                    current_pos = items.index(self.value_line_edit.text())
+                item, ok = QInputDialog.getItem(self, title, defs_pars.PARAMETER_FIELD_VALUE_TAG, items,
+                                                current_pos, False)
+                if ok and item:
+                    self.value_line_edit.setText(item)
         elif isinstance(self.parameter, RealParameter):
             current_value = float(self.value_line_edit.text())
             domain = self.parameter.domain
@@ -300,13 +350,32 @@ class ParameterDialog(QDialog):
                 current_pos = 0
                 if self.value_line_edit.text() in items:
                     current_pos = items.index(self.value_line_edit.text())
+                item, ok = QInputDialog.getItem(self, title, defs_pars.PARAMETER_FIELD_VALUE_TAG, items,
+                                                current_pos, False)
+                if ok and item:
+                    self.value_line_edit.setText(item)
+        elif isinstance(parameter, StringParameter):
+            str_value = self.value_line_edit.text()
+            if not self.parameter.domain:
+                text, ok = QInputDialog.getText(self, title, defs_pars.PARAMETER_FIELD_VALUE_TAG,
+                                                QLineEdit.Normal, str_value)
+                if ok and text != '' and text != str_value:
+                    self.value_line_edit.setText(text)
+            else:
+                items = []
+                for i in range(len(self.parameter.domain)):
+                    str_value_aux = self.parameter.domain[i]
+                    items.append(str_value_aux)
+                current_pos = 0
+                if str_value in items:
+                    current_pos = items.index(str_value)
                 item, ok = QInputDialog.getItem(self, title, defs_pars.PARAMETER_FIELD_VALUE_TAG, items, current_pos, False)
                 if ok and item:
                     self.value_line_edit.setText(item)
         else:
             text, ok = QInputDialog.getText(self, title, defs_pars.PARAMETER_FIELD_VALUE_TAG,
                                             QLineEdit.Normal, self.value_line_edit.text())
-            # if ok and text != '' and text != self.output_format_edit.text():
-            #     self.output_format_line_edit.setText(text)
+            if ok and text != '' and text != self.output_format_edit.text():
+                self.value_line_edit.setText(text)
         return
 

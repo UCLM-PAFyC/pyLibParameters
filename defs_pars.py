@@ -13,6 +13,9 @@ PARAMETER_FIELD_ARGPARSER = "argparser"
 PARAMETER_FIELD_DATE_FORMAT = "date_format"
 PARAMETER_FIELD_FILE_MODE = "file_mode"
 REAL_RELATIVE_TOLERANCE_DEFAULT_VALUE = 1e-9
+PARAMETER_FIELD_QUANTITY_UI_UNIT = "ui_unit"
+PARAMETER_FIELD_QUANTITY_COMPUTATION_UNIT = "computation_unit"
+PARAMETER_FIELD_QUANTITY_OUTPUT_FORMAT_UNIT = "output_format_unit"
 
 parameter_common_fields = []
 parameter_common_fields.append(PARAMETER_FIELD_LABEL)
@@ -32,6 +35,7 @@ PARAMETER_TYPE_FILE = 'file'
 # PARAMETER_TYPE_FILE_WRITE = 'file_write'
 # PARAMETER_TYPE_FILE_APPEND = 'file_append'
 PARAMETER_TYPE_FILE_MODE = 'file_mode'
+PARAMETER_TYPE_PHYSICAL_QUANTITY = 'physical_quantity'
 
 FILE_MODE_READ = "read"
 FILE_MODE_WRITE = "write"
@@ -60,6 +64,11 @@ parameter_fields_by_type[PARAMETER_TYPE_BOOLEAN] = []
 # parameter_fields_by_type[PARAMETER_TYPE_SAVE_FILE_TAG] = []
 parameter_fields_by_type[PARAMETER_TYPE_FILE] = []
 parameter_fields_by_type[PARAMETER_TYPE_FILE].append(PARAMETER_TYPE_FILE_MODE)
+parameter_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY] = []
+parameter_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY].append(PARAMETER_FIELD_DOMAIN)
+parameter_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY].append(PARAMETER_FIELD_QUANTITY_UI_UNIT)
+parameter_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY].append(PARAMETER_FIELD_QUANTITY_COMPUTATION_UNIT)
+parameter_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY].append(PARAMETER_FIELD_QUANTITY_OUTPUT_FORMAT_UNIT)
 
 parameter_optional_fields_by_type = {}
 parameter_optional_fields_by_type[PARAMETER_TYPE_REAL] = []
@@ -75,6 +84,8 @@ parameter_optional_fields_by_type[PARAMETER_TYPE_BOOLEAN] = []
 # parameter_optional_fields_by_type[PARAMETER_TYPE_SAVE_FILE_TAG].append(PARAMETER_FIELD_DOMAIN)
 parameter_optional_fields_by_type[PARAMETER_TYPE_FILE] = []
 parameter_optional_fields_by_type[PARAMETER_TYPE_FILE].append(PARAMETER_FIELD_DOMAIN)
+parameter_optional_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY] = []
+parameter_optional_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY].append(PARAMETER_FIELD_TOLERANCE)
 
 PARAMETERS_MANAGER_DIALOG_TITLE = "Parameters Manager"
 PARAMETER_FIELD_LABEL_TAG = "Label"

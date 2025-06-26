@@ -136,6 +136,23 @@ class ParametersManager:
                     str_error = ('ParametersManager.initialize\n')
                     str_error += str_aux_error
                     return str_error
+            elif parameter_type.casefold() == defs_pars.PARAMETER_TYPE_PHYSICAL_QUANTITY.casefold():
+                parameter = PhysicalQuantityParameter(parameter_label, parameter_argparser, parameter_description,
+                                                      parameter_output_format)
+                parameter_value = parameter_fields[defs_pars.PARAMETER_FIELD_VALUE]
+                parameter_domain = parameter_fields[defs_pars.PARAMETER_FIELD_DOMAIN]
+                parameter_ui_unit = parameter_fields[defs_pars.PARAMETER_FIELD_QUANTITY_UI_UNIT]
+                parameter_computation_unit = parameter_fields[defs_pars.PARAMETER_FIELD_QUANTITY_COMPUTATION_UNIT]
+                parameter_output_format_unit = parameter_fields[defs_pars.PARAMETER_FIELD_QUANTITY_OUTPUT_FORMAT_UNIT]
+                str_aux_error = parameter.initialize(parameter_value, parameter_domain,
+                                                     parameter_ui_unit,
+                                                     parameter_computation_unit,
+                                                     parameter_output_format_unit,
+                                                     relative_tolerance)
+                if str_aux_error:
+                    str_error = ('ParametersManager.initialize\n')
+                    str_error += str_aux_error
+                    return str_error
             str_value = str(parameter)
             parameters[parameter_label] = parameter
             parameters_count += 1
