@@ -524,6 +524,36 @@ class RealParameter(Parameter):
         self.value = value
         return str_error
 
+    def __str__(self):
+        str_value = str(eval(self.output_format.format(self.value)))
+        # str_value = "None"
+        # if self.value:
+        #     if not isinstance(self.value, str):
+        #         str_value = str(eval(self.output_format.format(self.value)))
+        #     else:
+        #         str_value = self.value
+        return str_value
+
+    def __unicode__(self):
+        str_value = str(eval(self.output_format.format(self.value)))
+        # str_value = "None"
+        # if self.value:
+        #     if not isinstance(self.value, str):
+        #         str_value = str(eval(self.output_format.format(self.value)))
+        #     else:
+        #         str_value = self.value
+        return str_value
+
+    def __repr__(self):
+        str_value = str(eval(self.output_format.format(self.value)))
+        # str_value = "None"
+        # if self.value:
+        #     if not isinstance(self.value, str):
+        #         str_value = str(eval(self.output_format.format(self.value)))
+        #     else:
+        #         str_value = self.value
+        return str_value
+
 
 class StringParameter(Parameter):
     def __init__(self, label, description, output_format, mandatory = True, enabled = True):
@@ -610,7 +640,10 @@ class PhysicalQuantityParameter(RealParameter):
         self.compatible_units = None
 
     def get_compatible_units(self):
-        return self.compatible_units
+        compatible_units = []
+        for compatible_unit in self.compatible_units:
+            compatible_units.append(str(compatible_unit))
+        return compatible_units
 
     def get_value(self, unit = '', to_ui_unit = True ):
         if not unit:

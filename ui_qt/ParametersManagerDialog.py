@@ -10,7 +10,7 @@ sys.path.append(os.path.join(current_path, '..'))
 
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.uic import loadUi
-from PyQt5.QtWidgets import (QApplication, QMessageBox, QDialog, QInputDialog,
+from PyQt5.QtWidgets import (QApplication, QMessageBox, QDialog, QInputDialog, QHBoxLayout, QDoubleSpinBox,
                              QFileDialog, QPushButton, QComboBox, QPlainTextEdit, QLineEdit, QDateEdit,
                              QDialogButtonBox, QVBoxLayout, QTableWidget, QTableWidgetItem, QLabel)
 from PyQt5.QtCore import QDir, QFileInfo, QFile, QSize, Qt, QDate
@@ -191,6 +191,14 @@ class ParametersManagerDialog(QDialog):
             str_values = str_value.split()
             str_value = str_values[0]
             current_value = float(str_value)
+            quantity_ui_unit = ureg.Quantity
+            try:
+                quantity_ui_unit = quantity_ui_unit(current_value, parameter.ui_unit)
+            except Exception as quantity_error:
+                str_error = (
+                    'Physical Quantity Parameter: {} setting value error:\n{}'.
+                    format(parameter_label, quantity_error))
+                return str_error
             domain = parameter.domain
             str_unit = ''
             if parameter.output_format_unit:
@@ -202,27 +210,90 @@ class ParametersManagerDialog(QDialog):
                 str_max_value = str(eval(parameter.output_format.format(domain[1])))
                 if parameter.output_format_unit:
                     str_max_value += " " + str_unit
-                msg = ("Input a value in domain: [{}, {}]:".format( str_min_value, str_max_value))
-                text, ok = QInputDialog.getText(self, title, msg,
-                                                QLineEdit.Normal, str_value)
-                if ok:
+                dialog = QDialog()
+                dialog.setWindowTitle(title)
+                dialog_button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+                dialog_button_box.accepted.connect(dialog.accept)
+                dialog_button_box.rejected.connect(dialog.reject)
+                layout = QVBoxLayout()
+                message = QLabel(("Input a value in domain: [{}, {}]:".format( str_min_value, str_max_value)))
+                layout.addWidget(message)
+                input_layout = QHBoxLayout()
+                unit_message = QLabel("Unit:")
+                quantity_unit_combo_box = QComboBox()
+                compatible_units = parameter.get_compatible_units()
+                pos = -1
+                str_ui_unit = str(quantity_ui_unit.units)
+                for i in range(len(compatible_units)):
+                    compatible_unit = compatible_units[i]
+                    # str_compatible_unit = parameter.output_format_unit.format(parameter.quantity.units)
+                    quantity_unit_combo_box.addItem(compatible_unit)
+                    if compatible_unit.casefold() == str_ui_unit.casefold():
+                        pos = i
+                quantity_unit_combo_box.setCurrentIndex(pos)
+                value_message = QLabel("Value:")
+                quantity_value_edit = QLineEdit()
+                quantity_value_edit.setText(str_value)
+                input_layout.addWidget(unit_message)
+                input_layout.addWidget(quantity_unit_combo_box)
+                input_layout.addWidget(value_message)
+                input_layout.addWidget(quantity_value_edit)
+                layout.addLayout(input_layout)
+                layout.addWidget(dialog_button_box)
+                dialog.setLayout(layout)
+                dialog_result = dialog.exec()
+                if dialog_result == QDialog.Accepted:
+                    new_str_value = quantity_value_edit.text()
+                    new_unit = quantity_unit_combo_box.currentText()
+                    if new_str_value == str_value and new_unit == str_unit:
+                        return
                     real_value = None
                     try:
-                        real_value = float(text)
+                        real_value = float(new_str_value)
                     except ValueError:
                         msg = ('Value must be a real number in domain: [{}, {}]'
                                .format(str_min_value, str_max_value))
                         QMessageBox.information(self, 'Information', msg)
                         return
-                    if real_value < domain[0] or real_value > domain[1]:
+                    quantity_selected_unit = ureg.Quantity
+                    try:
+                        quantity_selected_unit = quantity_selected_unit(real_value, new_unit)
+                    except Exception as quantity_error:
+                        str_error = (
+                            'Physical Quantity Parameter: {} setting value error:\n{}'.
+                            format(parameter_label, quantity_error))
+                        return str_error
+                    new_quantity_ui_unit = quantity_selected_unit.to(parameter.ui_unit)
+                    new_ui_value = new_quantity_ui_unit.magnitude
+                    if new_ui_value < domain[0] or new_ui_value > domain[1]:
                         msg = ('Value must be a real number in domain: [{}, {}]'
                                .format(str_min_value, str_max_value))
                         QMessageBox.information(self, 'Information', msg)
                         return
-                    str_value = str(eval(parameter.output_format.format(real_value)))
+                    str_value = str(eval(parameter.output_format.format(new_ui_value)))
                     if str_unit:
                         str_value += " " + str_unit
                     self.tableWidget.item(row, 1).setText(str_value)
+                # text, ok = QInputDialog.getText(self, title, msg,
+                #                                 QLineEdit.Normal, str_value)
+                # if ok:
+                #     real_value = None
+                #     try:
+                #         real_value = float(text)
+                #     except ValueError:
+                #         msg = ('Value must be a real number in domain: [{}, {}]'
+                #                .format(str_min_value, str_max_value))
+                #         QMessageBox.information(self, 'Information', msg)
+                #         return
+                #     if real_value < domain[0] or real_value > domain[1]:
+                #         msg = ('Value must be a real number in domain: [{}, {}]'
+                #                .format(str_min_value, str_max_value))
+                #         QMessageBox.information(self, 'Information', msg)
+                #         return
+                #     str_value = str(eval(parameter.output_format.format(real_value)))
+                #     if str_unit:
+                #         str_value += " " + str_unit
+                #     self.tableWidget.item(row, 1).setText(str_value)
             else:
                 items = []
                 for i in range(len(domain)):
