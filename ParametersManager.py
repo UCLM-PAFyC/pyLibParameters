@@ -4,7 +4,6 @@ import math
 import random
 import re
 
-
 here = os.path.dirname(__file__)
 sys.path.append(os.path.join(here, '.'))
 
@@ -144,10 +143,14 @@ class ParametersManager:
                 parameter_ui_unit = parameter_fields[defs_pars.PARAMETER_FIELD_QUANTITY_UI_UNIT]
                 parameter_computation_unit = parameter_fields[defs_pars.PARAMETER_FIELD_QUANTITY_COMPUTATION_UNIT]
                 parameter_output_format_unit = parameter_fields[defs_pars.PARAMETER_FIELD_QUANTITY_OUTPUT_FORMAT_UNIT]
+                parameter_ignored_units = []
+                if defs_pars.PARAMETER_FIELD_QUANTITY_IGNORED_UNITS in parameter_fields:
+                    parameter_ignored_units = parameter_fields[defs_pars.PARAMETER_FIELD_QUANTITY_IGNORED_UNITS]
                 str_aux_error = parameter.initialize(parameter_value, parameter_domain,
                                                      parameter_ui_unit,
                                                      parameter_computation_unit,
                                                      parameter_output_format_unit,
+                                                     parameter_ignored_units,
                                                      relative_tolerance)
                 if str_aux_error:
                     str_error = ('ParametersManager.initialize\n')

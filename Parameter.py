@@ -7,8 +7,11 @@ import defs_pars
 import pathlib
 import datetime
 
-from pint import UnitRegistry
-ureg = UnitRegistry()
+import defs_pars
+
+#
+# from pint import UnitRegistry
+# ureg = UnitRegistry()
 
 
 class Parameter:
@@ -633,7 +636,7 @@ class PhysicalQuantityParameter(RealParameter):
         super().__init__(label, description, output_format, mandatory, enabled)
         self.domain = None
         self.tol = defs_pars.REAL_RELATIVE_TOLERANCE_DEFAULT_VALUE
-        self.quantity = ureg.Quantity
+        self.quantity = defs_pars.ureg.Quantity
         self.ui_unit = None
         self.computation_unit = None
         self.output_format_unit = None
@@ -642,7 +645,8 @@ class PhysicalQuantityParameter(RealParameter):
     def get_compatible_units(self):
         compatible_units = []
         for compatible_unit in self.compatible_units:
-            compatible_units.append(str(compatible_unit))
+            if not compatible_unit in self.ignored_units:
+                compatible_units.append(str(compatible_unit))
         return compatible_units
 
     def get_value(self, unit = '', to_ui_unit = True ):
@@ -664,10 +668,15 @@ class PhysicalQuantityParameter(RealParameter):
 
     def initialize(self, value, domain,
                    ui_unit, computation_unit, output_format_unit,
+                   ignored_units,
                    tol=1e-9):
         str_error = ''
         if value is None:
             str_error = ('Physical Quantity Parameter value is None')
+            return str_error
+        if not isinstance(ignored_units, list):
+            str_error = ('Physical Quantity Parameter: {} ignored units must be a list and is: {}'.
+                         format(self.label, str(type(ignored_units))))
             return str_error
         if domain is None:
             str_error = ('Physical Quantity Parameter domain is None')
@@ -753,7 +762,7 @@ class PhysicalQuantityParameter(RealParameter):
                     format(self.label, quantity_error))
             return str_error
         str_compatible_units = []
-        compatible_units = ureg.get_compatible_units(quantity_ui_unit.dimensionality)
+        compatible_units = defs_pars.ureg.get_compatible_units(quantity_ui_unit.dimensionality)
         for unit in compatible_units:
             str_compatible_units.append(str(unit))
         if output_format_unit is None:
@@ -771,6 +780,7 @@ class PhysicalQuantityParameter(RealParameter):
         self.computation_unit = computation_unit
         self.output_format_unit = output_format_unit
         self.compatible_units = compatible_units
+        self.ignored_units = ignored_units
         return str_error
 
     def set_value(self, value, unit = '', from_ui_unit = True ):

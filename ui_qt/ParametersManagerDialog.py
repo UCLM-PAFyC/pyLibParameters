@@ -38,6 +38,10 @@ class ParametersManagerDialog(QDialog):
         self.last_path = None
         self.title = title
         self.formats = None
+        self.quantity_parameter = None
+        self.quantity_unit_combo_box = None
+        self.quantity_previous_selected_unit = None
+        self.quantity_value_edit = None
         self.initialize(title)
 
     def initialize(self,
@@ -82,6 +86,48 @@ class ParametersManagerDialog(QDialog):
         # # text = dialog.get_text()
         # # if text != current_text:
         # #     self.descriptionLineEdit.setText(text)
+        return
+
+    def select_quantity_unit(self):
+        new_unit = self.quantity_unit_combo_box.currentText()
+        if new_unit == self.quantity_previous_selected_unit:
+            return
+        str_value_previous_unit = self.quantity_value_edit.text()
+        value_previous_unit = None
+        try:
+            value_previous_unit = float(str_value_previous_unit)
+        except ValueError:
+            msg = ('Value must be a real number')
+            # msg = ('Value must be a real number in domain: [{}, {}]'
+            #        .format(str_min_value, str_max_value))
+            QMessageBox.information(self, 'Information', msg)
+            pos = self.quantity_unit_combo_box.findText(self.quantity_previous_selected_unit)
+            self.quantity_unit_combo_box.setCurrentIndex(pos)
+            return
+        quantity_previous_unit = defs_pars.ureg.Quantity
+        try:
+            quantity_previous_unit = quantity_previous_unit(value_previous_unit, self.quantity_previous_selected_unit)
+        except Exception as quantity_error:
+            str_error = (
+                'Physical Quantity Parameter: {} setting value error:\n{}'.
+                format(parameter_label, quantity_error))
+            QMessageBox.information(self, 'Information', msg)
+            pos = self.quantity_unit_combo_box.findText(self.quantity_previous_selected_unit)
+            self.quantity_unit_combo_box.setCurrentIndex(pos)
+            return str_error
+        quantity_selected_unit = quantity_previous_unit.to(new_unit)
+        value_selected_unit = quantity_selected_unit.magnitude
+        # if new_ui_value < domain[0] or new_ui_value > domain[1]:
+        #     msg = ('Value must be a real number in domain: [{}, {}]'
+        #            .format(str_min_value, str_max_value))
+        #     QMessageBox.information(self, 'Information', msg)
+        #     self.quantity_unit_combo_box.currentIndexChanged.disconnect(select_quantity_unit)
+        #     return
+        str_value_selected_unit = str(eval(self.quantity_parameter.output_format.format(value_selected_unit)))
+        # if str_unit:
+        #     str_value += " " + str_unit
+        self.quantity_value_edit.setText(str_value_selected_unit)
+        self.quantity_previous_selected_unit = new_unit
         return
 
     def set_value(self, row):
@@ -191,7 +237,7 @@ class ParametersManagerDialog(QDialog):
             str_values = str_value.split()
             str_value = str_values[0]
             current_value = float(str_value)
-            quantity_ui_unit = ureg.Quantity
+            quantity_ui_unit = defs_pars.ureg.Quantity
             try:
                 quantity_ui_unit = quantity_ui_unit(current_value, parameter.ui_unit)
             except Exception as quantity_error:
@@ -204,6 +250,10 @@ class ParametersManagerDialog(QDialog):
             if parameter.output_format_unit:
                 str_unit = parameter.output_format_unit.format(parameter.quantity.units)
             if len(domain) == 2:
+                self.quantity_parameter = None
+                self.quantity_unit_combo_box = None
+                self.quantity_previous_selected_unit = None
+                self.quantity_value_edit = None
                 str_min_value = str(eval(parameter.output_format.format(domain[0])))
                 if str_unit:
                     str_min_value += " " + str_unit
@@ -220,32 +270,40 @@ class ParametersManagerDialog(QDialog):
                 layout.addWidget(message)
                 input_layout = QHBoxLayout()
                 unit_message = QLabel("Unit:")
-                quantity_unit_combo_box = QComboBox()
+                self.quantity_parameter = parameter
+                self.quantity_unit_combo_box = QComboBox()
                 compatible_units = parameter.get_compatible_units()
                 pos = -1
                 str_ui_unit = str(quantity_ui_unit.units)
                 for i in range(len(compatible_units)):
                     compatible_unit = compatible_units[i]
                     # str_compatible_unit = parameter.output_format_unit.format(parameter.quantity.units)
-                    quantity_unit_combo_box.addItem(compatible_unit)
+                    self.quantity_unit_combo_box.addItem(compatible_unit)
                     if compatible_unit.casefold() == str_ui_unit.casefold():
                         pos = i
-                quantity_unit_combo_box.setCurrentIndex(pos)
+                self.quantity_unit_combo_box.setCurrentIndex(pos)
+                self.quantity_previous_selected_unit = self.quantity_unit_combo_box.currentText()
+                self.quantity_unit_combo_box.currentIndexChanged.connect(self.select_quantity_unit)
                 value_message = QLabel("Value:")
-                quantity_value_edit = QLineEdit()
-                quantity_value_edit.setText(str_value)
+                self.quantity_value_edit = QLineEdit()
+                self.quantity_value_edit.setText(str_value)
                 input_layout.addWidget(unit_message)
-                input_layout.addWidget(quantity_unit_combo_box)
+                input_layout.addWidget(self.quantity_unit_combo_box)
                 input_layout.addWidget(value_message)
-                input_layout.addWidget(quantity_value_edit)
+                input_layout.addWidget(self.quantity_value_edit)
                 layout.addLayout(input_layout)
                 layout.addWidget(dialog_button_box)
                 dialog.setLayout(layout)
                 dialog_result = dialog.exec()
                 if dialog_result == QDialog.Accepted:
-                    new_str_value = quantity_value_edit.text()
-                    new_unit = quantity_unit_combo_box.currentText()
+                    new_str_value = self.quantity_value_edit.text()
+                    new_unit = self.quantity_unit_combo_box.currentText()
                     if new_str_value == str_value and new_unit == str_unit:
+                        self.quantity_unit_combo_box.currentIndexChanged.disconnect()
+                        self.quantity_parameter = None
+                        self.quantity_unit_combo_box = None
+                        self.quantity_previous_selected_unit = None
+                        self.quantity_value_edit = None
                         return
                     real_value = None
                     try:
@@ -254,14 +312,24 @@ class ParametersManagerDialog(QDialog):
                         msg = ('Value must be a real number in domain: [{}, {}]'
                                .format(str_min_value, str_max_value))
                         QMessageBox.information(self, 'Information', msg)
+                        self.quantity_unit_combo_box.currentIndexChanged.disconnect()
+                        self.quantity_parameter = None
+                        self.quantity_unit_combo_box = None
+                        self.quantity_previous_selected_unit = None
+                        self.quantity_value_edit = None
                         return
-                    quantity_selected_unit = ureg.Quantity
+                    quantity_selected_unit = defs_pars.ureg.Quantity
                     try:
                         quantity_selected_unit = quantity_selected_unit(real_value, new_unit)
                     except Exception as quantity_error:
                         str_error = (
                             'Physical Quantity Parameter: {} setting value error:\n{}'.
                             format(parameter_label, quantity_error))
+                        self.quantity_unit_combo_box.currentIndexChanged.disconnect()
+                        self.quantity_parameter = None
+                        self.quantity_unit_combo_box = None
+                        self.quantity_previous_selected_unit = None
+                        self.quantity_value_edit = None
                         return str_error
                     new_quantity_ui_unit = quantity_selected_unit.to(parameter.ui_unit)
                     new_ui_value = new_quantity_ui_unit.magnitude
@@ -269,11 +337,27 @@ class ParametersManagerDialog(QDialog):
                         msg = ('Value must be a real number in domain: [{}, {}]'
                                .format(str_min_value, str_max_value))
                         QMessageBox.information(self, 'Information', msg)
+                        self.quantity_unit_combo_box.currentIndexChanged.disconnect()
+                        self.quantity_parameter = None
+                        self.quantity_unit_combo_box = None
+                        self.quantity_previous_selected_unit = None
+                        self.quantity_value_edit = None
                         return
                     str_value = str(eval(parameter.output_format.format(new_ui_value)))
                     if str_unit:
                         str_value += " " + str_unit
                     self.tableWidget.item(row, 1).setText(str_value)
+                    self.quantity_unit_combo_box.currentIndexChanged.disconnect()
+                    self.quantity_parameter = None
+                    self.quantity_unit_combo_box = None
+                    self.quantity_previous_selected_unit = None
+                    self.quantity_value_edit = None
+                else:
+                    self.quantity_unit_combo_box.currentIndexChanged.disconnect()
+                    self.quantity_parameter = None
+                    self.quantity_unit_combo_box = None
+                    self.quantity_previous_selected_unit = None
+                    self.quantity_value_edit = None
                 # text, ok = QInputDialog.getText(self, title, msg,
                 #                                 QLineEdit.Normal, str_value)
                 # if ok:

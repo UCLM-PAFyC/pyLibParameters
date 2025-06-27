@@ -1,6 +1,27 @@
 # authors:
 # David Hernandez Lopez, david.hernandez@uclm.es
 
+from pint import UnitRegistry
+ureg = UnitRegistry()
+
+# new quantities and units definitions
+# Relative Humidity
+# ureg.define('percent = [relative_humidity] = percent')
+ureg.define('percentage = 1. * percent = percentage = pc')
+ureg.define('perunit = 100. * percent = perunit = pu')
+ureg.define('[relative_humidity] = [volume] / [volume]')
+ureg.define('percentage = [relative_humidity] = pc')
+yo1 = 'pu' in ureg
+yo2 = 'perunit' in ureg
+yo3 = 'pu' in ureg
+yo4 = 'perunit' in ureg
+quantity_hr = ureg.Quantity
+try:
+    quantity_hr = quantity_hr(30.0, 'pu')
+except Exception as quantity_error:
+    yo = 5
+compatible_units = ureg.get_compatible_units(quantity_hr.dimensionality)
+
 PARAMETERS = "parameters"
 PARAMETER_FIELD_LABEL = "label"
 PARAMETER_FIELD_DESCRIPTION = "description"
@@ -16,6 +37,7 @@ REAL_RELATIVE_TOLERANCE_DEFAULT_VALUE = 1e-9
 PARAMETER_FIELD_QUANTITY_UI_UNIT = "ui_unit"
 PARAMETER_FIELD_QUANTITY_COMPUTATION_UNIT = "computation_unit"
 PARAMETER_FIELD_QUANTITY_OUTPUT_FORMAT_UNIT = "output_format_unit"
+PARAMETER_FIELD_QUANTITY_IGNORED_UNITS = "ignored_units"
 
 parameter_common_fields = []
 parameter_common_fields.append(PARAMETER_FIELD_LABEL)
@@ -86,6 +108,7 @@ parameter_optional_fields_by_type[PARAMETER_TYPE_FILE] = []
 parameter_optional_fields_by_type[PARAMETER_TYPE_FILE].append(PARAMETER_FIELD_DOMAIN)
 parameter_optional_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY] = []
 parameter_optional_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY].append(PARAMETER_FIELD_TOLERANCE)
+parameter_optional_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY].append(PARAMETER_FIELD_QUANTITY_IGNORED_UNITS)
 
 PARAMETERS_MANAGER_DIALOG_TITLE = "Parameters Manager"
 PARAMETER_FIELD_LABEL_TAG = "Label"
@@ -108,3 +131,4 @@ parameters_manager_dialog_tooltip_by_header_tag = {}
 parameters_manager_dialog_tooltip_by_header_tag[PARAMETER_FIELD_LABEL_TAG] = PARAMETER_FIELD_LABEL_TOOLTIP
 parameters_manager_dialog_tooltip_by_header_tag[PARAMETER_FIELD_VALUE_TAG] = PARAMETER_FIELD_VALUE_TOOLTIP
 parameters_manager_dialog_tooltip_by_header_tag[PARAMETER_FIELD_DESCRIPTION_TAG] = PARAMETER_FIELD_DESCRIPTION_TOOLTIP
+
