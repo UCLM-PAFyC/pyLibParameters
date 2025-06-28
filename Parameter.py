@@ -12,6 +12,7 @@ import defs_pars
 #
 # from pint import UnitRegistry
 # ureg = UnitRegistry()
+from pint.util import UnitsContainer
 
 
 class Parameter:
@@ -761,10 +762,16 @@ class PhysicalQuantityParameter(RealParameter):
                     'Physical Quantity Parameter: {} converting to computation unit error:\n{}'.
                     format(self.label, quantity_error))
             return str_error
-        str_compatible_units = []
         compatible_units = defs_pars.ureg.get_compatible_units(quantity_ui_unit.dimensionality)
-        for unit in compatible_units:
-            str_compatible_units.append(str(unit))
+        if len(compatible_units) == 0:
+            compatible_units = []
+            str_dimensionality = str(quantity_ui_unit.dimensionality)
+            values = [k for k, v in defs_pars.ureg._cache.dimensionality.items() if
+                      v == UnitsContainer({str_dimensionality: 1})]
+            for i in range(len(values)):
+                for key in values[i]._d:
+                    if key != str_dimensionality:
+                        compatible_units.append(key)
         if output_format_unit is None:
             str_error = ('Physical Quantity Parameter output format unit is None')
             return str_error

@@ -2,25 +2,29 @@
 # David Hernandez Lopez, david.hernandez@uclm.es
 
 from pint import UnitRegistry
+from pint.util import UnitsContainer
+from pint import Unit
 ureg = UnitRegistry()
 
 # new quantities and units definitions
 # Relative Humidity
-# ureg.define('percent = [relative_humidity] = percent')
-ureg.define('percentage = 1. * percent = percentage = pc')
-ureg.define('perunit = 100. * percent = perunit = pu')
-ureg.define('[relative_humidity] = [volume] / [volume]')
+dimension_label = '[relative_humidity]'
 ureg.define('percentage = [relative_humidity] = pc')
-yo1 = 'pu' in ureg
-yo2 = 'perunit' in ureg
-yo3 = 'pu' in ureg
-yo4 = 'perunit' in ureg
-quantity_hr = ureg.Quantity
-try:
-    quantity_hr = quantity_hr(30.0, 'pu')
-except Exception as quantity_error:
-    yo = 5
-compatible_units = ureg.get_compatible_units(quantity_hr.dimensionality)
+ureg.define('perunit = 100. * percentage = perunit = pu')
+ureg._build_cache()
+values = [k for k, v in ureg._cache.dimensionality.items() if v == UnitsContainer({'[relative_humidity]': 1})]
+compatible_units = []
+for i in range(len(values)):
+    for key in values[i]._d:
+        if key != '[currency]':
+            compatible_units.append(key)
+# quantity_hr_pc = ureg.Quantity
+# try:
+#     quantity_hr_pc = quantity_hr_pc(30.0, 'percentage')
+# except Exception as quantity_error:
+#     yo = 5
+# quantity_hr_pu = quantity_hr_pc.to('perunit')
+# dimensionality_value = str(quantity_hr_pu.dimensionality)
 
 PARAMETERS = "parameters"
 PARAMETER_FIELD_LABEL = "label"
