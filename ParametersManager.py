@@ -14,6 +14,7 @@ from Parameter import *
 class ParametersManager:
     def __init__(self):
         self.parameters = None
+        self.parameters_as_list_of_dict = None
 
     def initialize(self, parameters_dictionary_list):
         str_error = ''
@@ -23,6 +24,7 @@ class ParametersManager:
             return str_error
         parameters_count = 0
         parameters = {}
+        parameters_as_list_of_dict = []
         for parameter_dict in parameters_dictionary_list:
             if not isinstance(parameter_dict, dict):
                 str_error = ('ParametersManager.initialize\n')
@@ -158,6 +160,8 @@ class ParametersManager:
                     return str_error
             str_value = str(parameter)
             parameters[parameter_label] = parameter
+            parameters_as_list_of_dict.append(parameter_dict)
             parameters_count += 1
         self.parameters = parameters
+        self.parameters_as_list_of_dict = parameters_as_list_of_dict
         return str_error

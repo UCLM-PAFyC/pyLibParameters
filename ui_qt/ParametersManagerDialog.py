@@ -59,6 +59,7 @@ class ParametersManagerDialog(QDialog):
             self.tableWidget.setHorizontalHeaderItem(i, header_item)
         self.tableWidget.itemDoubleClicked.connect(self.on_click)
         self.tableWidget.itemClicked.connect(self.on_click)
+        self.savePushButton.clicked.connect(self.save)
         self.update_gui()
         return
 
@@ -66,11 +67,12 @@ class ParametersManagerDialog(QDialog):
     def on_click(self, item):
         row = item.row()
         column = item.column()
+        if column != 1:
+            return
         current_text = item.text()
         parameter_label =  self.tableWidget.item(row, 0).text()
         label = self.tableWidget.horizontalHeaderItem(column).text()
         tool_tip_text = self.tableWidget.horizontalHeaderItem(column).toolTip()
-
         self.set_value(row)
 
         # dialog = ParameterDialog(self.parameters_manager, parameter_label, self)
@@ -86,6 +88,13 @@ class ParametersManagerDialog(QDialog):
         # # text = dialog.get_text()
         # # if text != current_text:
         # #     self.descriptionLineEdit.setText(text)
+        return
+
+    def save(self):
+        for i in range(self.tableWidget.rowCount()):
+            parameter_label = self.tableWidget.item(i, 0).text()
+            parameter_value = self.tableWidget.item(i, 1).text()
+
         return
 
     def select_quantity_unit(self):
