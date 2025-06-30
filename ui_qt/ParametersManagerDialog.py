@@ -42,6 +42,7 @@ class ParametersManagerDialog(QDialog):
         self.quantity_unit_combo_box = None
         self.quantity_previous_selected_unit = None
         self.quantity_value_edit = None
+        self.selected_parameter_label = None
         self.initialize(title)
 
     def initialize(self,
@@ -93,8 +94,15 @@ class ParametersManagerDialog(QDialog):
     def save(self):
         for i in range(self.tableWidget.rowCount()):
             parameter_label = self.tableWidget.item(i, 0).text()
-            parameter_value = self.tableWidget.item(i, 1).text()
-
+            str_value = self.tableWidget.item(i, 1).text()
+            str_error = self.parameters_manager.set_value(parameter_label, str_value)
+            if str_error:
+                str_error = ('Saving parameter: {}, value: {}\nError: {}\nError:\n{}'.
+                             format(parameter_label, str_error))
+                QMessageBox.information(self, 'Information', str_value, str_error)
+                # return
+        str_msg = ('Saving of parameters has finished')
+        QMessageBox.information(self, 'Information', str_msg)
         return
 
     def select_quantity_unit(self):
@@ -119,8 +127,8 @@ class ParametersManagerDialog(QDialog):
         except Exception as quantity_error:
             str_error = (
                 'Physical Quantity Parameter: {} setting value error:\n{}'.
-                format(parameter_label, quantity_error))
-            QMessageBox.information(self, 'Information', msg)
+                format(self.selected_parameter_label, quantity_error))
+            QMessageBox.information(self, 'Information', str_error)
             pos = self.quantity_unit_combo_box.findText(self.quantity_previous_selected_unit)
             self.quantity_unit_combo_box.setCurrentIndex(pos)
             return str_error
@@ -141,6 +149,7 @@ class ParametersManagerDialog(QDialog):
 
     def set_value(self, row):
         parameter_label =  self.tableWidget.item(row, 0).text()
+        self.selected_parameter_label = parameter_label
         str_value = self.tableWidget.item(row, 1).text()
         parameter = self.parameters_manager.parameters[parameter_label]
         title = "Input " + defs_pars.PARAMETER_FIELD_VALUE_TAG

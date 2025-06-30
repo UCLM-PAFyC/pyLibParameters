@@ -286,7 +286,7 @@ class FileParameter(Parameter):
     def set_value(self, value):
         str_error = ''
         if value is None:
-            str_error = ('Real Parameter value is None')
+            str_error = ('File Parameter value is None')
             return str_error
         if not isinstance(value, str):
             str_value = None
@@ -294,7 +294,7 @@ class FileParameter(Parameter):
                 str_value = str(value)
             except ValueError:
                 str_error = (
-                    'String Parameter: {} value must be a string and is: {}'.format(self.label, str(type(value))))
+                    'File Parameter: {} value must be a string and is: {}'.format(self.label, str(type(value))))
                 return str_error
             value = str_value
         self.value = value
@@ -738,9 +738,9 @@ class PhysicalQuantityParameter(RealParameter):
                     'Physical Quantity Parameter: {} ui unit must be a string and is: {}'.
                     format(self.label, str(type(ui_unit))))
             return str_error
-        quantity_ui_unit = None
+        quantity_ui_unit = defs_pars.ureg.Quantity
         try:
-            quantity_ui_unit = self.quantity(float_value, ui_unit)
+            quantity_ui_unit = quantity_ui_unit(float_value, ui_unit)
         except Exception as quantity_error:
             str_error = (
                     'Physical Quantity Parameter: {} initializing error:\n{}'.
@@ -808,9 +808,9 @@ class PhysicalQuantityParameter(RealParameter):
                 unit = self.ui_unit
             else:
                 unit = self.computation_unit
-        quantity_unit = None
+        quantity_unit = defs_pars.ureg.Quantity
         try:
-            quantity_unit = self.quantity(float_value, unit)
+            quantity_unit = quantity_unit(float_value, unit)
         except Exception as quantity_error:
             str_error = (
                     'Physical Quantity Parameter: {} setting value error:\n{}'.

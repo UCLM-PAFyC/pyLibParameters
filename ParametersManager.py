@@ -165,3 +165,63 @@ class ParametersManager:
         self.parameters = parameters
         self.parameters_as_list_of_dict = parameters_as_list_of_dict
         return str_error
+
+    def set_value(self, label, str_value):
+        str_error = ''
+        if not label in self.parameters:
+            str_error = ('Not exists parameter: {}'.format(label))
+        parameter = self.parameters[label]
+        parameter_str_value = str(parameter)
+        if str_value.casefold() == parameter_str_value.casefold():
+            return str_error
+        value = None
+        if isinstance(parameter, BooleanParameter):
+            value = True
+            if str_value.casefold() == ('False').casefold():
+                value = False
+            str_error = parameter.set_value(value)
+            if str_error:
+                return str_error
+        elif isinstance(parameter, DateParameter):
+            str_error = parameter.set_value(str_value, parameter.date_format)
+            if str_error:
+                return str_error
+            value = str_value
+        elif isinstance(parameter, FileParameter):
+            str_error = parameter.set_value(str_value)
+            if str_error:
+                return str_error
+            value = str_value
+        elif isinstance(parameter, IntegerParameter):
+            str_error = parameter.set_value(str_value)
+            if str_error:
+                return str_error
+            value = str_value
+        elif isinstance(parameter, PhysicalQuantityParameter):
+            str_values = str_value.split()
+            str_value = str_values[0]
+            value = float(str_value)
+            str_error = parameter.set_value(str_value)
+            if str_error:
+                return str_error
+        elif isinstance(parameter, RealParameter):
+            value = float(str_value)
+            str_error = parameter.set_value(str_value)
+            if str_error:
+                return str_error
+        elif isinstance(parameter, StringParameter):
+            str_error = parameter.set_value(str_value)
+            if str_error:
+                return str_error
+            value = str_value
+        else:
+            yo = 1
+        # if not value:
+        #     str_error = ('Not found parameter: {}'.format(label))
+        #     return str_error
+        for i in range(len(self.parameters_as_list_of_dict)):
+            parameter_label = self.parameters_as_list_of_dict[i][defs_pars.PARAMETER_FIELD_LABEL]
+            if label.casefold() == parameter_label.casefold():
+                self.parameters_as_list_of_dict[i][defs_pars.PARAMETER_FIELD_VALUE] = value
+                break
+        return str_error
