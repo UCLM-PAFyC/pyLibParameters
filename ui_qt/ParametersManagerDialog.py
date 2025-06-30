@@ -45,6 +45,11 @@ class ParametersManagerDialog(QDialog):
         self.selected_parameter_label = None
         self.initialize(title)
 
+    def accept(self):
+        self.save()
+        self.close()
+        # self.super().accept()
+
     def initialize(self,
                    title):
         self.setWindowTitle(title)
@@ -60,7 +65,8 @@ class ParametersManagerDialog(QDialog):
             self.tableWidget.setHorizontalHeaderItem(i, header_item)
         self.tableWidget.itemDoubleClicked.connect(self.on_click)
         self.tableWidget.itemClicked.connect(self.on_click)
-        self.savePushButton.clicked.connect(self.save)
+        self.dialogButtonBox.accepted.connect(self.accept)
+        self.dialogButtonBox.rejected.connect(self.reject)
         self.update_gui()
         return
 
@@ -101,8 +107,8 @@ class ParametersManagerDialog(QDialog):
                              format(parameter_label, str_error))
                 QMessageBox.information(self, 'Information', str_value, str_error)
                 # return
-        str_msg = ('Saving of parameters has finished')
-        QMessageBox.information(self, 'Information', str_msg)
+        # str_msg = ('Saving of parameters has finished')
+        # QMessageBox.information(self, 'Information', str_msg)
         return
 
     def select_quantity_unit(self):
