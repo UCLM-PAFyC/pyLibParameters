@@ -16,6 +16,39 @@ class ParametersManager:
         self.parameters = None
         self.parameters_as_list_of_dict = None
 
+    def get_process_arguments(self):
+        str_error = ''
+        arguments = []
+        for parameter_label in self.parameters:
+            parameter = self.parameters[parameter_label]
+            str_argparser = parameter.argparser.strip()
+            parameter_arg_parser = ("--{}".format(str_argparser))
+            str_value = str(parameter).strip()
+            parameter_value = None
+            if isinstance(parameter, BooleanParameter):
+                if str_value.casefold() == ('True').casefold():
+                    parameter_value = '1'
+                else:
+                    parameter_value = '0'
+            elif isinstance(parameter, DateParameter):
+                parameter_value = ('\"{}\"'.format(str_value))
+            elif isinstance(parameter, FileParameter):
+                parameter_value = ('\"{}\"'.format(str_value))
+            elif isinstance(parameter, IntegerParameter):
+                parameter_value = str_value
+            elif isinstance(parameter, PhysicalQuantityParameter):
+                parameter_value = str_value
+            elif isinstance(parameter, RealParameter):
+                parameter_value = str_value
+            elif isinstance(parameter, StringParameter):
+                parameter_value = ('\"{}\"'.format(str_value))
+            if not parameter_value:
+                str_error = ('Invalid parameter: {}'.format(parameter.label))
+                return str_error, arguments
+            arguments.append(parameter_arg_parser)
+            arguments.append(parameter_value)
+        return str_error, arguments
+
     def initialize(self, parameters_dictionary_list):
         str_error = ''
         if not isinstance(parameters_dictionary_list, list):
