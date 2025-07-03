@@ -242,33 +242,35 @@ class FileParameter(Parameter):
                 return str_error
         else:
             string_value = value
-        file_path = os.path.normcase(string_value)
-        if domain:
-            file_extension = pathlib.Path(file_path).suffix
-            valid_value = False
-            for domain_value in domain:
-                if domain_value.casefold() == file_extension.casefold():
-                    valid_value = True
-                    break
-            if not valid_value:
-                str_value = eval(self.output_format.format(string_value))
-                str_error = (
-                    'File Parameter: {} value: {} is not in domain values: {}'
-                    .format(self.label, str_value, domain))
-                return str_error
-        if (str_file_mode.casefold() == defs_pars.FILE_MODE_READ.casefold()
-                or str_file_mode.casefold() == defs_pars.FILE_MODE_APPEND.casefold()):
-            if not os.path.isfile(file_path):
-                str_error = ('File Parameter: {} not exists file for read/append:\n{}'
-                             .format(self.label, file_path))
-                return str_error
-        else:
-            if os.path.isfile(file_path):
-                os.remove(file_path)
-                if os.path.isfile(file_path):
-                    str_error = ('File Parameter: {} error removing existing file for write:\n{}'
+        file_path = ''
+        if string_value: # maybe is empty
+            file_path = os.path.normcase(string_value)
+            if domain:
+                file_extension = pathlib.Path(file_path).suffix
+                valid_value = False
+                for domain_value in domain:
+                    if domain_value.casefold() == file_extension.casefold():
+                        valid_value = True
+                        break
+                if not valid_value:
+                    str_value = eval(self.output_format.format(string_value))
+                    str_error = (
+                        'File Parameter: {} value: {} is not in domain values: {}'
+                        .format(self.label, str_value, domain))
+                    return str_error
+            if (str_file_mode.casefold() == defs_pars.FILE_MODE_READ.casefold()
+                    or str_file_mode.casefold() == defs_pars.FILE_MODE_APPEND.casefold()):
+                if not os.path.isfile(file_path):
+                    str_error = ('File Parameter: {} not exists file for read/append:\n{}'
                                  .format(self.label, file_path))
                     return str_error
+            else:
+                if os.path.isfile(file_path):
+                    os.remove(file_path)
+                    if os.path.isfile(file_path):
+                        str_error = ('File Parameter: {} error removing existing file for write:\n{}'
+                                     .format(self.label, file_path))
+                        return str_error
         self.value = file_path
         self.file_mode = str_file_mode.casefold()
         if domain:
@@ -649,6 +651,18 @@ class PhysicalQuantityParameter(RealParameter):
             if not compatible_unit in self.ignored_units:
                 compatible_units.append(str(compatible_unit))
         return compatible_units
+
+    def get_str_value_wihtout_unit(self):
+        str_value = 'None'
+        if self.quantity == None:
+            return str_value
+        computation_unit = self.quantity
+        ui_unit = computation_unit.to(self.ui_unit)
+        str_value = str(eval(self.output_format.format(ui_unit.magnitude)))
+        if self.output_format_unit:
+            str_unit = self.output_format_unit.format(ui_unit.units)
+            # str_value += " " + str_unit
+        return str_value
 
     def get_value(self, unit = '', to_ui_unit = True ):
         if not unit:

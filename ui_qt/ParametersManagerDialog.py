@@ -211,15 +211,38 @@ class ParametersManagerDialog(QDialog):
                     str_files += ("*" + parameter.domain[i])
                 str_files += ')'
             file_name = None
+            dlg = QFileDialog()
+            dlg.setWindowTitle(title)
+            dlg.setDirectory(path)
+            dlg.setNameFilter(str_files)
             if parameter.file_mode == defs_pars.FILE_MODE_READ:
-                file_name, aux = QFileDialog.getOpenFileName(self, title, path, str_files)
+                dlg.setFileMode(QFileDialog.ExistingFile)
+                # file_name, aux = QFileDialog.getOpenFileName(self, title, path, str_files)
             elif parameter.file_mode == defs_pars.FILE_MODE_APPEND:
-                file_name, aux = QFileDialog.getOpenFileName(self, title, path, str_files)
+                dlg.setFileMode(QFileDialog.ExistingFile)
+                # file_name, aux = QFileDialog.getOpenFileName(self, title, path, str_files)
             elif parameter.file_mode == defs_pars.FILE_MODE_WRITE:
-                file_name, aux = QFileDialog.getSaveFileName(self, title, path, str_files)
-            if file_name and file_name.casefold() != previous_file.casefold():
-                str_value = file_name
+                dlg.setFileMode(QFileDialog.AnyFile)
+                # file_name, aux = QFileDialog.getSaveFileName(self, title, path, str_files)
+            if dlg.exec_():
+                file_names = dlg.selectedFiles()
+                file_name = file_names[0]
+                if file_name.casefold() != previous_file.casefold():
+                    str_value = file_name
+                    self.tableWidget.item(row, 1).setText(str_value)
+            else:
+                str_value = 'None'
                 self.tableWidget.item(row, 1).setText(str_value)
+            # if parameter.file_mode == defs_pars.FILE_MODE_READ:
+            #     file_name, aux = QFileDialog.getOpenFileName(self, title, path, str_files)
+            # elif parameter.file_mode == defs_pars.FILE_MODE_APPEND:
+            #     file_name, aux = QFileDialog.getOpenFileName(self, title, path, str_files)
+            # elif parameter.file_mode == defs_pars.FILE_MODE_WRITE:
+            #     file_name, aux = QFileDialog.getSaveFileName(self, title, path, str_files)
+            # # if file_name and file_name.casefold() != previous_file.casefold():
+            # if file_name.casefold() != previous_file.casefold():
+            #     str_value = file_name
+            #     self.tableWidget.item(row, 1).setText(str_value)
             # dlg = QFileDialog()
             # # dlg.setDirectory(self.last_path)
             # if self.parameter.file_mode == defs_pars.FILE_MODE_READ:
@@ -457,7 +480,8 @@ class ParametersManagerDialog(QDialog):
             if not parameter.domain:
                 text, ok = QInputDialog.getText(self, title, defs_pars.PARAMETER_FIELD_VALUE_TAG,
                                                 QLineEdit.Normal, str_value)
-                if ok and text != '' and text != str_value:
+                # if ok and text != '' and text != str_value:
+                if ok and text != str_value:
                     self.tableWidget.item(row, 1).setText(text)
             else:
                 items = []
@@ -473,7 +497,8 @@ class ParametersManagerDialog(QDialog):
         else:
             text, ok = QInputDialog.getText(self, title, defs_pars.PARAMETER_FIELD_VALUE_TAG,
                                             QLineEdit.Normal, str_value)
-            if ok and text != '' and text != str_value:
+            # if ok and text != '' and text != str_value:
+            if ok and text != str_value:
                 self.tableWidget.item(row, 1).setText(text)
         return
 

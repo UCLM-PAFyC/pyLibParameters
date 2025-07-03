@@ -37,6 +37,7 @@ class ParametersManager:
             elif isinstance(parameter, IntegerParameter):
                 parameter_value = str_value
             elif isinstance(parameter, PhysicalQuantityParameter):
+                str_value = parameter.get_str_value_wihtout_unit()
                 parameter_value = str_value
             elif isinstance(parameter, RealParameter):
                 parameter_value = str_value
