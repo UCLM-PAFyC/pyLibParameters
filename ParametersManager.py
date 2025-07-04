@@ -31,9 +31,11 @@ class ParametersManager:
                 else:
                     parameter_value = '0'
             elif isinstance(parameter, DateParameter):
-                parameter_value = ('\"{}\"'.format(str_value))
+                # parameter_value = ('\"{}\"'.format(str_value))
+                parameter_value = ('{}'.format(str_value))
             elif isinstance(parameter, FileParameter):
-                parameter_value = ('\"{}\"'.format(str_value))
+                # parameter_value = ('\"{}\"'.format(str_value))
+                parameter_value = ('{}'.format(str_value))
             elif isinstance(parameter, IntegerParameter):
                 parameter_value = str_value
             elif isinstance(parameter, PhysicalQuantityParameter):
@@ -42,7 +44,8 @@ class ParametersManager:
             elif isinstance(parameter, RealParameter):
                 parameter_value = str_value
             elif isinstance(parameter, StringParameter):
-                parameter_value = ('\"{}\"'.format(str_value))
+                # parameter_value = ('\"{}\"'.format(str_value))
+                parameter_value = ('{}'.format(str_value))
             if not parameter_value:
                 str_error = ('Invalid parameter: {}'.format(parameter.label))
                 return str_error, arguments
