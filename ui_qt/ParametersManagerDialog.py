@@ -19,6 +19,7 @@ import defs_pars
 from ParametersManager import ParametersManager
 from Parameter import *
 from .ParameterDialog import ParameterDialog
+from ui_qt.VectorLayerFieldDialog import VectorLayerFieldDialog
 
 
 from .Tools import SimpleTextEditDialog
@@ -30,6 +31,7 @@ class ParametersManagerDialog(QDialog):
     def __init__(self,
                  parameters_manager,
                  title,
+                 qgis_iface,
                  parent=None):
         super().__init__(parent)
         loadUi(os.path.join(os.path.dirname(__file__), 'ParametersManagerDialog.ui'), self)
@@ -37,6 +39,7 @@ class ParametersManagerDialog(QDialog):
         self.parameters_manager = parameters_manager
         self.last_path = None
         self.title = title
+        self.qgis_iface = qgis_iface
         self.formats = None
         self.quantity_parameter = None
         self.quantity_unit_combo_box = None
@@ -494,6 +497,23 @@ class ParametersManagerDialog(QDialog):
                 item, ok = QInputDialog.getItem(self, title, defs_pars.PARAMETER_FIELD_VALUE_TAG, items, current_pos, False)
                 if ok and item:
                     self.tableWidget.item(row, 1).setText(item)
+        elif isinstance(parameter, VectorLayerFieldNameParameter):
+            domain = parameter.domain
+            dialog = VectorLayerFieldDialog(title, parameter_label, str_value, domain, self.qgis_iface, self)
+            dialog_result = dialog.exec()
+            if dialog_result == QDialog.Accepted:
+                str_error, new_str_value = dialog.get_value_as_string()
+                if str_error:
+                    QMessageBox.information(self, 'Information', str_error)
+                    dialog.exec()
+                if new_str_value != str_value:
+                    self.tableWidget.item(row, 1).setText(new_str_value)
+
+            # text, ok = QInputDialog.getText(self, title, defs_pars.PARAMETER_FIELD_VALUE_TAG,
+            #                                 QLineEdit.Normal, str_value)
+            # # if ok and text != '' and text != str_value:
+            # if ok and text != str_value:
+            #     self.tableWidget.item(row, 1).setText(text)
         else:
             text, ok = QInputDialog.getText(self, title, defs_pars.PARAMETER_FIELD_VALUE_TAG,
                                             QLineEdit.Normal, str_value)

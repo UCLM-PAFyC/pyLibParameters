@@ -26,6 +26,7 @@ for i in range(len(values)):
 # quantity_hr_pu = quantity_hr_pc.to('perunit')
 # dimensionality_value = str(quantity_hr_pu.dimensionality)
 
+NO_COMBO_SELECT = ' ... '
 PARAMETERS = "parameters"
 PARAMETER_FIELD_LABEL = "label"
 PARAMETER_FIELD_DESCRIPTION = "description"
@@ -42,6 +43,8 @@ PARAMETER_FIELD_QUANTITY_UI_UNIT = "ui_unit"
 PARAMETER_FIELD_QUANTITY_COMPUTATION_UNIT = "computation_unit"
 PARAMETER_FIELD_QUANTITY_OUTPUT_FORMAT_UNIT = "output_format_unit"
 PARAMETER_FIELD_QUANTITY_IGNORED_UNITS = "ignored_units"
+
+PARAMETER_PIPE_CHARACTER = "|"
 
 parameter_common_fields = []
 parameter_common_fields.append(PARAMETER_FIELD_LABEL)
@@ -62,10 +65,16 @@ PARAMETER_TYPE_FILE = 'file'
 # PARAMETER_TYPE_FILE_APPEND = 'file_append'
 PARAMETER_TYPE_FILE_MODE = 'file_mode'
 PARAMETER_TYPE_PHYSICAL_QUANTITY = 'physical_quantity'
+PARAMETER_TYPE_VECTOR_LAYER_FIELD_NAME = 'vector_layer_field_name'
 
 FILE_MODE_READ = "read"
 FILE_MODE_WRITE = "write"
 FILE_MODE_APPEND = "append"
+
+TAG_FILE_PATH = 'file_path'
+TAG_LAYER_NAME = 'layer_name'
+TAG_FIELD_NAME = 'field_name'
+
 
 # types_group = {}
 # types_group[PARAMETER_TYPE_FILE] = []
@@ -95,6 +104,9 @@ parameter_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY].append(PARAMETER_FIEL
 parameter_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY].append(PARAMETER_FIELD_QUANTITY_UI_UNIT)
 parameter_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY].append(PARAMETER_FIELD_QUANTITY_COMPUTATION_UNIT)
 parameter_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY].append(PARAMETER_FIELD_QUANTITY_OUTPUT_FORMAT_UNIT)
+parameter_fields_by_type[PARAMETER_TYPE_VECTOR_LAYER_FIELD_NAME] = []
+parameter_fields_by_type[PARAMETER_TYPE_VECTOR_LAYER_FIELD_NAME].append(PARAMETER_FIELD_DOMAIN)
+parameter_fields_by_type[PARAMETER_TYPE_VECTOR_LAYER_FIELD_NAME].append(PARAMETER_TYPE_FILE_MODE)
 
 parameter_optional_fields_by_type = {}
 parameter_optional_fields_by_type[PARAMETER_TYPE_REAL] = []
@@ -113,6 +125,7 @@ parameter_optional_fields_by_type[PARAMETER_TYPE_FILE].append(PARAMETER_FIELD_DO
 parameter_optional_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY] = []
 parameter_optional_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY].append(PARAMETER_FIELD_TOLERANCE)
 parameter_optional_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY].append(PARAMETER_FIELD_QUANTITY_IGNORED_UNITS)
+parameter_optional_fields_by_type[PARAMETER_TYPE_VECTOR_LAYER_FIELD_NAME] = []
 
 PARAMETERS_MANAGER_DIALOG_TITLE = "Parameters Manager"
 PARAMETER_FIELD_LABEL_TAG = "Label"

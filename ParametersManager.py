@@ -195,6 +195,20 @@ class ParametersManager:
                     str_error = ('ParametersManager.initialize\n')
                     str_error += str_aux_error
                     return str_error
+            elif parameter_type == defs_pars.PARAMETER_TYPE_VECTOR_LAYER_FIELD_NAME:
+                parameter_file_mode = parameter_fields[defs_pars.PARAMETER_FIELD_FILE_MODE]
+                parameter = VectorLayerFieldNameParameter(parameter_label, parameter_argparser, parameter_description,
+                                                          parameter_output_format)
+                parameter_value = parameter_fields[defs_pars.PARAMETER_FIELD_VALUE]
+                parameter_domain = None
+                if defs_pars.PARAMETER_FIELD_DOMAIN in parameter_fields:
+                    parameter_domain = parameter_fields[defs_pars.PARAMETER_FIELD_DOMAIN]
+                str_aux_error = parameter.initialize(parameter_value, parameter_file_mode, parameter_domain)
+                if str_aux_error:
+                    str_error = ('ParametersManager.initialize\n')
+                    str_error += str_aux_error
+                    return str_error
+
             str_value = str(parameter)
             parameters[parameter_label] = parameter
             parameters_as_list_of_dict.append(parameter_dict)
@@ -251,6 +265,11 @@ class ParametersManager:
             if str_error:
                 return str_error
             value = str_value
+        elif isinstance(parameter, VectorLayerFieldNameParameter):
+            value = json.loads(str_value)
+            str_error = parameter.set_value(value)
+            if str_error:
+                return str_error
         else:
             yo = 1
         # if not value:
