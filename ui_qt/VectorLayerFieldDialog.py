@@ -24,6 +24,7 @@ from pyLibCRSs import CRSsDefines as defs_crs
 from pyLibCRSs.CRSsTools import CRSsTools
 from pyLibGDAL.GpkgTools import GpkgTools
 from pyLibGDAL import defs_gdal
+from pyLibGDAL.GDALTools import GDALTools
 
 from .Tools import SimpleTextEditDialog
 
@@ -58,6 +59,21 @@ class VectorLayerFieldDialog(QDialog):
         return
 
     def file_changed(self):
+        file_path = self.fileComboBox.currentText()
+        self.layerComboBox.clear()
+        self.layerComboBox.addItem(defs_pars.NO_COMBO_SELECT)
+        self.layerComboBox.setEnabled(False)
+        self.fieldComboBox.clear()
+        self.fieldComboBox.addItem(defs_pars.NO_COMBO_SELECT)
+        self.fieldComboBox.setEnabled(False)
+        self.newLayerPushButton.setEnabled(False)
+        self.newFieldPushButton.setEnabled(False)
+        if file_path == defs_pars.NO_COMBO_SELECT:
+            return
+        str_error, driver_name = GDALTools.get_driver_name_from_file(file_path)
+        if str_error:
+            QMessageBox.information(self, 'Information', str_error)
+            self.fileComboBox.setCurrentIndex(0)
         return
 
     def get_value_as_string(self):
@@ -136,22 +152,7 @@ class VectorLayerFieldDialog(QDialog):
         return str_error
 
     def layer_changed(self):
-        file_path = self.fileComboBox.currentText()
-        self.layerComboBox.clear()
-        self.layerComboBox.addItem(defs_pars.NO_COMBO_SELECT)
-        self.layerComboBox.setEnabled(False)
-        self.fieldComboBox.clear()
-        self.fieldComboBox.addItem(defs_pars.NO_COMBO_SELECT)
-        self.fieldComboBox.setEnabled(False)
-        self.newLayerPushButton.setEnabled(False)
-        self.newFieldPushButton.setEnabled(False)
-        if file_path == defs_pars.NO_COMBO_SELECT:
-            return
-        else:
-            if self.qgis_iface:
-                self.lsaLoadInQgisPushButton.setEnabled(True)
-            self.lsaResultsPushButton.setEnabled(True)
-            self.lsaRemovePushButton.setEnabled(True)
+
         return
 
     def new_field(self):
