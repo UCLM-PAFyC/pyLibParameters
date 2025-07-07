@@ -50,9 +50,34 @@ class VectorLayerFieldDialog(QDialog):
         self.file_path = None
         self.layer_name = None
         self.field_name = None
+        self.last_path = None
         self.initialize(str_value)
 
     def add_file(self):
+        last_path = self.last_path
+        if not last_path:
+            previous_file_path = self.fileComboBox.currentText()
+            if previous_file_path != defs_pars.NO_COMBO_SELECT:
+                last_path = QFileInfo(previous_file_path).absolutePath()
+            else:
+                last_path = QDir.currentPath()
+        title = "Select Vector File"
+        dlg = QFileDialog()
+        dlg.setDirectory(last_path)
+        # dlg.setFileMode(QFileDialog.AnyFile)
+        dlg.setFileMode(QFileDialog.ExistingFiles)
+        dlg.setNameFilter("Vector File (*.*)")
+        if dlg.exec_():
+            file_names = dlg.selectedFiles()
+            file_name = file_names[0]
+        else:
+            return
+        if file_name:
+            self.last_path = QFileInfo(file_name).absolutePath()
+            # self.settings.setValue("last_path", self.last_path)
+            # self.settings.sync()
+            self.fileComboBox.addItem(file_name)
+            self.fileComboBox.setCurrentText(file_name)
         return
 
     def field_changed(self):
@@ -74,11 +99,40 @@ class VectorLayerFieldDialog(QDialog):
         if str_error:
             QMessageBox.information(self, 'Information', str_error)
             self.fileComboBox.setCurrentIndex(0)
+        str_error, layer_names = GDALTools.get_layers_names(file_path)
+        if str_error:
+            QMessageBox.information(self, 'Information', str_error)
+            self.fileComboBox.setCurrentIndex(0)
+        if len(layer_names) == 0:
+            str_error = ('There are no layers in:\n{}'.format(file_path))
+            QMessageBox.information(self, 'Information', str_error)
+            self.fileComboBox.setCurrentIndex(0)
+        for i in range(len(layer_names)):
+            layer_name = layer_names[i]
+            self.layerComboBox.addItem(layer_name)
+        self.layerComboBox.setEnabled(True)
+        self.layerComboBox.setCurrentIndex(0)
         return
 
     def get_value_as_string(self):
         str_error = ''
-        str_error = 'kakita del to'
+        str_value = ''
+        file_path = self.fileComboBox.currentText()
+        if file_path == defs_pars.NO_COMBO_SELECT:
+            str_error = ('No file selected')
+            return str_error
+        layer_name = self.layerComboBox.currentText()
+        if layer_name == defs_pars.NO_COMBO_SELECT:
+            str_error = ('No layer selected')
+            return str_error
+        field_name = self.fieldComboBox.currentText()
+        if field_name == defs_pars.NO_COMBO_SELECT:
+            str_error = ('No field selected')
+            return str_error
+        self.value_as_dict[defs_pars.TAG_FILE_PATH] = file_path
+        self.value_as_dict[defs_pars.TAG_LAYER_NAME] = layer_name
+        self.value_as_dict[defs_pars.TAG_FIELD_NAME] = field_name
+        self.value_as_string = json.dumps(self.value_as_dict)
         return str_error, self.value_as_string
 
     def initialize(self, str_value):
@@ -152,7 +206,28 @@ class VectorLayerFieldDialog(QDialog):
         return str_error
 
     def layer_changed(self):
-
+        file_path = self.fileComboBox.currentText()
+        self.fieldComboBox.clear()
+        self.fieldComboBox.addItem(defs_pars.NO_COMBO_SELECT)
+        self.fieldComboBox.setEnabled(False)
+        self.newFieldPushButton.setEnabled(False)
+        layer_name = self.layerComboBox.currentText()
+        if not layer_name or layer_name == defs_pars.NO_COMBO_SELECT:
+            return
+        str_error, field_names = GDALTools.get_layer_field_names(file_path, layer_name)
+        if str_error:
+            QMessageBox.information(self, 'Information', str_error)
+            self.fileComboBox.setCurrentIndex(0)
+        if len(field_names) == 0:
+            str_error = ('There are no fields in layer: {}\nin file:\n{}'.format(layer_name, file_path))
+            QMessageBox.information(self, 'Information', str_error)
+            self.layerComboBox.setCurrentIndex(0)
+        for i in range(len(field_names)):
+            field_name = field_names[i]
+            self.fieldComboBox.addItem(field_name)
+        self.fieldComboBox.setEnabled(True)
+        self.fieldComboBox.currentIndexChanged.connect(self.field_changed)
+        self.fieldComboBox.setCurrentIndex(0)
         return
 
     def new_field(self):
