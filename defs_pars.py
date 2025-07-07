@@ -73,6 +73,7 @@ FILE_MODE_APPEND = "append"
 
 TAG_FILE_PATH = 'file_path'
 TAG_LAYER_NAME = 'layer_name'
+TAG_LAYER_GEOMETRY_TYPE = 'layer_geometry_type'
 TAG_FIELD_NAME = 'field_name'
 
 

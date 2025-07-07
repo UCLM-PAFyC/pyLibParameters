@@ -32,14 +32,15 @@ class ParametersManagerDialog(QDialog):
                  parameters_manager,
                  title,
                  qgis_iface,
+                 settings,
                  parent=None):
         super().__init__(parent)
         loadUi(os.path.join(os.path.dirname(__file__), 'ParametersManagerDialog.ui'), self)
         # loadUi("lib/InstrumentsDialog.ui", self)
         self.parameters_manager = parameters_manager
-        self.last_path = None
         self.title = title
         self.qgis_iface = qgis_iface
+        self.settings = settings
         self.formats = None
         self.quantity_parameter = None
         self.quantity_unit_combo_box = None
@@ -232,6 +233,9 @@ class ParametersManagerDialog(QDialog):
                 file_name = file_names[0]
                 if file_name.casefold() != previous_file.casefold():
                     str_value = file_name
+                    last_path = QFileInfo(file_name).absolutePath()
+                    self.settings.setValue("last_path", last_path)
+                    self.settings.sync()
                     self.tableWidget.item(row, 1).setText(str_value)
             else:
                 str_value = 'None'
@@ -499,7 +503,11 @@ class ParametersManagerDialog(QDialog):
                     self.tableWidget.item(row, 1).setText(item)
         elif isinstance(parameter, VectorLayerFieldNameParameter):
             domain = parameter.domain
-            dialog = VectorLayerFieldDialog(title, parameter_label, str_value, domain, self.qgis_iface, self)
+            dialog = VectorLayerFieldDialog(title, parameter_label, str_value, domain, 
+                                            self.qgis_iface, self.settings,  self)
+            if dialog.str_error:
+                QMessageBox.information(self, 'Information', str_error)
+                return
             dialog_result = dialog.exec()
             if dialog_result == QDialog.Accepted:
                 str_error, new_str_value = dialog.get_value_as_string()
@@ -508,12 +516,6 @@ class ParametersManagerDialog(QDialog):
                     dialog.exec()
                 if new_str_value != str_value:
                     self.tableWidget.item(row, 1).setText(new_str_value)
-
-            # text, ok = QInputDialog.getText(self, title, defs_pars.PARAMETER_FIELD_VALUE_TAG,
-            #                                 QLineEdit.Normal, str_value)
-            # # if ok and text != '' and text != str_value:
-            # if ok and text != str_value:
-            #     self.tableWidget.item(row, 1).setText(text)
         else:
             text, ok = QInputDialog.getText(self, title, defs_pars.PARAMETER_FIELD_VALUE_TAG,
                                             QLineEdit.Normal, str_value)
