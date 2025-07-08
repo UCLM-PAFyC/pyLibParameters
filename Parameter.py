@@ -17,7 +17,7 @@ from pint.util import UnitsContainer
 
 
 class Parameter:
-    def __init__(self, label, argparser, description, output_format, mandatory = True, enabled = True):
+    def __init__(self, label, argparser, description, output_format, mandatory, enabled = True):
         self.label = label
         self.argparser = argparser
         self.description = description
@@ -64,7 +64,7 @@ class Parameter:
 
 
 class BooleanParameter(Parameter):
-    def __init__(self, label, description, output_format, mandatory = True, enabled = True):
+    def __init__(self, label, description, output_format, mandatory, enabled = True):
         super().__init__(label, description, output_format, mandatory, enabled)
 
     def get_value(self):
@@ -117,7 +117,7 @@ class BooleanParameter(Parameter):
 
 
 class DateParameter(Parameter):
-    def __init__(self, label, description, output_format, mandatory = True, enabled = True):
+    def __init__(self, label, description, output_format, mandatory, enabled = True):
         super().__init__(label, description, output_format, mandatory, enabled)
 
     def get_value(self):
@@ -206,7 +206,7 @@ class DateParameter(Parameter):
 
 
 class FileParameter(Parameter):
-    def __init__(self, label, description, output_format, mandatory = True, enabled = True):
+    def __init__(self, label, description, output_format, mandatory, enabled = True):
         super().__init__(label, description, output_format, mandatory, enabled)
 
     def get_value(self):
@@ -307,7 +307,7 @@ class FileParameter(Parameter):
 
 
 class IntegerParameter(Parameter):
-    def __init__(self, label, description, output_format, mandatory = True, enabled = True):
+    def __init__(self, label, description, output_format, mandatory, enabled = True):
         super().__init__(label, description, output_format, mandatory, enabled)
         self.domain = None
 
@@ -403,7 +403,7 @@ class IntegerParameter(Parameter):
 
 
 class PathParameter(Parameter):
-    def __init__(self, label, description, output_format, mandatory = True, enabled = True):
+    def __init__(self, label, description, output_format, mandatory, enabled = True):
         super().__init__(label, description, output_format, mandatory, enabled)
 
     def get_value(self):
@@ -427,7 +427,7 @@ class PathParameter(Parameter):
 
 
 class RealParameter(Parameter):
-    def __init__(self, label, description, output_format, mandatory = True, enabled = True):
+    def __init__(self, label, description, output_format, mandatory, enabled = True):
         super().__init__(label, description, output_format, mandatory, enabled)
         self.domain = None
         self.tol = defs_pars.REAL_RELATIVE_TOLERANCE_DEFAULT_VALUE
@@ -565,7 +565,7 @@ class RealParameter(Parameter):
 
 
 class StringParameter(Parameter):
-    def __init__(self, label, description, output_format, mandatory = True, enabled = True):
+    def __init__(self, label, description, output_format, mandatory, enabled = True):
         super().__init__(label, description, output_format, mandatory, enabled)
         self.domain = None
 
@@ -638,7 +638,7 @@ class StringParameter(Parameter):
         return str_error
 
 class PhysicalQuantityParameter(RealParameter):
-    def __init__(self, label, description, output_format, mandatory = True, enabled = True):
+    def __init__(self, label, description, output_format, mandatory, enabled = True):
         super().__init__(label, description, output_format, mandatory, enabled)
         self.domain = None
         self.tol = defs_pars.REAL_RELATIVE_TOLERANCE_DEFAULT_VALUE
@@ -914,7 +914,7 @@ class PhysicalQuantityParameter(RealParameter):
 
 
 class VectorLayerFieldNameParameter(Parameter):
-    def __init__(self, label, description, output_format, mandatory = True, enabled = True):
+    def __init__(self, label, description, output_format, mandatory, enabled = True):
         super().__init__(label, description, output_format, mandatory, enabled)
 
     def get_value(self):

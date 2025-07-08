@@ -503,10 +503,11 @@ class ParametersManagerDialog(QDialog):
                     self.tableWidget.item(row, 1).setText(item)
         elif isinstance(parameter, VectorLayerFieldNameParameter):
             domain = parameter.domain
-            dialog = VectorLayerFieldDialog(title, parameter_label, str_value, domain, 
+            mandatory = parameter.mandatory
+            dialog = VectorLayerFieldDialog(title, parameter_label, str_value, domain, mandatory,
                                             self.qgis_iface, self.settings,  self)
             if dialog.str_error:
-                QMessageBox.information(self, 'Information', str_error)
+                QMessageBox.information(self, 'Information', dialog.str_error)
                 return
             dialog_result = dialog.exec()
             if dialog_result == QDialog.Accepted:

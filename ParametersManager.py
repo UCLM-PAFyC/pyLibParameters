@@ -106,13 +106,20 @@ class ParametersManager:
             parameter_label = parameter_fields[defs_pars.PARAMETER_FIELD_LABEL]
             parameter_argparser = parameter_fields[defs_pars.PARAMETER_FIELD_ARGPARSER]
             parameter_description = parameter_fields[defs_pars.PARAMETER_FIELD_DESCRIPTION]
+            parameter_mandatory = parameter_fields[defs_pars.PARAMETER_FIELD_MANDATORY]
             parameter_output_format = parameter_fields[defs_pars.PARAMETER_FIELD_OUTPUT_FORMAT]
             relative_tolerance = defs_pars.REAL_RELATIVE_TOLERANCE_DEFAULT_VALUE
             if defs_pars.PARAMETER_FIELD_TOLERANCE in parameter_fields:
                 relative_tolerance = parameter_fields[defs_pars.PARAMETER_FIELD_TOLERANCE]
+            parameter_value = parameter_fields[defs_pars.PARAMETER_FIELD_VALUE]
+            if not parameter_value and parameter_mandatory:
+                if defs_pars.PARAMETER_FIELD_TOLERANCE in parameter_fields:
+                    str_error = ('ParametersManager.initialize\n')
+                    str_error += ("No valud for mandatory parameter: {}".format(parameter_label))
+                    return str_error
             if parameter_type.casefold() == defs_pars.PARAMETER_TYPE_BOOLEAN.casefold():
                 parameter = BooleanParameter(parameter_label, parameter_argparser, parameter_description,
-                                             parameter_output_format)
+                                             parameter_output_format, parameter_mandatory)
                 parameter_value = parameter_fields[defs_pars.PARAMETER_FIELD_VALUE]
                 str_aux_error = parameter.initialize(parameter_value)
                 if str_aux_error:
@@ -122,7 +129,7 @@ class ParametersManager:
             elif parameter_type == defs_pars.PARAMETER_TYPE_FILE:
                 parameter_file_mode = parameter_fields[defs_pars.PARAMETER_FIELD_FILE_MODE]
                 parameter = FileParameter(parameter_label, parameter_argparser, parameter_description,
-                                          parameter_output_format)
+                                          parameter_output_format, parameter_mandatory)
                 parameter_value = parameter_fields[defs_pars.PARAMETER_FIELD_VALUE]
                 parameter_domain = None
                 if defs_pars.PARAMETER_FIELD_DOMAIN in parameter_fields:
@@ -134,7 +141,7 @@ class ParametersManager:
                     return str_error
             elif parameter_type.casefold() == defs_pars.PARAMETER_TYPE_INTEGER.casefold():
                 parameter = IntegerParameter(parameter_label, parameter_argparser, parameter_description,
-                                             parameter_output_format)
+                                             parameter_output_format, parameter_mandatory)
                 parameter_value = parameter_fields[defs_pars.PARAMETER_FIELD_VALUE]
                 parameter_domain = parameter_fields[defs_pars.PARAMETER_FIELD_DOMAIN]
                 str_aux_error = parameter.initialize(parameter_value, parameter_domain)
@@ -144,7 +151,7 @@ class ParametersManager:
                     return str_error
             elif parameter_type.casefold() == defs_pars.PARAMETER_TYPE_REAL.casefold():
                 parameter = RealParameter(parameter_label, parameter_argparser, parameter_description,
-                                          parameter_output_format)
+                                          parameter_output_format, parameter_mandatory)
                 parameter_value = parameter_fields[defs_pars.PARAMETER_FIELD_VALUE]
                 parameter_domain = parameter_fields[defs_pars.PARAMETER_FIELD_DOMAIN]
                 str_aux_error = parameter.initialize(parameter_value, parameter_domain, relative_tolerance)
@@ -154,7 +161,7 @@ class ParametersManager:
                     return str_error
             elif parameter_type.casefold() == defs_pars.PARAMETER_TYPE_STRING.casefold():
                 parameter = StringParameter(parameter_label, parameter_argparser, parameter_description,
-                                            parameter_output_format)
+                                            parameter_output_format, parameter_mandatory)
                 parameter_value = parameter_fields[defs_pars.PARAMETER_FIELD_VALUE]
                 parameter_domain = None
                 if defs_pars.PARAMETER_FIELD_DOMAIN in parameter_fields:
@@ -166,7 +173,7 @@ class ParametersManager:
                     return str_error
             elif parameter_type.casefold() == defs_pars.PARAMETER_TYPE_DATE.casefold():
                 parameter = DateParameter(parameter_label, parameter_argparser, parameter_description,
-                                            parameter_output_format)
+                                            parameter_output_format, parameter_mandatory)
                 parameter_value = parameter_fields[defs_pars.PARAMETER_FIELD_VALUE]
                 parameter_date_format = parameter_fields[defs_pars.PARAMETER_FIELD_DATE_FORMAT]
                 str_aux_error = parameter.initialize(parameter_value, parameter_date_format)
@@ -176,7 +183,7 @@ class ParametersManager:
                     return str_error
             elif parameter_type.casefold() == defs_pars.PARAMETER_TYPE_PHYSICAL_QUANTITY.casefold():
                 parameter = PhysicalQuantityParameter(parameter_label, parameter_argparser, parameter_description,
-                                                      parameter_output_format)
+                                                      parameter_output_format, parameter_mandatory)
                 parameter_value = parameter_fields[defs_pars.PARAMETER_FIELD_VALUE]
                 parameter_domain = parameter_fields[defs_pars.PARAMETER_FIELD_DOMAIN]
                 parameter_ui_unit = parameter_fields[defs_pars.PARAMETER_FIELD_QUANTITY_UI_UNIT]
@@ -198,7 +205,7 @@ class ParametersManager:
             elif parameter_type == defs_pars.PARAMETER_TYPE_VECTOR_LAYER_FIELD_NAME:
                 parameter_file_mode = parameter_fields[defs_pars.PARAMETER_FIELD_FILE_MODE]
                 parameter = VectorLayerFieldNameParameter(parameter_label, parameter_argparser, parameter_description,
-                                                          parameter_output_format)
+                                                          parameter_output_format, parameter_mandatory)
                 parameter_value = parameter_fields[defs_pars.PARAMETER_FIELD_VALUE]
                 parameter_domain = None
                 if defs_pars.PARAMETER_FIELD_DOMAIN in parameter_fields:
