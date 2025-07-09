@@ -180,32 +180,32 @@ class VectorLayerDialog(QDialog):
             if not value:
                 return str_error
             if not defs_pars.TAG_FILE_PATH in value:
-                str_error = ('Vector Layer Field Name Parameter: {} value must contain {}'
+                str_error = ('Vector Layer Parameter: {} value must contain {}'
                              .format(self.label, defs_pars.TAG_FILE_PATH))
                 return str_error
             self.file_path = value[defs_pars.TAG_FILE_PATH]
             if not defs_pars.TAG_LAYER_NAME in value:
-                str_error = ('Vector Layer Field Name Parameter: {} value must contain {}'
+                str_error = ('Vector Layer Parameter: {} value must contain {}'
                              .format(self.label, defs_pars.TAG_LAYER_NAME))
                 return str_error
             self.layer_name = value[defs_pars.TAG_LAYER_NAME]
             if not defs_pars.TAG_LAYER_GEOMETRY_TYPE in value:
-                str_error = ('Vector Layer Field Name Parameter: {} value must contain {}'
+                str_error = ('Vector Layer Parameter: {} value must contain {}'
                              .format(self.label, defs_pars.TAG_LAYER_GEOMETRY_TYPE))
                 return str_error
             layer_geometry_type = value[defs_pars.TAG_LAYER_GEOMETRY_TYPE]
             if not isinstance(layer_geometry_type, list):
-                str_error = ('Vector Layer Field Name Parameter: {} layer geometry type must be a list and is: {}'
+                str_error = ('Vector Layer Parameter: {} layer geometry type must be a list and is: {}'
                              .format(self.label, str(type(layer_geometry_type))))
                 return str_error
             for i in range(len(layer_geometry_type)):
                 str_layer_geometry_type = layer_geometry_type[i]
                 if not isinstance(str_layer_geometry_type, str):
-                    str_error = ('Vector Layer Field Name Parameter: {} each layer geometry type value in list must be a string and is: {}'
+                    str_error = ('Vector Layer Parameter: {} each layer geometry type value in list must be a string and is: {}'
                                  .format(self.label, str(type(str_layer_geometry_type))))
                     return str_error
                 if not str_layer_geometry_type in defs_gdal.geometry_type_by_name:
-                    str_error = ('Vector Layer Field Name Parameter: {} not valid geometry type: {}'
+                    str_error = ('Vector Layer Parameter: {} not valid geometry type: {}'
                                  .format(self.label, str_layer_geometry_type))
                     return str_error
                 self.layer_geometry_ogr_wkb_type.append(defs_gdal.geometry_type_by_name[str_layer_geometry_type])

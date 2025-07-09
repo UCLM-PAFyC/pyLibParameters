@@ -202,6 +202,19 @@ class ParametersManager:
                     str_error = ('ParametersManager.initialize\n')
                     str_error += str_aux_error
                     return str_error
+            elif parameter_type == defs_pars.PARAMETER_TYPE_RASTER_LAYER:
+                parameter_file_mode = parameter_fields[defs_pars.PARAMETER_FIELD_FILE_MODE]
+                parameter = RasterLayerParameter(parameter_label, parameter_argparser, parameter_description,
+                                                 parameter_output_format, parameter_mandatory)
+                parameter_value = parameter_fields[defs_pars.PARAMETER_FIELD_VALUE]
+                parameter_domain = None
+                if defs_pars.PARAMETER_FIELD_DOMAIN in parameter_fields:
+                    parameter_domain = parameter_fields[defs_pars.PARAMETER_FIELD_DOMAIN]
+                str_aux_error = parameter.initialize(parameter_value, parameter_file_mode, parameter_domain)
+                if str_aux_error:
+                    str_error = ('ParametersManager.initialize\n')
+                    str_error += str_aux_error
+                    return str_error
             elif parameter_type == defs_pars.PARAMETER_TYPE_VECTOR_LAYER:
                 parameter_file_mode = parameter_fields[defs_pars.PARAMETER_FIELD_FILE_MODE]
                 parameter = VectorLayerParameter(parameter_label, parameter_argparser, parameter_description,

@@ -69,6 +69,7 @@ PARAMETER_TYPE_FILE_MODE = 'file_mode'
 PARAMETER_TYPE_PHYSICAL_QUANTITY = 'physical_quantity'
 PARAMETER_TYPE_VECTOR_LAYER_FIELD_NAME = 'vector_layer_field_name'
 PARAMETER_TYPE_VECTOR_LAYER = 'vector_layer'
+PARAMETER_TYPE_RASTER_LAYER = 'raster_layer'
 
 FILE_MODE_READ = "read"
 FILE_MODE_WRITE = "write"
@@ -78,6 +79,13 @@ TAG_FILE_PATH = 'file_path'
 TAG_LAYER_NAME = 'layer_name'
 TAG_LAYER_GEOMETRY_TYPE = 'layer_geometry_type'
 TAG_FIELD_NAME = 'field_name'
+TAG_LAYER_INDEX = 'layer_index'
+TAG_SCALE = 'scale'
+TAG_OFFSET = 'offset'
+SCALE_DEFAULT_VALUE = 1.0
+OFFSET_DEFAULT_VALUE = 0.0
+SCALE_STRING_FORMAT = '{:.2E}'
+OFFSET_STRING_FORMAT = '{:.2E}'
 
 
 # types_group = {}
@@ -114,6 +122,9 @@ parameter_fields_by_type[PARAMETER_TYPE_VECTOR_LAYER_FIELD_NAME].append(PARAMETE
 parameter_fields_by_type[PARAMETER_TYPE_VECTOR_LAYER] = []
 parameter_fields_by_type[PARAMETER_TYPE_VECTOR_LAYER].append(PARAMETER_FIELD_DOMAIN)
 parameter_fields_by_type[PARAMETER_TYPE_VECTOR_LAYER].append(PARAMETER_TYPE_FILE_MODE)
+parameter_fields_by_type[PARAMETER_TYPE_RASTER_LAYER] = []
+parameter_fields_by_type[PARAMETER_TYPE_RASTER_LAYER].append(PARAMETER_FIELD_DOMAIN)
+parameter_fields_by_type[PARAMETER_TYPE_RASTER_LAYER].append(PARAMETER_TYPE_FILE_MODE)
 
 parameter_optional_fields_by_type = {}
 parameter_optional_fields_by_type[PARAMETER_TYPE_REAL] = []
@@ -134,6 +145,7 @@ parameter_optional_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY].append(PARAM
 parameter_optional_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY].append(PARAMETER_FIELD_QUANTITY_IGNORED_UNITS)
 parameter_optional_fields_by_type[PARAMETER_TYPE_VECTOR_LAYER_FIELD_NAME] = []
 parameter_optional_fields_by_type[PARAMETER_TYPE_VECTOR_LAYER] = []
+parameter_optional_fields_by_type[PARAMETER_TYPE_RASTER_LAYER] = []
 
 PARAMETERS_MANAGER_DIALOG_TITLE = "Parameters Manager"
 PARAMETER_FIELD_LABEL_TAG = "Label"
