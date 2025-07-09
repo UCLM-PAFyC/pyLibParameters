@@ -68,6 +68,7 @@ PARAMETER_TYPE_FILE = 'file'
 PARAMETER_TYPE_FILE_MODE = 'file_mode'
 PARAMETER_TYPE_PHYSICAL_QUANTITY = 'physical_quantity'
 PARAMETER_TYPE_VECTOR_LAYER_FIELD_NAME = 'vector_layer_field_name'
+PARAMETER_TYPE_VECTOR_LAYER = 'vector_layer'
 
 FILE_MODE_READ = "read"
 FILE_MODE_WRITE = "write"
@@ -110,6 +111,9 @@ parameter_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY].append(PARAMETER_FIEL
 parameter_fields_by_type[PARAMETER_TYPE_VECTOR_LAYER_FIELD_NAME] = []
 parameter_fields_by_type[PARAMETER_TYPE_VECTOR_LAYER_FIELD_NAME].append(PARAMETER_FIELD_DOMAIN)
 parameter_fields_by_type[PARAMETER_TYPE_VECTOR_LAYER_FIELD_NAME].append(PARAMETER_TYPE_FILE_MODE)
+parameter_fields_by_type[PARAMETER_TYPE_VECTOR_LAYER] = []
+parameter_fields_by_type[PARAMETER_TYPE_VECTOR_LAYER].append(PARAMETER_FIELD_DOMAIN)
+parameter_fields_by_type[PARAMETER_TYPE_VECTOR_LAYER].append(PARAMETER_TYPE_FILE_MODE)
 
 parameter_optional_fields_by_type = {}
 parameter_optional_fields_by_type[PARAMETER_TYPE_REAL] = []
@@ -129,6 +133,7 @@ parameter_optional_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY] = []
 parameter_optional_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY].append(PARAMETER_FIELD_TOLERANCE)
 parameter_optional_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY].append(PARAMETER_FIELD_QUANTITY_IGNORED_UNITS)
 parameter_optional_fields_by_type[PARAMETER_TYPE_VECTOR_LAYER_FIELD_NAME] = []
+parameter_optional_fields_by_type[PARAMETER_TYPE_VECTOR_LAYER] = []
 
 PARAMETERS_MANAGER_DIALOG_TITLE = "Parameters Manager"
 PARAMETER_FIELD_LABEL_TAG = "Label"

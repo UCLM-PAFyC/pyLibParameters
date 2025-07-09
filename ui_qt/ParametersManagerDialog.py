@@ -20,6 +20,7 @@ from ParametersManager import ParametersManager
 from Parameter import *
 from .ParameterDialog import ParameterDialog
 from ui_qt.VectorLayerFieldDialog import VectorLayerFieldDialog
+from ui_qt.VectorLayerDialog import VectorLayerDialog
 
 
 from .Tools import SimpleTextEditDialog
@@ -162,6 +163,7 @@ class ParametersManagerDialog(QDialog):
         self.selected_parameter_label = parameter_label
         str_value = self.tableWidget.item(row, 1).text()
         parameter = self.parameters_manager.parameters[parameter_label]
+        mandatory = parameter.mandatory
         title = "Input " + defs_pars.PARAMETER_FIELD_VALUE_TAG
         if isinstance(parameter, BooleanParameter):
             items = ['True', 'False']
@@ -200,6 +202,10 @@ class ParametersManagerDialog(QDialog):
                 new_day = new_qdate.day()
                 new_date = datetime.date(new_year, new_month, new_day)
                 str_value = new_date.strftime(parameter.date_format)
+                if not str_value and mandatory:
+                    msg = ('Parameter: {} is mandatory'.format(parameter_label))
+                    QMessageBox.information(self, 'Information', msg)
+                    self.set_value(row)
                 self.tableWidget.item(row, 1).setText(str_value)
         elif isinstance(parameter, FileParameter):
             previous_file = str_value
@@ -233,13 +239,21 @@ class ParametersManagerDialog(QDialog):
                 file_name = file_names[0]
                 if file_name.casefold() != previous_file.casefold():
                     str_value = file_name
+                    if not str_value and mandatory:
+                        msg = ('Parameter: {} is mandatory'.format(parameter_label))
+                        QMessageBox.information(self, 'Information', msg)
+                        self.set_value(row)
                     last_path = QFileInfo(file_name).absolutePath()
                     self.settings.setValue("last_path", last_path)
                     self.settings.sync()
                     self.tableWidget.item(row, 1).setText(str_value)
             else:
-                str_value = 'None'
-                self.tableWidget.item(row, 1).setText(str_value)
+                if not str_value and mandatory:
+                    msg = ('Parameter: {} is mandatory'.format(parameter_label))
+                    QMessageBox.information(self, 'Information', msg)
+                    self.set_value(row)
+                # str_value = 'None'
+                # self.tableWidget.item(row, 1).setText(str_value)
             # if parameter.file_mode == defs_pars.FILE_MODE_READ:
             #     file_name, aux = QFileDialog.getOpenFileName(self, title, path, str_files)
             # elif parameter.file_mode == defs_pars.FILE_MODE_APPEND:
@@ -275,6 +289,10 @@ class ParametersManagerDialog(QDialog):
                                                            current_value, domain[0], domain[1], 1)
                 if ok:
                     str_value = str(eval(parameter.output_format.format(int_value)))
+                    if not str_value and mandatory:
+                        msg = ('Parameter: {} is mandatory'.format(parameter_label))
+                        QMessageBox.information(self, 'Information', msg)
+                        self.set_value(row)
                     self.tableWidget.item(row, 1).setText(str_value)
             else:
                 items = []
@@ -400,6 +418,10 @@ class ParametersManagerDialog(QDialog):
                     str_value = str(eval(parameter.output_format.format(new_ui_value)))
                     if str_unit:
                         str_value += " " + str_unit
+                    if not str_value and mandatory:
+                        msg = ('Parameter: {} is mandatory'.format(parameter_label))
+                        QMessageBox.information(self, 'Information', msg)
+                        self.set_value(row)
                     self.tableWidget.item(row, 1).setText(str_value)
                     self.quantity_unit_combo_box.currentIndexChanged.disconnect()
                     self.quantity_parameter = None
@@ -470,6 +492,10 @@ class ParametersManagerDialog(QDialog):
                         QMessageBox.information(self, 'Information', msg)
                         return
                     str_value = str(eval(parameter.output_format.format(real_value)))
+                    if not str_value and mandatory:
+                        msg = ('Parameter: {} is mandatory'.format(parameter_label))
+                        QMessageBox.information(self, 'Information', msg)
+                        self.set_value(row)
                     self.tableWidget.item(row, 1).setText(str_value)
             else:
                 items = []
@@ -489,7 +515,12 @@ class ParametersManagerDialog(QDialog):
                                                 QLineEdit.Normal, str_value)
                 # if ok and text != '' and text != str_value:
                 if ok and text != str_value:
-                    self.tableWidget.item(row, 1).setText(text)
+                    str_value = text
+                    if not str_value and mandatory:
+                        msg = ('Parameter: {} is mandatory'.format(parameter_label))
+                        QMessageBox.information(self, 'Information', msg)
+                        self.set_value(row)
+                    self.tableWidget.item(row, 1).setText(str_value)
             else:
                 items = []
                 for i in range(len(parameter.domain)):
@@ -501,9 +532,23 @@ class ParametersManagerDialog(QDialog):
                 item, ok = QInputDialog.getItem(self, title, defs_pars.PARAMETER_FIELD_VALUE_TAG, items, current_pos, False)
                 if ok and item:
                     self.tableWidget.item(row, 1).setText(item)
+        elif isinstance(parameter, VectorLayerParameter):
+            domain = parameter.domain
+            dialog = VectorLayerDialog(title, parameter_label, str_value, domain, mandatory,
+                                       self.qgis_iface, self.settings,  self)
+            if dialog.str_error:
+                QMessageBox.information(self, 'Information', dialog.str_error)
+                return
+            dialog_result = dialog.exec()
+            if dialog_result == QDialog.Accepted:
+                str_error, new_str_value = dialog.get_value_as_string()
+                if str_error:
+                    QMessageBox.information(self, 'Information', str_error)
+                    dialog.exec()
+                if new_str_value != str_value:
+                    self.tableWidget.item(row, 1).setText(new_str_value)
         elif isinstance(parameter, VectorLayerFieldNameParameter):
             domain = parameter.domain
-            mandatory = parameter.mandatory
             dialog = VectorLayerFieldDialog(title, parameter_label, str_value, domain, mandatory,
                                             self.qgis_iface, self.settings,  self)
             if dialog.str_error:
@@ -522,7 +567,12 @@ class ParametersManagerDialog(QDialog):
                                             QLineEdit.Normal, str_value)
             # if ok and text != '' and text != str_value:
             if ok and text != str_value:
-                self.tableWidget.item(row, 1).setText(text)
+                str_value = text
+                if not str_value and mandatory:
+                    msg = ('Parameter: {} is mandatory'.format(parameter_label))
+                    QMessageBox.information(self, 'Information', msg)
+                    self.set_value(row)
+                self.tableWidget.item(row, 1).setText(str_value)
         return
 
     def update_gui(self):

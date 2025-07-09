@@ -31,7 +31,7 @@ from pyLibQGIS.QGISTools import QGISTools
 from .Tools import SimpleTextEditDialog
 
 
-class VectorLayerFieldDialog(QDialog):
+class VectorLayerDialog(QDialog):
     """Employee dialog."""
 
     def __init__(self,
@@ -44,7 +44,7 @@ class VectorLayerFieldDialog(QDialog):
                  settings,
                  parent=None):
         super().__init__(parent)
-        loadUi(os.path.join(os.path.dirname(__file__), 'VectorLayerFieldDialog.ui'), self)
+        loadUi(os.path.join(os.path.dirname(__file__), 'VectorLayerDialog.ui'), self)
         self.label = label
         self.domain = domain
         self.mandatory = mandatory
@@ -54,7 +54,6 @@ class VectorLayerFieldDialog(QDialog):
         self.value_as_string = None
         self.file_path = None
         self.layer_name = None
-        self.field_name = None
         self.layer_geometry_ogr_wkb_type = []
         self.qgis_layers_by_name = {}
         self.str_error = self.initialize(str_value)
@@ -92,19 +91,12 @@ class VectorLayerFieldDialog(QDialog):
             self.fileComboBox.setCurrentText(file_name)
         return
 
-    def field_changed(self):
-        return
-
     def file_changed(self):
         file_path = self.fileComboBox.currentText()
         self.layerComboBox.clear()
         self.layerComboBox.addItem(defs_pars.NO_COMBO_SELECT)
         self.layerComboBox.setEnabled(False)
-        self.fieldComboBox.clear()
-        self.fieldComboBox.addItem(defs_pars.NO_COMBO_SELECT)
-        self.fieldComboBox.setEnabled(False)
         self.newLayerPushButton.setEnabled(False)
-        self.newFieldPushButton.setEnabled(False)
         if file_path == defs_pars.NO_COMBO_SELECT:
             return
         current_position = 0
@@ -146,7 +138,6 @@ class VectorLayerFieldDialog(QDialog):
         str_value = ''
         file_path = ''
         layer_name = ''
-        field_name = ''
         file_path = self.fileComboBox.currentText()
         if file_path == defs_pars.NO_COMBO_SELECT:
             if self.mandatory:
@@ -163,19 +154,8 @@ class VectorLayerFieldDialog(QDialog):
                 else:
                     file_path = ''
                     layer_name = ''
-            else:
-                field_name = self.fieldComboBox.currentText()
-                if field_name == defs_pars.NO_COMBO_SELECT:
-                    if self.mandatory:
-                        str_error = ('No field selected')
-                        return str_error, self.value_as_string
-                    else:
-                        file_path = ''
-                        layer_name = ''
-                        field_name = ''
         self.value_as_dict[defs_pars.TAG_FILE_PATH] = file_path
         self.value_as_dict[defs_pars.TAG_LAYER_NAME] = layer_name
-        self.value_as_dict[defs_pars.TAG_FIELD_NAME] = field_name
         self.value_as_string = json.dumps(self.value_as_dict)
         return str_error, self.value_as_string
 
@@ -183,13 +163,12 @@ class VectorLayerFieldDialog(QDialog):
         str_error = ''
         self.file_path = None
         self.layer_name = None
-        self.field_name = None
         if str_value:
             if str_value is None:
-                str_error = ('Vector Layer Field Name Parameter value is None')
+                str_error = ('Vector Layer Parameter value is None')
                 return str_error
             if not isinstance(str_value, str):
-                str_error = ('Vector Layer Field Name Parameter: {} value as string must be a string and is: {}'
+                str_error = ('Vector Layer Parameter: {} value as string must be a string and is: {}'
                              .format(self.label, str(type(str_value))))
                 return str_error
             value = None
@@ -230,11 +209,6 @@ class VectorLayerFieldDialog(QDialog):
                                  .format(self.label, str_layer_geometry_type))
                     return str_error
                 self.layer_geometry_ogr_wkb_type.append(defs_gdal.geometry_type_by_name[str_layer_geometry_type])
-            if not defs_pars.TAG_FIELD_NAME in value:
-                str_error = ('Vector Layer Field Name Parameter: {} value must contain {}'
-                             .format(self.label, defs_pars.TAG_FIELD_NAME))
-                return str_error
-            self.field_name = value[defs_pars.TAG_FIELD_NAME]
             self.value_as_dict = value
             self.value_as_string = str_value
 
@@ -256,58 +230,18 @@ class VectorLayerFieldDialog(QDialog):
         #     self.layerComboBox.addItem(self.layer_name)
         self.layerComboBox.setEnabled(False)
 
-        self.fieldComboBox.clear()
-        self.fieldComboBox.addItem(defs_pars.NO_COMBO_SELECT)
-        # if field_name:
-        #     self.fieldComboBox.addItem(field_name)
-        self.fieldComboBox.setEnabled(False)
-
         self.fileComboBox.currentIndexChanged.connect(self.file_changed)
         self.layerComboBox.currentIndexChanged.connect(self.layer_changed)
-        self.fieldComboBox.currentIndexChanged.connect(self.field_changed)
 
         if self.file_path:
             self.fileComboBox.setCurrentIndex(1)
 
         self.addFilePushButton.clicked.connect(self.add_file)
         self.newLayerPushButton.clicked.connect(self.new_layer)
-        self.newFieldPushButton.clicked.connect(self.new_field)
         self.newLayerPushButton.setEnabled(False)
-        self.newFieldPushButton.setEnabled(False)
         return str_error
 
     def layer_changed(self):
-        file_path = self.fileComboBox.currentText()
-        self.fieldComboBox.clear()
-        self.fieldComboBox.addItem(defs_pars.NO_COMBO_SELECT)
-        self.fieldComboBox.setEnabled(False)
-        self.newFieldPushButton.setEnabled(False)
-        layer_name = self.layerComboBox.currentText()
-        if not layer_name or layer_name == defs_pars.NO_COMBO_SELECT:
-            return
-        current_position = 0
-        if file_path == defs_qgis.QGIS_PROJECT_TAG:
-            str_error, field_names = QGISTools.get_vector_layer_field_names(self.qgis_layers_by_name[layer_name])
-        else:
-            str_error, field_names = GDALTools.get_layer_field_names(file_path, layer_name)
-        if str_error:
-            QMessageBox.information(self, 'Information', str_error)
-            self.fileComboBox.setCurrentIndex(0)
-        if len(field_names) == 0:
-            str_error = ('There are no fields in layer: {}\nin file:\n{}'.format(layer_name, file_path))
-            QMessageBox.information(self, 'Information', str_error)
-            self.layerComboBox.setCurrentIndex(0)
-        for i in range(len(field_names)):
-            field_name = field_names[i]
-            if self.field_name:
-                if field_name.casefold() == self.field_name.casefold():
-                    current_position = i + 1
-            self.fieldComboBox.addItem(field_name)
-        self.fieldComboBox.setEnabled(True)
-        self.fieldComboBox.setCurrentIndex(current_position)
-        return
-
-    def new_field(self):
         return
 
     def new_layer(self):
