@@ -298,12 +298,17 @@ class ParametersManager:
             if str_error:
                 return str_error
             value = str_value
-        elif isinstance(parameter, VectorLayer):
+        elif isinstance(parameter, VectorLayerParameter):
             value = json.loads(str_value)
             str_error = parameter.set_value(value)
             if str_error:
                 return str_error
         elif isinstance(parameter, VectorLayerFieldNameParameter):
+            value = json.loads(str_value)
+            str_error = parameter.set_value(value)
+            if str_error:
+                return str_error
+        elif isinstance(parameter, RasterLayerParameter):
             value = json.loads(str_value)
             str_error = parameter.set_value(value)
             if str_error:

@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtWidgets
 from PyQt5.uic import loadUi
 from PyQt5.QtWidgets import (QApplication, QMessageBox, QDialog, QInputDialog, QHBoxLayout, QDoubleSpinBox,
                              QFileDialog, QPushButton, QComboBox, QPlainTextEdit, QLineEdit, QDateEdit,
-                             QDialogButtonBox, QVBoxLayout, QTableWidget, QTableWidgetItem, QLabel)
+                             QDialogButtonBox, QVBoxLayout, QTableWidget, QTableWidgetItem, QLabel, QHeaderView)
 from PyQt5.QtCore import QDir, QFileInfo, QFile, QSize, Qt, QDate
 
 import defs_pars
@@ -26,6 +26,8 @@ from pyLibGDAL import defs_gdal
 from pyLibGDAL.GDALTools import GDALTools
 from pyLibQGIS import defs_qgis
 from pyLibQGIS.QGISTools import QGISTools
+from pyLibQtTools.JsonModel import JsonModel
+
 
 
 from .Tools import SimpleTextEditDialog
@@ -100,7 +102,7 @@ class RasterLayerDialog(QDialog):
         self.newLayerPushButton.setEnabled(False)
         self.scalePushButton.setEnabled(False)
         self.offsetPushButton.setEnabled(False)
-        self.metadataPlainTextEdit.clear()
+        self.metadataTreeView.setModel(None)
         if file_path == defs_pars.NO_COMBO_SELECT:
             str_scale = str(eval(defs_pars.SCALE_STRING_FORMAT.format(defs_pars.SCALE_DEFAULT_VALUE)))
             self.scaleLineEdit.setText(str_scale)
@@ -109,56 +111,90 @@ class RasterLayerDialog(QDialog):
             return
         current_position = 0
         if file_path in self.qgis_layers_by_name:
-            yo = 1
-            # for qgis_layer_name in self.qgis_layers_by_name:
-            #     self.layerComboBox.addItem(qgis_layer_name)
-            #     if qgis_layer_name.casefold() == self.layer_name.casefold():
-            #         current_position = self.layerComboBox.findText(qgis_layer_name)
+            layer_name = file_path
+            str_error, raster_count = QGISTools.get_raster_band_count(layer_name)
+            if str_error:
+                QMessageBox.information(self, 'Information', str_error)
+                self.fileComboBox.setCurrentIndex(0)
+            str_error, file_path = QGISTools.get_file_path(layer_name)
+            if str_error:
+                QMessageBox.information(self, 'Information', str_error)
+                self.fileComboBox.setCurrentIndex(0)
+                return
         else:
             str_error, raster_count = GDALTools.get_raster_count(file_path)
             if str_error:
                 QMessageBox.information(self, 'Information', str_error)
                 self.fileComboBox.setCurrentIndex(0)
-            for i in range(raster_count):
-                self.layerComboBox.addItem(str(i + 1))
-                if self.layer_index == (i + 1):
-                    current_position = i + 1
-            str_scale = str(eval(defs_pars.SCALE_STRING_FORMAT.format(self.scale)))
-            self.scaleLineEdit.setText(str_scale)
-            str_offset = str(eval(defs_pars.OFFSET_STRING_FORMAT.format(self.offset)))
-            self.offsetLineEdit.setText(str_offset)
-            str_error, metadata = GDALTools.get_metadata(file_path)
-            self.metadataPlainTextEdit.setPlainText(metadata)
+                return
+        for i in range(raster_count):
+            self.layerComboBox.addItem(str(i + 1))
+            if self.layer_index == (i + 1):
+                current_position = i + 1
+        str_scale = str(eval(defs_pars.SCALE_STRING_FORMAT.format(self.scale)))
+        self.scaleLineEdit.setText(str_scale)
+        str_offset = str(eval(defs_pars.OFFSET_STRING_FORMAT.format(self.offset)))
+        self.offsetLineEdit.setText(str_offset)
+        str_error, metadata = GDALTools.get_metadata(file_path)
+        if str_error:
+            QMessageBox.information(self, 'Information', str_error)
+            self.fileComboBox.setCurrentIndex(0)
+            return
+        metadata_dict = json.loads(metadata)
+        model = JsonModel()
+        self.metadataTreeView.setModel(model)
+        # self.metadataTreeView.header().setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+        self.metadataTreeView.setAlternatingRowColors(True)
+        # self.metadataTreeView.resize(500, 300)
+        model.load(metadata_dict)
+        # self.metadataTreeView.header().setStretchLastSection(True)
+        # self.metadataTreeView.header().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.metadataTreeView.resizeColumnToContents(0)
+        # self.metadataTreeView.resizeColumnToContents(1)
         self.layerComboBox.setEnabled(True)
         self.layerComboBox.setCurrentIndex(current_position)
         self.scalePushButton.setEnabled(True)
         self.offsetPushButton.setEnabled(True)
+        # self.resize(500, 1000)
+        # self.adjustSize()
         return
 
     def get_value_as_string(self):
         str_error = ''
         str_value = ''
         file_path = ''
-        layer_name = ''
-        # file_path = self.fileComboBox.currentText()
-        # if file_path == defs_pars.NO_COMBO_SELECT:
-        #     if self.mandatory:
-        #         str_error = ('No file selected')
-        #         return str_error, self.value_as_string
-        #     else:
-        #         file_path = ''
-        # else:
-        #     layer_name = self.layerComboBox.currentText()
-        #     if layer_name == defs_pars.NO_COMBO_SELECT:
-        #         if self.mandatory:
-        #             str_error = ('No layer selected')
-        #             return str_error, self.value_as_string
-        #         else:
-        #             file_path = ''
-        #             layer_name = ''
-        # self.value_as_dict[defs_pars.TAG_FILE_PATH] = file_path
-        # self.value_as_dict[defs_pars.TAG_LAYER_NAME] = layer_name
-        # self.value_as_string = json.dumps(self.value_as_dict)
+        str_layer_index = ''
+        layer_index = None
+        str_scale = ''
+        scale = None
+        str_offset = ''
+        offset = None
+        file_path = self.fileComboBox.currentText()
+        if file_path == defs_pars.NO_COMBO_SELECT:
+            if self.mandatory:
+                str_error = ('No file selected')
+                return str_error, self.value_as_string
+            else:
+                file_path = ''
+        else:
+            str_layer_index = self.layerComboBox.currentText()
+            if str_layer_index == defs_pars.NO_COMBO_SELECT:
+                if self.mandatory:
+                    str_error = ('No layer index selected')
+                    return str_error, self.value_as_string
+                else:
+                    file_path = ''
+                    layer_name = None
+            layer_index = int(str_layer_index)
+            str_scale = self.scaleLineEdit.text()
+            scale = float(str_scale)
+            str_offset = self.offsetLineEdit.text()
+            offset = float(str_offset)
+        self.value_as_dict[defs_pars.TAG_FILE_PATH] = file_path
+        self.value_as_dict[defs_pars.TAG_LAYER_INDEX] = layer_index
+        self.value_as_dict[defs_pars.TAG_SCALE] = scale
+        self.value_as_dict[defs_pars.TAG_OFFSET] = offset
+        self.value_as_string = json.dumps(self.value_as_dict)
         return str_error, self.value_as_string
 
     def initialize(self, str_value):
@@ -221,8 +257,8 @@ class RasterLayerDialog(QDialog):
             str_error, self.qgis_layers_by_name = QGISTools.get_raster_layers()
             if str_error:
                 return str_error
-            if len(self.qgis_layers_by_name) > 0:
-                self.fileComboBox.addItem(defs_qgis.QGIS_PROJECT_TAG)
+            for qgis_raster_layer_name in self.qgis_layers_by_name:
+                self.fileComboBox.addItem(qgis_raster_layer_name)
         self.fileComboBox.setEnabled(True)
 
         self.layerComboBox.clear()
@@ -270,7 +306,37 @@ class RasterLayerDialog(QDialog):
         return
 
     def select_scale(self):
+        str_value = self.scaleLineEdit.text()
+        title = "Target value = scale * DL + offset"
+        msg = ("Input scale:")
+        text, ok = QInputDialog.getText(self, title, msg,
+                                        QLineEdit.Normal, str_value)
+        if ok:
+            real_value = None
+            try:
+                real_value = float(text)
+            except ValueError:
+                msg = ('Value must be a real number in domain')
+                QMessageBox.information(self, 'Information', msg)
+                return
+            str_scale = str(eval(defs_pars.SCALE_STRING_FORMAT.format(real_value)))
+            self.scaleLineEdit.setText(str_scale)
         return
 
     def select_offset(self):
+        str_value = self.offsetLineEdit.text()
+        title = "Target value = scale * DL + offset"
+        msg = ("Input offset:")
+        text, ok = QInputDialog.getText(self, title, msg,
+                                        QLineEdit.Normal, str_value)
+        if ok:
+            real_value = None
+            try:
+                real_value = float(text)
+            except ValueError:
+                msg = ('Value must be a real number in domain')
+                QMessageBox.information(self, 'Information', msg)
+                return
+            str_offset = str(eval(defs_pars.SCALE_STRING_FORMAT.format(real_value)))
+            self.offsetLineEdit.setText(str_offset)
         return
