@@ -26,6 +26,7 @@ from pyLibGDAL import defs_gdal
 from pyLibGDAL.GDALTools import GDALTools
 from pyLibQGIS import defs_qgis
 from pyLibQGIS.QGISTools import QGISTools
+from pyLibQtTools.JsonModel import JsonModel
 
 
 from .Tools import SimpleTextEditDialog
@@ -282,6 +283,7 @@ class VectorLayerFieldDialog(QDialog):
         self.fieldComboBox.addItem(defs_pars.NO_COMBO_SELECT)
         self.fieldComboBox.setEnabled(False)
         self.newFieldPushButton.setEnabled(False)
+        self.metadataTreeView.setModel(None)
         layer_name = self.layerComboBox.currentText()
         if not layer_name or layer_name == defs_pars.NO_COMBO_SELECT:
             return
@@ -305,6 +307,33 @@ class VectorLayerFieldDialog(QDialog):
             self.fieldComboBox.addItem(field_name)
         self.fieldComboBox.setEnabled(True)
         self.fieldComboBox.setCurrentIndex(current_position)
+        if file_path == defs_qgis.QGIS_PROJECT_TAG:
+            str_error, file_path = QGISTools.get_file_path(layer_name)
+            if str_error:
+                QMessageBox.information(self, 'Information', str_error)
+                self.fileComboBox.setCurrentIndex(0)
+                return
+            str_error, layer_name = QGISTools.get_layer_name(layer_name)
+            if str_error:
+                QMessageBox.information(self, 'Information', str_error)
+                self.fileComboBox.setCurrentIndex(0)
+                return
+        str_error, metadata = GDALTools.ogrinfo_as_json(file_path, layer_name)
+        if str_error:
+            QMessageBox.information(self, 'Information', str_error)
+            self.fileComboBox.setCurrentIndex(0)
+            return
+        metadata_dict = json.loads(metadata)
+        model = JsonModel()
+        self.metadataTreeView.setModel(model)
+        # self.metadataTreeView.header().setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+        self.metadataTreeView.setAlternatingRowColors(True)
+        # self.metadataTreeView.resize(500, 300)
+        model.load(metadata_dict)
+        # self.metadataTreeView.header().setStretchLastSection(True)
+        # self.metadataTreeView.header().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.metadataTreeView.resizeColumnToContents(0)
+        # self.metadataTreeView.resizeColumnToContents(1)
         return
 
     def new_field(self):

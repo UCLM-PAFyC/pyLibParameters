@@ -135,7 +135,7 @@ class RasterLayerDialog(QDialog):
         self.scaleLineEdit.setText(str_scale)
         str_offset = str(eval(defs_pars.OFFSET_STRING_FORMAT.format(self.offset)))
         self.offsetLineEdit.setText(str_offset)
-        str_error, metadata = GDALTools.get_metadata(file_path)
+        str_error, metadata = GDALTools.gdalinfo_as_json(file_path)
         if str_error:
             QMessageBox.information(self, 'Information', str_error)
             self.fileComboBox.setCurrentIndex(0)
