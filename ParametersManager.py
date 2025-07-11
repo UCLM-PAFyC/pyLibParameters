@@ -51,11 +51,13 @@ class ParametersManager:
                 parameter_value = ('\"{}\"'.format(str_value))
                 # parameter_value = ('{}'.format(str_value))
             elif isinstance(parameter, VectorLayerParameter):
-                # parameter_value = ('\"{}\"'.format(str_value))
-                parameter_value = ('{}'.format(str_value))
+                str_value = str_value.replace("\"", "\\\"\"")
+                parameter_value = ('\"{}\"'.format(str_value))
+                # parameter_value = ('{}'.format(str_value))
             elif isinstance(parameter, VectorLayerFieldNameParameter):
-                # parameter_value = ('\"{}\"'.format(str_value))
-                parameter_value = ('{}'.format(str_value))
+                str_value = str_value.replace("\"", "\\\"\"")
+                parameter_value = ('\"{}\"'.format(str_value))
+                # parameter_value = ('{}'.format(str_value))
             if not parameter_value:
                 str_error = ('Invalid parameter: {}'.format(parameter.label))
                 return str_error, arguments
