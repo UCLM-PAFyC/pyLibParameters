@@ -27,9 +27,11 @@ class ParametersManager:
             parameter_value = None
             if isinstance(parameter, BooleanParameter):
                 if str_value.casefold() == ('True').casefold():
-                    parameter_value = 1
+                    parameter_value = '1' # needed for argument in list of strings
+                    # parameter_value = 1
                 else:
-                    parameter_value = 0
+                    parameter_value = '0' # needed for argument in list of strings
+                    # parameter_value = 0
             elif isinstance(parameter, DateParameter):
                 # parameter_value = ('\"{}\"'.format(str_value))
                 parameter_value = ('{}'.format(str_value))
@@ -37,27 +39,30 @@ class ParametersManager:
                 # parameter_value = ('\"{}\"'.format(str_value))
                 parameter_value = ('{}'.format(str_value))
             elif isinstance(parameter, IntegerParameter):
-                parameter_value = int(str_value)
+                # parameter_value = int(str_value)
+                parameter_value = str_value # needed for argument in list of strings
             elif isinstance(parameter, PhysicalQuantityParameter):
                 str_value = parameter.get_str_value_wihtout_unit()
-                parameter_value = float(str_value)
+                parameter_value = str_value # needed for argument in list of strings
+                # parameter_value = float(str_value)
             elif isinstance(parameter, RealParameter):
-                parameter_value = float(str_value)
+                parameter_value = str_value # needed for argument in list of strings
+                # parameter_value = float(str_value)
             elif isinstance(parameter, StringParameter):
                 # parameter_value = ('\"{}\"'.format(str_value))
                 parameter_value = ('{}'.format(str_value))
             elif isinstance(parameter, RasterLayerParameter):
-                str_value = str_value.replace("\"", "\\\"\"")
-                parameter_value = ('\"{}\"'.format(str_value))
-                # parameter_value = ('{}'.format(str_value))
+                # str_value = str_value.replace("\"", "\\\"\"")
+                # parameter_value = ('\"{}\"'.format(str_value))
+                parameter_value = ('{}'.format(str_value))
             elif isinstance(parameter, VectorLayerParameter):
-                str_value = str_value.replace("\"", "\\\"\"")
-                parameter_value = ('\"{}\"'.format(str_value))
-                # parameter_value = ('{}'.format(str_value))
+                # str_value = str_value.replace("\"", "\\\"\"")
+                # parameter_value = ('\"{}\"'.format(str_value))
+                parameter_value = ('{}'.format(str_value))
             elif isinstance(parameter, VectorLayerFieldNameParameter):
-                str_value = str_value.replace("\"", "\\\"\"")
-                parameter_value = ('\"{}\"'.format(str_value))
-                # parameter_value = ('{}'.format(str_value))
+                # str_value = str_value.replace("\"", "\\\"\"")
+                # parameter_value = ('\"{}\"'.format(str_value))
+                parameter_value = ('{}'.format(str_value))
             if not parameter_value:
                 str_error = ('Invalid parameter: {}'.format(parameter.label))
                 return str_error, arguments
