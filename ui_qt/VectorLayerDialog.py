@@ -147,14 +147,31 @@ class VectorLayerDialog(QDialog):
             else:
                 file_path = ''
         else:
-            layer_name = self.layerComboBox.currentText()
-            if layer_name == defs_pars.NO_COMBO_SELECT:
-                if self.mandatory:
-                    str_error = ('No layer selected')
-                    return str_error, self.value_as_string
+            if file_path == defs_qgis.QGIS_PROJECT_TAG:
+                layer_name = self.layerComboBox.currentText()
+                if layer_name == defs_pars.NO_COMBO_SELECT:
+                    if self.mandatory:
+                        str_error = ('No layer selected')
+                        return str_error, self.value_as_string
+                    else:
+                        file_path = ''
+                        layer_name = ''
                 else:
-                    file_path = ''
-                    layer_name = ''
+                    str_error, file_path = QGISTools.get_file_path(layer_name)
+                    if str_error:
+                        return str_error, self.value_as_string
+                    str_error, layer_name = QGISTools.get_layer_name(layer_name)
+                    if str_error:
+                        return str_error, self.value_as_string
+            else:
+                layer_name = self.layerComboBox.currentText()
+                if layer_name == defs_pars.NO_COMBO_SELECT:
+                    if self.mandatory:
+                        str_error = ('No layer selected')
+                        return str_error, self.value_as_string
+                    else:
+                        file_path = ''
+                        layer_name = ''
         self.value_as_dict[defs_pars.TAG_FILE_PATH] = file_path
         self.value_as_dict[defs_pars.TAG_LAYER_NAME] = layer_name
         self.value_as_string = json.dumps(self.value_as_dict)

@@ -177,6 +177,10 @@ class RasterLayerDialog(QDialog):
             else:
                 file_path = ''
         else:
+            if not os.path.isfile(file_path):
+                str_error, file_path = QGISTools.get_file_path(file_path)
+                if str_error:
+                    return str_error, self.value_as_string
             str_layer_index = self.layerComboBox.currentText()
             if str_layer_index == defs_pars.NO_COMBO_SELECT:
                 if self.mandatory:
