@@ -687,7 +687,7 @@ class PhysicalQuantityParameter(RealParameter):
     def initialize(self, value, domain,
                    ui_unit, computation_unit, output_format_unit,
                    ignored_units,
-                   tol=1e-9):
+                   tol = 1e-9):
         str_error = ''
         if value is None:
             str_error = ('Physical Quantity Parameter value is None')

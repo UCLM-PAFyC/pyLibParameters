@@ -23,8 +23,7 @@ import defs_pars
 from ParametersManager import ParametersManager
 from Parameter import *
 
-
-from .Tools import SimpleTextEditDialog
+from pyLibQtTools.Tools import SimpleTextEditDialog
 
 
 class ParameterDialog(QDialog):
@@ -40,7 +39,6 @@ class ParameterDialog(QDialog):
         self.str_error = ""
 
     def accept(self):
-        yo = 1
         super().accept()
         return
 
@@ -124,7 +122,6 @@ class ParameterDialog(QDialog):
         return
 
     def reject(self):
-        yo = 1
         super().reject()
         return
 
@@ -354,7 +351,7 @@ class ParameterDialog(QDialog):
                                                 current_pos, False)
                 if ok and item:
                     self.value_line_edit.setText(item)
-        elif isinstance(parameter, StringParameter):
+        elif isinstance(self.parameter, StringParameter):
             str_value = self.value_line_edit.text()
             if not self.parameter.domain:
                 text, ok = QInputDialog.getText(self, title, defs_pars.PARAMETER_FIELD_VALUE_TAG,

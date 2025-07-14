@@ -331,10 +331,8 @@ class ParametersManager:
             if str_error:
                 return str_error
         else:
-            yo = 1
-        # if not value:
-        #     str_error = ('Not found parameter: {}'.format(label))
-        #     return str_error
+            str_error = ('Not found parameter: {}'.format(label))
+            return str_error
         for i in range(len(self.parameters_as_list_of_dict)):
             parameter_label = self.parameters_as_list_of_dict[i][defs_pars.PARAMETER_FIELD_LABEL]
             if label.casefold() == parameter_label.casefold():

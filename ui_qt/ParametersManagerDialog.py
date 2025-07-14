@@ -24,7 +24,7 @@ from ui_qt.VectorLayerDialog import VectorLayerDialog
 from ui_qt.RasterLayerDialog import RasterLayerDialog
 
 
-from .Tools import SimpleTextEditDialog
+from pyLibQtTools.Tools import SimpleTextEditDialog
 
 
 class ParametersManagerDialog(QDialog):

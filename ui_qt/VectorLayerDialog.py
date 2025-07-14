@@ -27,13 +27,10 @@ from pyLibGDAL.GDALTools import GDALTools
 from pyLibQGIS import defs_qgis
 from pyLibQGIS.QGISTools import QGISTools
 from pyLibQtTools.JsonModel import JsonModel
-
-
-from .Tools import SimpleTextEditDialog
+from pyLibQtTools.Tools import SimpleTextEditDialog
 
 
 class VectorLayerDialog(QDialog):
-    """Employee dialog."""
 
     def __init__(self,
                  title,
@@ -289,14 +286,9 @@ class VectorLayerDialog(QDialog):
         metadata_dict = json.loads(metadata)
         model = JsonModel()
         self.metadataTreeView.setModel(model)
-        # self.metadataTreeView.header().setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
         self.metadataTreeView.setAlternatingRowColors(True)
-        # self.metadataTreeView.resize(500, 300)
         model.load(metadata_dict)
-        # self.metadataTreeView.header().setStretchLastSection(True)
-        # self.metadataTreeView.header().setSectionResizeMode(QHeaderView.ResizeToContents)
         self.metadataTreeView.resizeColumnToContents(0)
-        # self.metadataTreeView.resizeColumnToContents(1)
         return
 
     def new_layer(self):

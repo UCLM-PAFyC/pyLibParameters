@@ -87,17 +87,6 @@ OFFSET_DEFAULT_VALUE = 0.0
 SCALE_STRING_FORMAT = '{:.3E}'
 OFFSET_STRING_FORMAT = '{:.2E}'
 
-
-# types_group = {}
-# types_group[PARAMETER_TYPE_FILE] = []
-# types_group[PARAMETER_TYPE_FILE].append(PARAMETER_TYPE_FILE_READ)
-# types_group[PARAMETER_TYPE_FILE].append(PARAMETER_TYPE_FILE_WRITE)
-# types_group[PARAMETER_TYPE_FILE].append(PARAMETER_TYPE_FILE_APPEND)
-# type_group_by_type = {}
-# type_group_by_type[PARAMETER_TYPE_FILE_READ] = PARAMETER_TYPE_FILE
-# type_group_by_type[PARAMETER_TYPE_FILE_WRITE] = PARAMETER_TYPE_FILE
-# type_group_by_type[PARAMETER_TYPE_FILE_APPEND] = PARAMETER_TYPE_FILE
-
 parameter_fields_by_type = {}
 parameter_fields_by_type[PARAMETER_TYPE_REAL] = []
 parameter_fields_by_type[PARAMETER_TYPE_REAL].append(PARAMETER_FIELD_DOMAIN)
@@ -107,8 +96,6 @@ parameter_fields_by_type[PARAMETER_TYPE_DATE] = []
 parameter_fields_by_type[PARAMETER_TYPE_DATE].append(PARAMETER_FIELD_DATE_FORMAT)
 parameter_fields_by_type[PARAMETER_TYPE_STRING] = []
 parameter_fields_by_type[PARAMETER_TYPE_BOOLEAN] = []
-# parameter_fields_by_type[PARAMETER_TYPE_OPEN_FILE_TAG] = []
-# parameter_fields_by_type[PARAMETER_TYPE_SAVE_FILE_TAG] = []
 parameter_fields_by_type[PARAMETER_TYPE_FILE] = []
 parameter_fields_by_type[PARAMETER_TYPE_FILE].append(PARAMETER_TYPE_FILE_MODE)
 parameter_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY] = []
@@ -134,10 +121,6 @@ parameter_optional_fields_by_type[PARAMETER_TYPE_DATE] = []
 parameter_optional_fields_by_type[PARAMETER_TYPE_STRING] = []
 parameter_optional_fields_by_type[PARAMETER_TYPE_STRING].append(PARAMETER_FIELD_DOMAIN)
 parameter_optional_fields_by_type[PARAMETER_TYPE_BOOLEAN] = []
-# parameter_optional_fields_by_type[PARAMETER_TYPE_OPEN_FILE_TAG] = []
-# parameter_optional_fields_by_type[PARAMETER_TYPE_OPEN_FILE_TAG].append(PARAMETER_FIELD_DOMAIN)
-# parameter_optional_fields_by_type[PARAMETER_TYPE_SAVE_FILE_TAG] = []
-# parameter_optional_fields_by_type[PARAMETER_TYPE_SAVE_FILE_TAG].append(PARAMETER_FIELD_DOMAIN)
 parameter_optional_fields_by_type[PARAMETER_TYPE_FILE] = []
 parameter_optional_fields_by_type[PARAMETER_TYPE_FILE].append(PARAMETER_FIELD_DOMAIN)
 parameter_optional_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY] = []
@@ -156,7 +139,6 @@ PARAMETER_FIELD_VALUE_TOOLTIP = "Value"
 PARAMETER_FIELD_DESCRIPTION_TOOLTIP = "Description"
 PARAMETER_FIELD_ARGPARSE_TAG = "argparse"
 PARAMETER_FIELD_OUTPUT_FORMAT_TAG = "Output format"
-parameters_manager_dialog_field_by_header_tag = {}
 parameters_manager_dialog_header=[PARAMETER_FIELD_LABEL_TAG,
                                   PARAMETER_FIELD_VALUE_TAG,
                                   PARAMETER_FIELD_DESCRIPTION_TAG]

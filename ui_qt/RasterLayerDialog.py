@@ -31,11 +31,10 @@ from pyLibQtTools.JsonModel import JsonModel
 
 
 
-from .Tools import SimpleTextEditDialog
+from pyLibQtTools.Tools import SimpleTextEditDialog
 
 
 class RasterLayerDialog(QDialog):
-    """Employee dialog."""
 
     def __init__(self,
                  title,
@@ -144,31 +143,19 @@ class RasterLayerDialog(QDialog):
         metadata_dict = json.loads(metadata)
         model = JsonModel()
         self.metadataTreeView.setModel(model)
-        # self.metadataTreeView.header().setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
         self.metadataTreeView.setAlternatingRowColors(True)
-        # self.metadataTreeView.resize(500, 300)
         model.load(metadata_dict)
-        # self.metadataTreeView.header().setStretchLastSection(True)
-        # self.metadataTreeView.header().setSectionResizeMode(QHeaderView.ResizeToContents)
         self.metadataTreeView.resizeColumnToContents(0)
-        # self.metadataTreeView.resizeColumnToContents(1)
         self.layerComboBox.setEnabled(True)
         self.layerComboBox.setCurrentIndex(current_position)
         self.scalePushButton.setEnabled(True)
         self.offsetPushButton.setEnabled(True)
-        # self.resize(500, 1000)
-        # self.adjustSize()
         return
 
     def get_value_as_string(self):
         str_error = ''
-        str_value = ''
-        file_path = ''
-        str_layer_index = ''
         layer_index = None
-        str_scale = ''
         scale = None
-        str_offset = ''
         offset = None
         file_path = self.fileComboBox.currentText()
         if file_path == defs_pars.NO_COMBO_SELECT:
