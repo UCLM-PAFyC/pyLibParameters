@@ -13,7 +13,8 @@ from PyQt5 import QtCore, QtWidgets
 from PyQt5.uic import loadUi
 from PyQt5.QtWidgets import (QApplication, QMessageBox, QDialog, QInputDialog, QHBoxLayout, QDoubleSpinBox,
                              QFileDialog, QPushButton, QComboBox, QPlainTextEdit, QLineEdit, QDateEdit,
-                             QDialogButtonBox, QVBoxLayout, QTableWidget, QTableWidgetItem, QLabel, QHeaderView)
+                             QDialogButtonBox, QVBoxLayout, QTableWidget, QTableWidgetItem, QLabel, QHeaderView,
+                             QAbstractItemView)
 from PyQt5.QtCore import QDir, QFileInfo, QFile, QSize, Qt, QDate
 
 import defs_pars
@@ -285,6 +286,7 @@ class RasterLayerDialog(QDialog):
         self.offsetLineEdit.setText(str_offset)
         self.scalePushButton.setEnabled(False)
         self.offsetPushButton.setEnabled(False)
+        self.metadataTreeView.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
         if self.file_path:
             self.fileComboBox.setCurrentIndex(1)

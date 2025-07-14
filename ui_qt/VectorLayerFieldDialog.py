@@ -13,7 +13,7 @@ from PyQt5 import QtCore, QtWidgets
 from PyQt5.uic import loadUi
 from PyQt5.QtWidgets import (QApplication, QMessageBox, QDialog, QInputDialog, QHBoxLayout, QDoubleSpinBox,
                              QFileDialog, QPushButton, QComboBox, QPlainTextEdit, QLineEdit, QDateEdit,
-                             QDialogButtonBox, QVBoxLayout, QTableWidget, QTableWidgetItem, QLabel)
+                             QDialogButtonBox, QVBoxLayout, QTableWidget, QTableWidgetItem, QLabel, QAbstractItemView)
 from PyQt5.QtCore import QDir, QFileInfo, QFile, QSize, Qt, QDate
 
 import defs_pars
@@ -301,6 +301,7 @@ class VectorLayerFieldDialog(QDialog):
         self.newFieldPushButton.clicked.connect(self.new_field)
         self.newLayerPushButton.setEnabled(False)
         self.newFieldPushButton.setEnabled(False)
+        self.metadataTreeView.setEditTriggers(QAbstractItemView.NoEditTriggers)
         return str_error
 
     def layer_changed(self):
