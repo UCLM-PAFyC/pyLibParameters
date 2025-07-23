@@ -25,7 +25,7 @@ from pyLibCRSs.CRSsTools import CRSsTools
 from pyLibGDAL import defs_gdal
 from pyLibGDAL.GDALTools import GDALTools
 from pyLibQGIS import defs_qgis
-from pyLibQGIS.QGISTools import QGISTools
+# from pyLibQGIS.QGISTools import QGISTools
 from pyLibQtTools.JsonModel import JsonModel
 from pyLibQtTools.Tools import SimpleTextEditDialog
 
@@ -55,6 +55,7 @@ class VectorLayerFieldDialog(QDialog):
         self.field_name = None
         self.layer_geometry_ogr_wkb_type = []
         self.qgis_layers_by_name = {}
+        self.imported_qgistools = False
         self.str_error = self.initialize(str_value)
 
     def add_file(self):
@@ -203,6 +204,7 @@ class VectorLayerFieldDialog(QDialog):
 
     def initialize(self, str_value):
         str_error = ''
+        self.imported_qgistools = False
         self.file_path = None
         self.layer_name = None
         self.field_name = None
@@ -265,6 +267,9 @@ class VectorLayerFieldDialog(QDialog):
         if self.file_path:
             self.fileComboBox.addItem(self.file_path)
         if self.qgis_iface:
+            if not self.imported_qgistools:
+                from pyLibQGIS.QGISTools import QGISTools
+                self.imported_qgistools = True
             str_error, self.qgis_layers_by_name = QGISTools.get_vector_layers(self.layer_geometry_ogr_wkb_type)
             if str_error:
                 return str_error
