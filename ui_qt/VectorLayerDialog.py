@@ -25,9 +25,9 @@ from pyLibCRSs.CRSsTools import CRSsTools
 from pyLibGDAL import defs_gdal
 from pyLibGDAL.GDALTools import GDALTools
 from pyLibQGIS import defs_qgis
-# from pyLibQGIS.QGISTools import QGISTools
 from pyLibQtTools.JsonModel import JsonModel
 from pyLibQtTools.Tools import SimpleTextEditDialog
+# from pyLibQGIS.QGISTools import QGISTools
 
 
 class VectorLayerDialog(QDialog):
@@ -54,7 +54,7 @@ class VectorLayerDialog(QDialog):
         self.layer_name = None
         self.layer_geometry_ogr_wkb_type = []
         self.qgis_layers_by_name = {}
-        self.imported_qgistools = False
+        self.QGISTools = None
         self.str_error = self.initialize(str_value)
 
     def add_file(self):
@@ -155,10 +155,10 @@ class VectorLayerDialog(QDialog):
                         file_path = ''
                         layer_name = ''
                 else:
-                    str_error, file_path = QGISTools.get_file_path(layer_name)
+                    str_error, file_path = self.QGISTools.get_file_path(layer_name)
                     if str_error:
                         return str_error, self.value_as_string
-                    str_error, layer_name = QGISTools.get_layer_name(layer_name)
+                    str_error, layer_name = self.QGISTools.get_layer_name(layer_name)
                     if str_error:
                         return str_error, self.value_as_string
             else:
@@ -177,7 +177,9 @@ class VectorLayerDialog(QDialog):
 
     def initialize(self, str_value):
         str_error = ''
-        self.imported_qgistools = False
+        if self.qgis_iface:
+            from pyLibQGIS.QGISTools import QGISTools
+            self.QGISTools = QGISTools
         self.file_path = None
         self.layer_name = None
         if str_value:
@@ -234,10 +236,7 @@ class VectorLayerDialog(QDialog):
         if self.file_path:
             self.fileComboBox.addItem(self.file_path)
         if self.qgis_iface:
-            if not self.imported_qgistools:
-                from pyLibQGIS.QGISTools import QGISTools
-                self.imported_qgistools = True
-            str_error, self.qgis_layers_by_name = QGISTools.get_vector_layers(self.layer_geometry_ogr_wkb_type)
+            str_error, self.qgis_layers_by_name = self.QGISTools.get_vector_layers(self.layer_geometry_ogr_wkb_type)
             if str_error:
                 return str_error
             if len(self.qgis_layers_by_name) > 0:
@@ -273,12 +272,12 @@ class VectorLayerDialog(QDialog):
         if not layer_name:
             return
         if file_path == defs_qgis.QGIS_PROJECT_TAG:
-            str_error, file_path = QGISTools.get_file_path(layer_name)
+            str_error, file_path = self.QGISTools.get_file_path(layer_name)
             if str_error:
                 QMessageBox.information(self, 'Information', str_error)
                 self.fileComboBox.setCurrentIndex(0)
                 return
-            str_error, layer_name = QGISTools.get_layer_name(layer_name)
+            str_error, layer_name = self.QGISTools.get_layer_name(layer_name)
             if str_error:
                 QMessageBox.information(self, 'Information', str_error)
                 self.fileComboBox.setCurrentIndex(0)

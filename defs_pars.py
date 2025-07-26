@@ -1,6 +1,7 @@
 # authors:
 # David Hernandez Lopez, david.hernandez@uclm.es
 
+# https://github.com/hgrecco/pint/blob/master/pint/default_en.txt
 from pint import UnitRegistry
 from pint.util import UnitsContainer
 from pint import Unit
@@ -25,6 +26,16 @@ for i in range(len(values)):
 #     yo = 5
 # quantity_hr_pu = quantity_hr_pc.to('perunit')
 # dimensionality_value = str(quantity_hr_pu.dimensionality)
+
+# Q_ = ureg.Quantity
+# pressure = Q_(1013.25, 'hPa')
+# print(ureg.get_compatible_units(pressure))
+# pressure_units = ['bar', 'mbar', 'psi', 'MPa', 'kpsi', 'mPa', 'millimeter_Hg', 'mmHg']
+# print(pressure)
+# for p_unit in pressure_units:
+#     mag = pressure.to(p_unit).magnitude
+#     unit = pressure.to(p_unit).units
+#     print('{:.2f}'.format(mag), unit)
 
 NO_COMBO_SELECT = ' ... '
 PARAMETERS = "parameters"

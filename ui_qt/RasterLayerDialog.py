@@ -59,7 +59,7 @@ class RasterLayerDialog(QDialog):
         self.scale = None
         self.offset = None
         self.qgis_layers_by_name = {}
-        self.imported_qgistools = False
+        self.QGISTools = None
         self.str_error = self.initialize(str_value)
 
     def add_file(self):
@@ -113,11 +113,11 @@ class RasterLayerDialog(QDialog):
         current_position = 0
         if file_path in self.qgis_layers_by_name:
             layer_name = file_path
-            str_error, raster_count = QGISTools.get_raster_band_count(layer_name)
+            str_error, raster_count = self.QGISTools.get_raster_band_count(layer_name)
             if str_error:
                 QMessageBox.information(self, 'Information', str_error)
                 self.fileComboBox.setCurrentIndex(0)
-            str_error, file_path = QGISTools.get_file_path(layer_name)
+            str_error, file_path = self.QGISTools.get_file_path(layer_name)
             if str_error:
                 QMessageBox.information(self, 'Information', str_error)
                 self.fileComboBox.setCurrentIndex(0)
@@ -167,7 +167,7 @@ class RasterLayerDialog(QDialog):
                 file_path = ''
         else:
             if not os.path.isfile(file_path):
-                str_error, file_path = QGISTools.get_file_path(file_path)
+                str_error, file_path = self.QGISTools.get_file_path(file_path)
                 if str_error:
                     return str_error, self.value_as_string
             str_layer_index = self.layerComboBox.currentText()
@@ -192,7 +192,9 @@ class RasterLayerDialog(QDialog):
 
     def initialize(self, str_value):
         str_error = ''
-        self.imported_qgistools = False
+        if self.qgis_iface:
+            from pyLibQGIS.QGISTools import QGISTools
+            self.QGISTools = QGISTools
         self.file_path = None
         self.layer_name = None
         if str_value:
@@ -248,10 +250,7 @@ class RasterLayerDialog(QDialog):
         if self.file_path:
             self.fileComboBox.addItem(self.file_path)
         if self.qgis_iface:
-            if not self.imported_qgistools:
-                from pyLibQGIS.QGISTools import QGISTools
-                self.imported_qgistools = True
-            str_error, self.qgis_layers_by_name = QGISTools.get_raster_layers()
+            str_error, self.qgis_layers_by_name = self.QGISTools.get_raster_layers()
             if str_error:
                 return str_error
             for qgis_raster_layer_name in self.qgis_layers_by_name:

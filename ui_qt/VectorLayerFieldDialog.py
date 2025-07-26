@@ -55,7 +55,7 @@ class VectorLayerFieldDialog(QDialog):
         self.field_name = None
         self.layer_geometry_ogr_wkb_type = []
         self.qgis_layers_by_name = {}
-        self.imported_qgistools = False
+        self.QGISTools = None
         self.str_error = self.initialize(str_value)
 
     def add_file(self):
@@ -162,10 +162,10 @@ class VectorLayerFieldDialog(QDialog):
                         file_path = ''
                         layer_name = ''
                 else:
-                    str_error, file_path = QGISTools.get_file_path(layer_name)
+                    str_error, file_path = self.QGISTools.get_file_path(layer_name)
                     if str_error:
                         return str_error, self.value_as_string
-                    str_error, layer_name = QGISTools.get_layer_name(layer_name)
+                    str_error, layer_name = self.QGISTools.get_layer_name(layer_name)
                     if str_error:
                         return str_error, self.value_as_string
                     field_name = self.fieldComboBox.currentText()
@@ -204,7 +204,9 @@ class VectorLayerFieldDialog(QDialog):
 
     def initialize(self, str_value):
         str_error = ''
-        self.imported_qgistools = False
+        if self.qgis_iface:
+            from pyLibQGIS.QGISTools import QGISTools
+            self.QGISTools = QGISTools
         self.file_path = None
         self.layer_name = None
         self.field_name = None
@@ -267,10 +269,7 @@ class VectorLayerFieldDialog(QDialog):
         if self.file_path:
             self.fileComboBox.addItem(self.file_path)
         if self.qgis_iface:
-            if not self.imported_qgistools:
-                from pyLibQGIS.QGISTools import QGISTools
-                self.imported_qgistools = True
-            str_error, self.qgis_layers_by_name = QGISTools.get_vector_layers(self.layer_geometry_ogr_wkb_type)
+            str_error, self.qgis_layers_by_name = self.QGISTools.get_vector_layers(self.layer_geometry_ogr_wkb_type)
             if str_error:
                 return str_error
             if len(self.qgis_layers_by_name) > 0:
@@ -316,7 +315,7 @@ class VectorLayerFieldDialog(QDialog):
             return
         current_position = 0
         if file_path == defs_qgis.QGIS_PROJECT_TAG:
-            str_error, field_names = QGISTools.get_vector_layer_field_names(self.qgis_layers_by_name[layer_name])
+            str_error, field_names = self.QGISTools.get_vector_layer_field_names(self.qgis_layers_by_name[layer_name])
         else:
             str_error, field_names = GDALTools.get_layer_field_names(file_path, layer_name)
         if str_error:
@@ -335,12 +334,12 @@ class VectorLayerFieldDialog(QDialog):
         self.fieldComboBox.setEnabled(True)
         self.fieldComboBox.setCurrentIndex(current_position)
         if file_path == defs_qgis.QGIS_PROJECT_TAG:
-            str_error, file_path = QGISTools.get_file_path(layer_name)
+            str_error, file_path = self.QGISTools.get_file_path(layer_name)
             if str_error:
                 QMessageBox.information(self, 'Information', str_error)
                 self.fileComboBox.setCurrentIndex(0)
                 return
-            str_error, layer_name = QGISTools.get_layer_name(layer_name)
+            str_error, layer_name = self.QGISTools.get_layer_name(layer_name)
             if str_error:
                 QMessageBox.information(self, 'Information', str_error)
                 self.fileComboBox.setCurrentIndex(0)
