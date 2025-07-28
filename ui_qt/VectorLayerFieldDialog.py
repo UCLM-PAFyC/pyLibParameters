@@ -127,15 +127,15 @@ class VectorLayerFieldDialog(QDialog):
                 self.fileComboBox.setCurrentIndex(0)
             for i in range(len(layer_names)):
                 layer_name = layer_names[i]
-                if self.layer_name:
-                    str_error, geometry_type = GDALTools.get_layer_geometry_type(file_path, layer_name)
-                    if str_error:
-                        QMessageBox.information(self, 'Information', str_error)
-                        return
-                    if geometry_type in self.layer_geometry_ogr_wkb_type:
+                str_error, geometry_type = GDALTools.get_layer_geometry_type(file_path, layer_name)
+                if str_error:
+                    QMessageBox.information(self, 'Information', str_error)
+                    return
+                if geometry_type in self.layer_geometry_ogr_wkb_type:
+                    if self.layer_name:
                         if layer_name.casefold() == self.layer_name.casefold():
                             current_position = i + 1
-                        self.layerComboBox.addItem(layer_name)
+                    self.layerComboBox.addItem(layer_name)
         self.layerComboBox.setEnabled(True)
         self.layerComboBox.setCurrentIndex(current_position)
         return
@@ -155,12 +155,8 @@ class VectorLayerFieldDialog(QDialog):
             if file_path == defs_qgis.QGIS_PROJECT_TAG:
                 layer_name = self.layerComboBox.currentText()
                 if layer_name == defs_pars.NO_COMBO_SELECT:
-                    if self.mandatory:
-                        str_error = ('No layer selected')
-                        return str_error, self.value_as_string
-                    else:
-                        file_path = ''
-                        layer_name = ''
+                    str_error = ('No layer selected')
+                    return str_error, self.value_as_string
                 else:
                     str_error, file_path = self.QGISTools.get_file_path(layer_name)
                     if str_error:
@@ -170,32 +166,18 @@ class VectorLayerFieldDialog(QDialog):
                         return str_error, self.value_as_string
                     field_name = self.fieldComboBox.currentText()
                     if field_name == defs_pars.NO_COMBO_SELECT:
-                        if self.mandatory:
-                            str_error = ('No field selected')
-                            return str_error, self.value_as_string
-                        else:
-                            file_path = ''
-                            layer_name = ''
-                            field_name = ''
+                        str_error = ('No field selected')
+                        return str_error, self.value_as_string
             else:
                 layer_name = self.layerComboBox.currentText()
                 if layer_name == defs_pars.NO_COMBO_SELECT:
-                    if self.mandatory:
-                        str_error = ('No layer selected')
-                        return str_error, self.value_as_string
-                    else:
-                        file_path = ''
-                        layer_name = ''
+                    str_error = ('No layer selected')
+                    return str_error, self.value_as_string
                 else:
                     field_name = self.fieldComboBox.currentText()
                     if field_name == defs_pars.NO_COMBO_SELECT:
-                        if self.mandatory:
-                            str_error = ('No field selected')
-                            return str_error, self.value_as_string
-                        else:
-                            file_path = ''
-                            layer_name = ''
-                            field_name = ''
+                        str_error = ('No field selected')
+                        return str_error, self.value_as_string
         self.value_as_dict[defs_pars.TAG_FILE_PATH] = file_path
         self.value_as_dict[defs_pars.TAG_LAYER_NAME] = layer_name
         self.value_as_dict[defs_pars.TAG_FIELD_NAME] = field_name
@@ -230,12 +212,20 @@ class VectorLayerFieldDialog(QDialog):
                 str_error = ('Vector Layer Field Name Parameter: {} value must contain {}'
                              .format(self.label, defs_pars.TAG_FILE_PATH))
                 return str_error
-            self.file_path = value[defs_pars.TAG_FILE_PATH]
+            file_name = value[defs_pars.TAG_FILE_PATH]
+            if not os.path.exists(file_name):
+                msg = ('Not exists file:\n{}'.format(file_name))
+                QMessageBox.information(self, 'Information', msg)
+                file_name = ''
+            self.file_path = file_name
             if not defs_pars.TAG_LAYER_NAME in value:
                 str_error = ('Vector Layer Field Name Parameter: {} value must contain {}'
                              .format(self.label, defs_pars.TAG_LAYER_NAME))
                 return str_error
-            self.layer_name = value[defs_pars.TAG_LAYER_NAME]
+            layer_name = ''
+            if file_name:
+                layer_name = value[defs_pars.TAG_LAYER_NAME]
+            self.layer_name = layer_name
             if not defs_pars.TAG_LAYER_GEOMETRY_TYPE in value:
                 str_error = ('Vector Layer Field Name Parameter: {} value must contain {}'
                              .format(self.label, defs_pars.TAG_LAYER_GEOMETRY_TYPE))
@@ -260,10 +250,12 @@ class VectorLayerFieldDialog(QDialog):
                 str_error = ('Vector Layer Field Name Parameter: {} value must contain {}'
                              .format(self.label, defs_pars.TAG_FIELD_NAME))
                 return str_error
-            self.field_name = value[defs_pars.TAG_FIELD_NAME]
+            field_name = ''
+            if file_name and layer_name:
+                field_name = value[defs_pars.TAG_FIELD_NAME]
+            self.field_name = field_name
             self.value_as_dict = value
             self.value_as_string = str_value
-
         self.fileComboBox.clear()
         self.fileComboBox.addItem(defs_pars.NO_COMBO_SELECT)
         if self.file_path:

@@ -172,12 +172,8 @@ class RasterLayerDialog(QDialog):
                     return str_error, self.value_as_string
             str_layer_index = self.layerComboBox.currentText()
             if str_layer_index == defs_pars.NO_COMBO_SELECT:
-                if self.mandatory:
-                    str_error = ('No layer index selected')
-                    return str_error, self.value_as_string
-                else:
-                    file_path = ''
-                    layer_name = None
+                str_error = ('No layer index selected')
+                return str_error, self.value_as_string
             layer_index = int(str_layer_index)
             str_scale = self.scaleLineEdit.text()
             scale = float(str_scale)
@@ -217,31 +213,43 @@ class RasterLayerDialog(QDialog):
                 str_error = ('Raster Layer Parameter: {} value must contain {}'
                              .format(self.label, defs_pars.TAG_FILE_PATH))
                 return str_error
-            self.file_path = value[defs_pars.TAG_FILE_PATH]
+            file_name = value[defs_pars.TAG_FILE_PATH]
+            if not os.path.exists(file_name):
+                msg = ('Not exists file:\n{}'.format(file_name))
+                QMessageBox.information(self, 'Information', msg)
+                file_name = ''
+            self.file_path = file_name
             if not defs_pars.TAG_LAYER_INDEX in value:
                 str_error = ('Raster Layer Parameter: {} value must contain {}'
                              .format(self.label, defs_pars.TAG_LAYER_INDEX))
                 return str_error
-            self.layer_index = value[defs_pars.TAG_LAYER_INDEX]
+            layer_index = None
+            if file_name:
+                layer_index = value[defs_pars.TAG_LAYER_INDEX]
+            self.layer_index = layer_index
             if not defs_pars.TAG_SCALE in value:
                 str_error = ('Raster Layer Parameter: {} value must contain {}'
                              .format(self.label, defs_pars.TAG_SCALE))
                 return str_error
-            scale = value[defs_pars.TAG_SCALE]
-            if not isinstance(scale, float):
-                str_error = ('Raster Layer Parameter: {} scale must be a float and is: {}'
-                             .format(self.label, str(type(scale))))
-                return str_error
+            scale = defs_pars.SCALE_DEFAULT_VALUE
+            if layer_index:
+                scale = value[defs_pars.TAG_SCALE]
+                if not isinstance(scale, float):
+                    str_error = ('Raster Layer Parameter: {} scale must be a float and is: {}'
+                                 .format(self.label, str(type(scale))))
+                    return str_error
             self.scale = scale
             if not defs_pars.TAG_OFFSET in value:
                 str_error = ('Raster Layer Parameter: {} value must contain {}'
                              .format(self.label, defs_pars.TAG_OFFSET))
                 return str_error
-            offset = value[defs_pars.TAG_OFFSET]
-            if not isinstance(offset, float):
-                str_error = ('Raster Layer Parameter: {} offset must be a float and is: {}'
-                             .format(self.label, str(type(offset))))
-                return str_error
+            offset = defs_pars.OFFSET_DEFAULT_VALUE
+            if layer_index:
+                offset = value[defs_pars.TAG_OFFSET]
+                if not isinstance(offset, float):
+                    str_error = ('Raster Layer Parameter: {} offset must be a float and is: {}'
+                                 .format(self.label, str(type(offset))))
+                    return str_error
             self.offset = offset
             self.value_as_dict = value
             self.value_as_string = str_value

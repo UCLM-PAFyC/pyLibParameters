@@ -540,14 +540,19 @@ class ParametersManagerDialog(QDialog):
             if dialog.str_error:
                 QMessageBox.information(self, 'Information', dialog.str_error)
                 return
-            dialog_result = dialog.exec()
-            if dialog_result == QDialog.Accepted:
-                str_error, new_str_value = dialog.get_value_as_string()
-                if str_error:
-                    QMessageBox.information(self, 'Information', str_error)
-                    dialog.exec()
-                if new_str_value != str_value:
-                    self.tableWidget.item(row, 1).setText(new_str_value)
+            new_str_value = str_value
+            while True:
+                dialog_result = dialog.exec()
+                if dialog_result == QDialog.Accepted:
+                    str_error, new_str_value = dialog.get_value_as_string()
+                    if str_error:
+                        QMessageBox.information(self, 'Information', str_error)
+                    else:
+                        break
+                else:
+                    break
+            if new_str_value != str_value:
+                self.tableWidget.item(row, 1).setText(new_str_value)
         elif isinstance(parameter, VectorLayerParameter):
             domain = parameter.domain
             dialog = VectorLayerDialog(title, parameter_label, str_value, domain, mandatory,
@@ -555,14 +560,19 @@ class ParametersManagerDialog(QDialog):
             if dialog.str_error:
                 QMessageBox.information(self, 'Information', dialog.str_error)
                 return
-            dialog_result = dialog.exec()
-            if dialog_result == QDialog.Accepted:
-                str_error, new_str_value = dialog.get_value_as_string()
-                if str_error:
-                    QMessageBox.information(self, 'Information', str_error)
-                    dialog.exec()
-                if new_str_value != str_value:
-                    self.tableWidget.item(row, 1).setText(new_str_value)
+            new_str_value = str_value
+            while True:
+                dialog_result = dialog.exec()
+                if dialog_result == QDialog.Accepted:
+                    str_error, new_str_value = dialog.get_value_as_string()
+                    if str_error:
+                        QMessageBox.information(self, 'Information', str_error)
+                    else:
+                        break
+                else:
+                    break
+            if new_str_value != str_value:
+                self.tableWidget.item(row, 1).setText(new_str_value)
         elif isinstance(parameter, VectorLayerFieldNameParameter):
             domain = parameter.domain
             dialog = VectorLayerFieldDialog(title, parameter_label, str_value, domain, mandatory,
@@ -570,14 +580,19 @@ class ParametersManagerDialog(QDialog):
             if dialog.str_error:
                 QMessageBox.information(self, 'Information', dialog.str_error)
                 return
-            dialog_result = dialog.exec()
-            if dialog_result == QDialog.Accepted:
-                str_error, new_str_value = dialog.get_value_as_string()
-                if str_error:
-                    QMessageBox.information(self, 'Information', str_error)
-                    dialog.exec()
-                if new_str_value != str_value:
-                    self.tableWidget.item(row, 1).setText(new_str_value)
+            new_str_value = str_value
+            while True:
+                dialog_result = dialog.exec()
+                if dialog_result == QDialog.Accepted:
+                    str_error, new_str_value = dialog.get_value_as_string()
+                    if str_error:
+                        QMessageBox.information(self, 'Information', str_error)
+                    else:
+                        break
+                else:
+                    break
+            if new_str_value != str_value:
+                self.tableWidget.item(row, 1).setText(new_str_value)
         else:
             text, ok = QInputDialog.getText(self, title, defs_pars.PARAMETER_FIELD_VALUE_TAG,
                                             QLineEdit.Normal, str_value)

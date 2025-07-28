@@ -264,9 +264,10 @@ class FileParameter(Parameter):
             if (str_file_mode.casefold() == defs_pars.FILE_MODE_READ.casefold()
                     or str_file_mode.casefold() == defs_pars.FILE_MODE_APPEND.casefold()):
                 if not os.path.isfile(file_path):
-                    str_error = ('File Parameter: {} not exists file for read/append:\n{}'
-                                 .format(self.label, file_path))
-                    return str_error
+                    # str_error = ('File Parameter: {} not exists file for read/append:\n{}'
+                    #              .format(self.label, file_path))
+                    # return str_error
+                    is_error = None
             else:
                 if os.path.isfile(file_path):
                     os.remove(file_path)
@@ -983,9 +984,10 @@ class RasterLayerParameter(Parameter):
             if (str_file_mode.casefold() == defs_pars.FILE_MODE_READ.casefold()
                     or str_file_mode.casefold() == defs_pars.FILE_MODE_APPEND.casefold()):
                 if not os.path.isfile(file_path):
-                    str_error = ('Raster Layer Parameter: {} not exists file for read/append:\n{}'
-                                 .format(self.label, file_path))
-                    return str_error
+                    # str_error = ('Raster Layer Parameter: {} not exists file for read/append:\n{}'
+                    #              .format(self.label, file_path))
+                    # return str_error
+                    is_error = None
             else:
                 if os.path.isfile(file_path):
                     os.remove(file_path)
@@ -1095,9 +1097,10 @@ class VectorLayerParameter(Parameter):
             if (str_file_mode.casefold() == defs_pars.FILE_MODE_READ.casefold()
                     or str_file_mode.casefold() == defs_pars.FILE_MODE_APPEND.casefold()):
                 if not os.path.isfile(file_path):
-                    str_error = ('Vector Layer Parameter: {} not exists file for read/append:\n{}'
-                                 .format(self.label, file_path))
-                    return str_error
+                    # str_error = ('Vector Layer Parameter: {} not exists file for read/append:\n{}'
+                    #              .format(self.label, file_path))
+                    # return str_error
+                    is_error = None
             else:
                 if os.path.isfile(file_path):
                     os.remove(file_path)
@@ -1208,9 +1211,10 @@ class VectorLayerFieldNameParameter(Parameter):
             if (str_file_mode.casefold() == defs_pars.FILE_MODE_READ.casefold()
                     or str_file_mode.casefold() == defs_pars.FILE_MODE_APPEND.casefold()):
                 if not os.path.isfile(file_path):
-                    str_error = ('Vector Layer Field Name Parameter: {} not exists file for read/append:\n{}'
-                                 .format(self.label, file_path))
-                    return str_error
+                    # str_error = ('Vector Layer Field Name Parameter: {} not exists file for read/append:\n{}'
+                    #              .format(self.label, file_path))
+                    # return str_error
+                    is_error = None
             else:
                 if os.path.isfile(file_path):
                     os.remove(file_path)
