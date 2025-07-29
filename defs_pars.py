@@ -42,6 +42,7 @@ PARAMETERS = "parameters"
 PARAMETER_FIELD_LABEL = "label"
 PARAMETER_FIELD_DESCRIPTION = "description"
 PARAMETER_FIELD_MANDATORY = "mandatory"
+PARAMETER_FIELD_OUTPUT = "output"
 PARAMETER_FIELD_TYPE = "type"
 PARAMETER_FIELD_VALUE = "value"
 PARAMETER_FIELD_OUTPUT_FORMAT = "output_format"
@@ -63,6 +64,7 @@ parameter_common_fields.append(PARAMETER_FIELD_LABEL)
 parameter_common_fields.append(PARAMETER_FIELD_ARGPARSER)
 parameter_common_fields.append(PARAMETER_FIELD_DESCRIPTION)
 parameter_common_fields.append(PARAMETER_FIELD_MANDATORY)
+parameter_common_fields.append(PARAMETER_FIELD_OUTPUT)
 parameter_common_fields.append(PARAMETER_FIELD_TYPE)
 parameter_common_fields.append(PARAMETER_FIELD_VALUE)
 parameter_common_fields.append(PARAMETER_FIELD_OUTPUT_FORMAT)
