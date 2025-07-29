@@ -46,6 +46,7 @@ class ParametersManager:
                                                                                       str_value))
                         return str_error, arguments
                     str_value = os.path.normcase(str_value)
+                str_value = str_value.replace('\\','/')
                 parameter_value = ('{}'.format(str_value))
             elif isinstance(parameter, IntegerParameter):
                 # parameter_value = int(str_value)
@@ -67,11 +68,15 @@ class ParametersManager:
                     if not str_value:
                         str_error += ('For parameter: {} file is not selected'.format(parameter_label))
                         return str_error, arguments
-                    if not os.path.exists(str_value):
+                if str_value:
+                    parameter_value = parameter.get_value()
+                    file_path = parameter_value[defs_pars.TAG_FILE_PATH]
+                    if not os.path.exists(file_path):
                         str_error += ('For parameter: {} not exists file:\n{}'.format(parameter_label,
-                                                                                      str_value))
+                                                                                      file_path))
                         return str_error, arguments
-                    str_value = os.path.normcase(str_value)
+                    # str_value = os.path.normcase(str_value)
+                str_value = str_value.replace('\\','/')
                 parameter_value = ('{}'.format(str_value))
             elif isinstance(parameter, VectorLayerParameter):
                 # str_value = str_value.replace("\"", "\\\"\"")
@@ -80,11 +85,14 @@ class ParametersManager:
                     if not str_value:
                         str_error += ('For parameter: {} file is not selected'.format(parameter_label))
                         return str_error, arguments
-                    if not os.path.exists(str_value):
+                    parameter_value = parameter.get_value()
+                    file_path = parameter_value[defs_pars.TAG_FILE_PATH]
+                    if not os.path.exists(file_path):
                         str_error += ('For parameter: {} not exists file:\n{}'.format(parameter_label,
-                                                                                      str_value))
+                                                                                      file_path))
                         return str_error, arguments
-                    str_value = os.path.normcase(str_value)
+                    # str_value = os.path.normcase(str_value)
+                str_value = str_value.replace('\\','/')
                 parameter_value = ('{}'.format(str_value))
             elif isinstance(parameter, VectorLayerFieldNameParameter):
                 # str_value = str_value.replace("\"", "\\\"\"")
@@ -93,11 +101,15 @@ class ParametersManager:
                     if not str_value:
                         str_error += ('For parameter: {} file is not selected'.format(parameter_label))
                         return str_error, arguments
-                    if not os.path.exists(str_value):
+                if str_value:
+                    parameter_value = parameter.get_value()
+                    file_path = parameter_value[defs_pars.TAG_FILE_PATH]
+                    if not os.path.exists(file_path):
                         str_error += ('For parameter: {} not exists file:\n{}'.format(parameter_label,
-                                                                                      str_value))
+                                                                                      file_path))
                         return str_error, arguments
-                    str_value = os.path.normcase(str_value)
+                    # str_value = os.path.normcase(str_value)
+                str_value = str_value.replace('\\','/')
                 parameter_value = ('{}'.format(str_value))
             if not parameter_value:
                 str_error = ('Invalid parameter: {}'.format(parameter.label))
