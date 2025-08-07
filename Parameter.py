@@ -689,6 +689,7 @@ class PhysicalQuantityParameter(RealParameter):
     def initialize(self, value, domain,
                    ui_unit, computation_unit, output_format_unit,
                    ignored_units,
+                   valid_units,
                    tol = 1e-9):
         str_error = ''
         if value is None:
@@ -697,6 +698,10 @@ class PhysicalQuantityParameter(RealParameter):
         if not isinstance(ignored_units, list):
             str_error = ('Physical Quantity Parameter: {} ignored units must be a list and is: {}'.
                          format(self.label, str(type(ignored_units))))
+            return str_error
+        if not isinstance(valid_units, list):
+            str_error = ('Physical Quantity Parameter: {} valid units must be a list and is: {}'.
+                         format(self.label, str(type(valid_units))))
             return str_error
         if domain is None:
             str_error = ('Physical Quantity Parameter domain is None')
@@ -757,6 +762,11 @@ class PhysicalQuantityParameter(RealParameter):
                     'Physical Quantity Parameter: {} ui unit must be a string and is: {}'.
                     format(self.label, str(type(ui_unit))))
             return str_error
+        if len(valid_units) > 0:
+            if not ui_unit in valid_units:
+                str_error = (
+                    'Physical Quantity Parameter: {} ui unit: {} is not a valid unit'.format(self.label, ui_unit))
+                return str_error
         quantity_ui_unit = defs_pars.ureg.Quantity
         try:
             quantity_ui_unit = quantity_ui_unit(float_value, ui_unit)
@@ -768,6 +778,12 @@ class PhysicalQuantityParameter(RealParameter):
         if computation_unit is None:
             str_error = ('Physical Quantity Parameter computation unit is None')
             return str_error
+        if len(valid_units) > 0:
+            if not computation_unit in valid_units:
+                str_error = (
+                    'Physical Quantity Parameter: {} computation unit: {} is not a valid unit'.
+                    format(self.label, computation_unit))
+                return str_error
         if not isinstance(computation_unit, str):
             str_error = (
                     'Physical Quantity Parameter: {} computation unit must be a string and is: {}'.
@@ -807,6 +823,7 @@ class PhysicalQuantityParameter(RealParameter):
         self.output_format_unit = output_format_unit
         self.compatible_units = compatible_units
         self.ignored_units = ignored_units
+        self.valid_units = valid_units
         return str_error
 
     def set_value(self, value, unit = '', from_ui_unit = True ):

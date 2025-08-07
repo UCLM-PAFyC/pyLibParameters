@@ -267,11 +267,15 @@ class ParametersManager:
                 parameter_ignored_units = []
                 if defs_pars.PARAMETER_FIELD_QUANTITY_IGNORED_UNITS in parameter_fields:
                     parameter_ignored_units = parameter_fields[defs_pars.PARAMETER_FIELD_QUANTITY_IGNORED_UNITS]
+                parameter_valid_units = []
+                if defs_pars.PARAMETER_FIELD_QUANTITY_VALID_UNITS in parameter_fields:
+                    parameter_valid_units = parameter_fields[defs_pars.PARAMETER_FIELD_QUANTITY_VALID_UNITS]
                 str_aux_error = parameter.initialize(parameter_value, parameter_domain,
                                                      parameter_ui_unit,
                                                      parameter_computation_unit,
                                                      parameter_output_format_unit,
                                                      parameter_ignored_units,
+                                                     parameter_valid_units,
                                                      relative_tolerance)
                 if str_aux_error:
                     str_error = ('ParametersManager.initialize\n')

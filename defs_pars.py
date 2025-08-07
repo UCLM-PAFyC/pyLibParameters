@@ -56,6 +56,7 @@ PARAMETER_FIELD_QUANTITY_UI_UNIT = "ui_unit"
 PARAMETER_FIELD_QUANTITY_COMPUTATION_UNIT = "computation_unit"
 PARAMETER_FIELD_QUANTITY_OUTPUT_FORMAT_UNIT = "output_format_unit"
 PARAMETER_FIELD_QUANTITY_IGNORED_UNITS = "ignored_units"
+PARAMETER_FIELD_QUANTITY_VALID_UNITS = "valid_units"
 
 PARAMETER_PIPE_CHARACTER = "|"
 
@@ -139,6 +140,7 @@ parameter_optional_fields_by_type[PARAMETER_TYPE_FILE].append(PARAMETER_FIELD_DO
 parameter_optional_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY] = []
 parameter_optional_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY].append(PARAMETER_FIELD_TOLERANCE)
 parameter_optional_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY].append(PARAMETER_FIELD_QUANTITY_IGNORED_UNITS)
+parameter_optional_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY].append(PARAMETER_FIELD_QUANTITY_VALID_UNITS)
 parameter_optional_fields_by_type[PARAMETER_TYPE_VECTOR_LAYER_FIELD_NAME] = []
 parameter_optional_fields_by_type[PARAMETER_TYPE_VECTOR_LAYER] = []
 parameter_optional_fields_by_type[PARAMETER_TYPE_RASTER_LAYER] = []
