@@ -649,12 +649,24 @@ class PhysicalQuantityParameter(RealParameter):
         self.computation_unit = None
         self.output_format_unit = None
         self.compatible_units = None
+        self.ignored_units = None
+        self.valid_units = None
 
     def get_compatible_units(self):
         compatible_units = []
         for compatible_unit in self.compatible_units:
             if not compatible_unit in self.ignored_units:
-                compatible_units.append(str(compatible_unit))
+                if self.valid_units:
+                    str_compatible_unit = str(compatible_unit)
+                    is_valid_unit = False
+                    for valid_unit in self.valid_units:
+                        if (str_compatible_unit.casefold() == valid_unit.casefold()
+                                or str_compatible_unit.casefold() in valid_unit.casefold()
+                                or valid_unit.casefold() in str_compatible_unit.casefold()):
+                            compatible_units.append(valid_unit)
+                            break
+                else:
+                    compatible_units.append(str(compatible_unit))
         return compatible_units
 
     def get_str_value_wihtout_unit(self):

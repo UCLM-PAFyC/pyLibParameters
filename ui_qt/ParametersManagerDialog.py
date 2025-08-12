@@ -320,19 +320,21 @@ class ParametersManagerDialog(QDialog):
                 return str_error
             domain = parameter.domain
             str_unit = ''
+            str_ui_unit_acronym = ''
             if parameter.output_format_unit:
                 str_unit = parameter.output_format_unit.format(parameter.quantity.units)
+                str_ui_unit_acronym = parameter.output_format_unit.format(quantity_ui_unit.units)
             if len(domain) == 2:
                 self.quantity_parameter = None
                 self.quantity_unit_combo_box = None
                 self.quantity_previous_selected_unit = None
                 self.quantity_value_edit = None
                 str_min_value = str(eval(parameter.output_format.format(domain[0])))
-                if str_unit:
-                    str_min_value += " " + str_unit
+                if str_ui_unit_acronym:
+                    str_min_value += " " + str_ui_unit_acronym
                 str_max_value = str(eval(parameter.output_format.format(domain[1])))
                 if parameter.output_format_unit:
-                    str_max_value += " " + str_unit
+                    str_max_value += " " + str_ui_unit_acronym
                 dialog = QDialog()
                 dialog.setWindowTitle(title)
                 dialog_button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
@@ -350,10 +352,15 @@ class ParametersManagerDialog(QDialog):
                 str_ui_unit = str(quantity_ui_unit.units)
                 for i in range(len(compatible_units)):
                     compatible_unit = compatible_units[i]
-                    # str_compatible_unit = parameter.output_format_unit.format(parameter.quantity.units)
-                    self.quantity_unit_combo_box.addItem(compatible_unit)
                     if compatible_unit.casefold() == str_ui_unit.casefold():
                         pos = i
+                        self.quantity_unit_combo_box.addItem(str_ui_unit)
+                    else:
+                        self.quantity_unit_combo_box.addItem(compatible_unit)
+                # # str_compatible_unit = parameter.output_format_unit.format(parameter.quantity.units)
+                    # self.quantity_unit_combo_box.addItem(compatible_unit)
+                    # if compatible_unit.casefold() == str_ui_unit.casefold():
+                    #     pos = i
                 self.quantity_unit_combo_box.setCurrentIndex(pos)
                 self.quantity_previous_selected_unit = self.quantity_unit_combo_box.currentText()
                 self.quantity_unit_combo_box.currentIndexChanged.connect(self.select_quantity_unit)
@@ -371,7 +378,7 @@ class ParametersManagerDialog(QDialog):
                 if dialog_result == QDialog.Accepted:
                     new_str_value = self.quantity_value_edit.text()
                     new_unit = self.quantity_unit_combo_box.currentText()
-                    if new_str_value == str_value and new_unit == str_unit:
+                    if new_str_value == str_value and new_unit == str_ui_unit:
                         self.quantity_unit_combo_box.currentIndexChanged.disconnect()
                         self.quantity_parameter = None
                         self.quantity_unit_combo_box = None
@@ -417,8 +424,10 @@ class ParametersManagerDialog(QDialog):
                         self.quantity_value_edit = None
                         return
                     str_value = str(eval(parameter.output_format.format(new_ui_value)))
-                    if str_unit:
-                        str_value += " " + str_unit
+                    # if str_ui_unit:
+                    #     str_value += " " + str_ui_unit
+                    if str_ui_unit_acronym:
+                        str_value += " " + str_ui_unit_acronym
                     if not str_value and mandatory:
                         msg = ('Parameter: {} is mandatory'.format(parameter_label))
                         QMessageBox.information(self, 'Information', msg)
@@ -460,7 +469,8 @@ class ParametersManagerDialog(QDialog):
                 for i in range(len(domain)):
                     str_value_aux = str(eval(parameter.output_format.format(domain[i])))
                     if str_unit:
-                        str_value_aux += " " + str_unit
+                        str_value_aux += " " + str_ui_unit_acronym
+                        # str_value_aux += " " + str_unit
                     items.append(str_value_aux)
                 current_pos = 0
                 if str_value in items:

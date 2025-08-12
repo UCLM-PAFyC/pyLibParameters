@@ -9,33 +9,33 @@ ureg = UnitRegistry()
 
 # new quantities and units definitions
 # Relative Humidity
-dimension_label = '[relative_humidity]'
-ureg.define('percentage = [relative_humidity] = pc')
-ureg.define('perunit = 100. * percentage = perunit = pu')
-ureg._build_cache()
-values = [k for k, v in ureg._cache.dimensionality.items() if v == UnitsContainer({'[relative_humidity]': 1})]
-compatible_units = []
-for i in range(len(values)):
-    for key in values[i]._d:
-        if key != '[currency]':
-            compatible_units.append(key)
-# quantity_hr_pc = ureg.Quantity
-# try:
-#     quantity_hr_pc = quantity_hr_pc(30.0, 'percentage')
-# except Exception as quantity_error:
-#     yo = 5
-# quantity_hr_pu = quantity_hr_pc.to('perunit')
-# dimensionality_value = str(quantity_hr_pu.dimensionality)
+# dimension_label = '[relative_humidity]'
+# ureg.define('percentage = [relative_humidity] = pc')
+# ureg.define('perunit = 100. * percentage = perunit = pu')
+# ureg._build_cache()
+# values = [k for k, v in ureg._cache.dimensionality.items() if v == UnitsContainer({'[relative_humidity]': 1})]
+# compatible_units = []
+# for i in range(len(values)):
+#     for key in values[i]._d:
+#         if key != '[currency]':
+#             compatible_units.append(key)
+# # quantity_hr_pc = ureg.Quantity
+# # try:
+# #     quantity_hr_pc = quantity_hr_pc(30.0, 'percentage')
+# # except Exception as quantity_error:
+# #     yo = 5
+# # quantity_hr_pu = quantity_hr_pc.to('perunit')
+# # dimensionality_value = str(quantity_hr_pu.dimensionality)
 
-# Q_ = ureg.Quantity
-# pressure = Q_(1013.25, 'hPa')
-# print(ureg.get_compatible_units(pressure))
-# pressure_units = ['bar', 'mbar', 'psi', 'MPa', 'kpsi', 'mPa', 'millimeter_Hg', 'mmHg']
-# print(pressure)
-# for p_unit in pressure_units:
-#     mag = pressure.to(p_unit).magnitude
-#     unit = pressure.to(p_unit).units
-#     print('{:.2f}'.format(mag), unit)
+Q_ = ureg.Quantity
+pressure = Q_(1013.25, 'hPa')
+print(ureg.get_compatible_units(pressure))
+pressure_units = ['bar', 'mbar', 'psi', 'MPa', 'kpsi', 'mPa', 'millimeter_Hg', 'mmHg']
+print(pressure)
+for p_unit in pressure_units:
+    mag = pressure.to(p_unit).magnitude
+    unit = pressure.to(p_unit).units
+    print('{:.2f}'.format(mag), unit)
 
 NO_COMBO_SELECT = ' ... '
 PARAMETERS = "parameters"
