@@ -27,15 +27,15 @@ ureg = UnitRegistry()
 # # quantity_hr_pu = quantity_hr_pc.to('perunit')
 # # dimensionality_value = str(quantity_hr_pu.dimensionality)
 
-Q_ = ureg.Quantity
-pressure = Q_(1013.25, 'hPa')
-print(ureg.get_compatible_units(pressure))
-pressure_units = ['bar', 'mbar', 'psi', 'MPa', 'kpsi', 'mPa', 'millimeter_Hg', 'mmHg']
-print(pressure)
-for p_unit in pressure_units:
-    mag = pressure.to(p_unit).magnitude
-    unit = pressure.to(p_unit).units
-    print('{:.2f}'.format(mag), unit)
+# Q_ = ureg.Quantity
+# pressure = Q_(1013.25, 'hPa')
+# print(ureg.get_compatible_units(pressure))
+# pressure_units = ['bar', 'mbar', 'psi', 'MPa', 'kpsi', 'mPa', 'millimeter_Hg', 'mmHg']
+# print(pressure)
+# for p_unit in pressure_units:
+#     mag = pressure.to(p_unit).magnitude
+#     unit = pressure.to(p_unit).units
+#     print('{:.2f}'.format(mag), unit)
 
 NO_COMBO_SELECT = ' ... '
 PARAMETERS = "parameters"
