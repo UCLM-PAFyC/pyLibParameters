@@ -9,17 +9,17 @@ ureg = UnitRegistry()
 
 # new quantities and units definitions
 # Relative Humidity
-# dimension_label = '[relative_humidity]'
-# ureg.define('percentage = [relative_humidity] = pc')
-# ureg.define('perunit = 100. * percentage = perunit = pu')
-# ureg._build_cache()
-# values = [k for k, v in ureg._cache.dimensionality.items() if v == UnitsContainer({'[relative_humidity]': 1})]
-# compatible_units = []
-# for i in range(len(values)):
-#     for key in values[i]._d:
-#         if key != '[currency]':
-#             compatible_units.append(key)
-# # quantity_hr_pc = ureg.Quantity
+dimension_label = '[relative_humidity]'
+ureg.define('percentage = [relative_humidity] = pc')
+ureg.define('perunit = 100. * percentage = perunit = pu')
+ureg._build_cache()
+values = [k for k, v in ureg._cache.dimensionality.items() if v == UnitsContainer({'[relative_humidity]': 1})]
+compatible_units = []
+for i in range(len(values)):
+    for key in values[i]._d:
+        if key != '[currency]':
+            compatible_units.append(key)
+# quantity_hr_pc = ureg.Quantity
 # # try:
 # #     quantity_hr_pc = quantity_hr_pc(30.0, 'percentage')
 # # except Exception as quantity_error:
