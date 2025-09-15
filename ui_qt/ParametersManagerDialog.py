@@ -210,9 +210,13 @@ class ParametersManagerDialog(QDialog):
                 self.tableWidget.item(row, 1).setText(str_value)
         elif isinstance(parameter, FileParameter):
             previous_file = str_value
-            path = QDir.currentPath()
+            path = None
             if os.path.isfile(previous_file):
                 path = os.path.dirname(previous_file)
+            else:
+                path = self.settings.value("last_path")
+                if not path:
+                    path = QDir.currentPath()
             str_files = '(*.*)'
             if parameter.domain:
                 str_files = 'Files ('

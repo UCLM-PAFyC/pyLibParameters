@@ -111,6 +111,7 @@ parameter_fields_by_type[PARAMETER_TYPE_DATE].append(PARAMETER_FIELD_DATE_FORMAT
 parameter_fields_by_type[PARAMETER_TYPE_STRING] = []
 parameter_fields_by_type[PARAMETER_TYPE_BOOLEAN] = []
 parameter_fields_by_type[PARAMETER_TYPE_FILE] = []
+parameter_fields_by_type[PARAMETER_TYPE_FILE].append(PARAMETER_FIELD_DOMAIN)
 parameter_fields_by_type[PARAMETER_TYPE_FILE].append(PARAMETER_TYPE_FILE_MODE)
 parameter_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY] = []
 parameter_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY].append(PARAMETER_FIELD_DOMAIN)
