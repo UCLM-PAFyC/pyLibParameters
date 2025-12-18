@@ -84,6 +84,7 @@ PARAMETER_TYPE_PHYSICAL_QUANTITY = 'physical_quantity'
 PARAMETER_TYPE_VECTOR_LAYER_FIELD_NAME = 'vector_layer_field_name'
 PARAMETER_TYPE_VECTOR_LAYER = 'vector_layer'
 PARAMETER_TYPE_RASTER_LAYER = 'raster_layer'
+PARAMETER_TYPE_LAYER_SET = 'layer_set'
 
 FILE_MODE_READ = "read"
 FILE_MODE_WRITE = "write"
@@ -91,6 +92,7 @@ FILE_MODE_APPEND = "append"
 
 TAG_FILE_PATH = 'file_path'
 TAG_LAYER_NAME = 'layer_name'
+TAG_LAYER_NAMES = 'layer_names'
 TAG_LAYER_GEOMETRY_TYPE = 'layer_geometry_type'
 TAG_FIELD_NAME = 'field_name'
 TAG_LAYER_INDEX = 'layer_index'
@@ -113,6 +115,9 @@ parameter_fields_by_type[PARAMETER_TYPE_BOOLEAN] = []
 parameter_fields_by_type[PARAMETER_TYPE_FILE] = []
 parameter_fields_by_type[PARAMETER_TYPE_FILE].append(PARAMETER_FIELD_DOMAIN)
 parameter_fields_by_type[PARAMETER_TYPE_FILE].append(PARAMETER_TYPE_FILE_MODE)
+parameter_fields_by_type[PARAMETER_TYPE_LAYER_SET] = []
+parameter_fields_by_type[PARAMETER_TYPE_LAYER_SET].append(PARAMETER_FIELD_DOMAIN)
+parameter_fields_by_type[PARAMETER_TYPE_LAYER_SET].append(PARAMETER_TYPE_FILE_MODE)
 parameter_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY] = []
 parameter_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY].append(PARAMETER_FIELD_DOMAIN)
 parameter_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY].append(PARAMETER_FIELD_QUANTITY_UI_UNIT)
@@ -138,6 +143,7 @@ parameter_optional_fields_by_type[PARAMETER_TYPE_STRING].append(PARAMETER_FIELD_
 parameter_optional_fields_by_type[PARAMETER_TYPE_BOOLEAN] = []
 parameter_optional_fields_by_type[PARAMETER_TYPE_FILE] = []
 parameter_optional_fields_by_type[PARAMETER_TYPE_FILE].append(PARAMETER_FIELD_DOMAIN)
+parameter_optional_fields_by_type[PARAMETER_TYPE_LAYER_SET] = []
 parameter_optional_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY] = []
 parameter_optional_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY].append(PARAMETER_FIELD_TOLERANCE)
 parameter_optional_fields_by_type[PARAMETER_TYPE_PHYSICAL_QUANTITY].append(PARAMETER_FIELD_QUANTITY_IGNORED_UNITS)
