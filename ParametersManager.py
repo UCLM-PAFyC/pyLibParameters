@@ -192,6 +192,21 @@ class ParametersManager:
                     str_error = ('ParametersManager.initialize\n')
                     str_error += ("No valud for mandatory parameter: {}".format(parameter_label))
                     return str_error
+            # parameters, parameters[parameter_label] = parameter
+            # self.parameters = parameters
+            # self.parameters_as_list_of_dict = parameters_as_list_of_dict
+            parameter_parameters_manager = None
+            if defs_pars.PARAMETER_FIELD_PARAMETERS in parameter_fields:
+                parameter_parameters_dictionary_list = parameter_fields[defs_pars.PARAMETER_FIELD_PARAMETERS]
+                parameter_parameters_manager = ParametersManager()
+                str_aux_error = parameter_parameters_manager.initialize(parameter_parameters_dictionary_list)
+                if str_aux_error:
+                    str_error = ('ParametersManager.initialize\n')
+                    str_error += ("In process from file:\n{}".
+                                  format(process_file))
+                    str_error += ("\nError:\n{}".
+                                  format(str_aux_error))
+                    return str_error
             if parameter_type.casefold() == defs_pars.PARAMETER_TYPE_BOOLEAN.casefold():
                 parameter = BooleanParameter(parameter_label, parameter_argparser, parameter_description,
                                              parameter_output_format, parameter_mandatory, parameter_output)
@@ -329,6 +344,76 @@ class ParametersManager:
                 if defs_pars.PARAMETER_FIELD_DOMAIN in parameter_fields:
                     parameter_domain = parameter_fields[defs_pars.PARAMETER_FIELD_DOMAIN]
                 str_aux_error = parameter.initialize(parameter_value, parameter_file_mode, parameter_domain)
+                if str_aux_error:
+                    str_error = ('ParametersManager.initialize\n')
+                    str_error += str_aux_error
+                    return str_error
+            elif parameter_type == defs_pars.PARAMETER_TYPE_LAYERS_SET:
+                parameter_value = parameter_fields[defs_pars.PARAMETER_FIELD_VALUE]
+                if not defs_pars.TAG_LAYERS in parameter_value:
+                    str_error = ('ParametersManager.initialize\n')
+                    str_error += ('\nLayers Set Parameter: {} value must contain {}'
+                                 .format(parameter_label, defs_pars.TAG_LAYERS))
+                    return str_error
+                layers = parameter_value[defs_pars.TAG_LAYERS]
+                if not isinstance(layers, list):
+                    str_error = ('ParametersManager.initialize\n')
+                    str_error += ('\nLayers Set Parameter: {} value: {} must be a list and is: {}'
+                                 .format(parameter_label, defs_pars.TAG_LAYERS,
+                                         str(type(parameter_value[defs_pars.TAG_LAYERS]))))
+                    return str_error
+                layers_parameters_manager = []
+                for layer_pos in range(len(layers)):
+                    parameters_dictionary_list = layers[layer_pos]
+                    if not isinstance(parameters_dictionary_list, list):
+                        str_error = ('ParametersManager.initialize\n')
+                        str_error += ('\nIn layers Set Parameter: {} '.format(parameter_label))
+                        str_error += ('\nIn layer position: {}'.format(str(layer_pos + 1)))
+                        str_error += ('\nContent is not a list')
+                        return str_error
+                    layer_parameters_manager = ParametersManager()
+                    str_aux_error = layer_parameters_manager.initialize(parameters_dictionary_list)
+                    if str_aux_error:
+                        str_error = ('ParametersManager.initialize\n')
+                        str_error += ('\nIn layers Set Parameter: {} '.format(parameter_label))
+                        str_error += ('\nIn layer position: {}'.format(str(layer_pos + 1)))
+                        str_error += ('\nContent is not a list')
+                        return str_error
+                    for parameter_in_def_label in parameter_parameters_manager.parameters:
+                        find_parameter_in_def = False
+                        for parameter_in_layer_label in layer_parameters_manager.parameters:
+                            if parameter_in_def_label == parameter_in_layer_label:
+                                find_parameter_in_def = True
+                                break
+                        if not find_parameter_in_def:
+                            str_error = ('ParametersManager.initialize\n')
+                            str_error += ('\nIn layers Set Parameter: {} '.format(parameter_label))
+                            str_error += ('\nIn layer position: {}'.format(str(layer_pos + 1)))
+                            str_error += ('\nNot exists definited field: {}'.format(parameter_in_def_label))
+                            return str_error
+                    for parameter_in_layer_label in layer_parameters_manager.parameters:
+                        find_parameter_in_layer = False
+                        for parameter_in_def_label in parameter_parameters_manager.parameters:
+                            if parameter_in_def_label == parameter_in_layer_label:
+                                find_parameter_in_layer = True
+                                break
+                        if not find_parameter_in_layer:
+                            str_error = ('ParametersManager.initialize\n')
+                            str_error += ('\nIn layers Set Parameter: {} '.format(parameter_label))
+                            str_error += ('\nIn layer position: {}'.format(str(layer_pos + 1)))
+                            str_error += ('\nNot exists field: {} in definition'.format(parameter_in_layer_label))
+                            return str_error
+                    layers_parameters_manager.append(layer_parameters_manager)
+                parameter_file_mode = parameter_fields[defs_pars.PARAMETER_FIELD_FILE_MODE]
+                parameter = LayersSetParameter(parameter_label, parameter_argparser, parameter_description,
+                                               parameter_output_format, parameter_mandatory, parameter_output)
+                parameter_domain = None
+                if defs_pars.PARAMETER_FIELD_DOMAIN in parameter_fields:
+                    parameter_domain = parameter_fields[defs_pars.PARAMETER_FIELD_DOMAIN]
+                str_aux_error = parameter.initialize(parameter_value, parameter_file_mode,
+                                                     parameter_parameters_manager,
+                                                     layers_parameters_manager,
+                                                     domain = parameter_domain)
                 if str_aux_error:
                     str_error = ('ParametersManager.initialize\n')
                     str_error += str_aux_error

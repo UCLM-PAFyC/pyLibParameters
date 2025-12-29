@@ -23,8 +23,7 @@ from ui_qt.VectorLayerFieldDialog import VectorLayerFieldDialog
 from ui_qt.VectorLayerDialog import VectorLayerDialog
 from ui_qt.RasterLayerDialog import RasterLayerDialog
 from ui_qt.LayerSetDialog import LayerSetDialog
-
-
+from ui_qt.LayersSetDialog import LayersSetDialog
 from pyLibQtTools.Tools import SimpleTextEditDialog
 
 
@@ -311,6 +310,26 @@ class ParametersManagerDialog(QDialog):
                 item, ok = QInputDialog.getItem(self, title, defs_pars.PARAMETER_FIELD_VALUE_TAG, items, current_pos, False)
                 if ok and item:
                     self.tableWidget.item(row, 1).setText(item)
+        elif isinstance(parameter, LayersSetParameter):
+            domain = parameter.domain
+            dialog = LayersSetDialog(title, parameter_label, parameter, domain, mandatory,
+                                     self.qgis_iface, self.settings,  self)
+            if dialog.str_error:
+                QMessageBox.information(self, 'Information', dialog.str_error)
+                return
+            new_str_value = str_value
+            while True:
+                dialog_result = dialog.exec()
+                if dialog_result == QDialog.Accepted:
+                    str_error, new_str_value = dialog.get_value_as_string()
+                    if str_error:
+                        QMessageBox.information(self, 'Information', str_error)
+                    else:
+                        break
+                else:
+                    break
+            if new_str_value != str_value:
+                self.tableWidget.item(row, 1).setText(new_str_value)
         elif isinstance(parameter, LayerSetParameter):
             domain = parameter.domain
             dialog = LayerSetDialog(title, parameter_label, str_value, domain, mandatory,
@@ -654,7 +673,8 @@ class ParametersManagerDialog(QDialog):
             column_pos = 0
             self.tableWidget.setItem(rowPosition, column_pos, label_item)
             value_item = QTableWidgetItem(parameter_value)
-            value_item.setTextAlignment(Qt.AlignCenter)
+            # value_item.setTextAlignment(Qt.AlignCenter)
+            value_item.setTextAlignment(Qt.AlignLeft)
             column_pos += 1
             self.tableWidget.setItem(rowPosition, column_pos, value_item)
             description_item = QTableWidgetItem(parameter_description)

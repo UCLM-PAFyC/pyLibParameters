@@ -15,7 +15,6 @@ import json
 # ureg = UnitRegistry()
 from pint.util import UnitsContainer
 
-
 class Parameter:
     def __init__(self, label, argparser, description, output_format, mandatory, output, enabled = True):
         self.label = label
@@ -482,6 +481,115 @@ class LayerSetParameter(Parameter):
         self.file_mode = str_file_mode.casefold()
         if domain:
             self.domain = domain
+        return str_error
+
+    def set_value(self, value):
+        str_error = ''
+        if value is None:
+            str_error = ('Layer Set Parameter value is None')
+            return str_error
+        if not isinstance(value, dict):
+            str_error = ('Layer Set Parameter: {} value must be a dictionary and is: {}'
+                         .format(self.label, str(type(value))))
+            return str_error
+        if not defs_pars.TAG_FILE_PATH in value:
+            str_error = ('Layer Set Parameter: {} value must contain {}'
+                         .format(self.label, defs_pars.TAG_FILE_PATH))
+            return str_error
+        if not defs_pars.TAG_LAYER_NAMES in value:
+            str_error = ('Layer Set Parameter: {} value must contain {}'
+                         .format(self.label, defs_pars.TAG_LAYER_NAMES))
+            return str_error
+        self.value = value
+        return str_error
+
+
+class LayersSetParameter(Parameter):
+    def __init__(self, label, description, output_format, mandatory, output, enabled = True):
+        super().__init__(label, description, output_format, mandatory, output, enabled)
+        self.parameters_manager = None
+        self.layers_parameter_manager = []
+
+    def get_value(self):
+        return self.value
+
+    def initialize(self, value, file_mode, parameters_manager, layers_parameters_manager, domain = None):
+        str_error = ''
+        if value is None:
+            str_error = ('Layers Set Parameter value is None')
+            return str_error
+        str_file_mode = file_mode
+        if not isinstance(file_mode, str):
+            try:
+                str_file_mode = str(file_mode)
+            except ValueError:
+                str_error = ('Layers Set Parameter: {} file mode must be a string and is: {}'
+                             .format(self.label, str(type(file_mode))))
+                return str_error
+        if (str_file_mode.casefold() != defs_pars.FILE_MODE_READ.casefold()):
+                # and str_file_mode.casefold() != defs_pars.FILE_MODE_WRITE.casefold()
+                # and str_file_mode.casefold() != defs_pars.FILE_MODE_APPEND.casefold()):
+            str_error = ('File Parameter: {} invalid file mode value: {}'
+                         .format(self.label, str(type(file_mode))))
+            return str_error
+        if domain:
+            if not isinstance(domain, list):
+                str_error = ('Layers Set Parameter: {} domain must be a list and is: {}'
+                             .format(self.label, str(type(domain))))
+                return str_error
+            domain.sort()
+        if not isinstance(value, dict):
+            str_error = ('Layers Set Parameter: {} value must be a dict and is: {}'
+                         .format(self.label, str(type(value))))
+            return str_error
+        if not defs_pars.TAG_FILE_PATH in value:
+            str_error = ('Layers Set Parameter: {} value must contain {}'
+                         .format(self.label, defs_pars.TAG_FILE_PATH))
+            return str_error
+        if not defs_pars.TAG_LAYERS in value:
+            str_error = ('Layers Set Parameter: {} value must contain {}'
+                         .format(self.label, defs_pars.TAG_LAYERS))
+            return str_error
+        file_path = value[defs_pars.TAG_FILE_PATH].strip()
+        # layers = value[defs_pars.TAG_LAYERS]
+        # if not isinstance(layers, list):
+        #     str_error = ('Layers Set Parameter: {} value must be a list and is: {}'
+        #                  .format(defs_pars.TAG_LAYERS, str(type(value[defs_pars.TAG_LAYERS]))))
+        #     return str_error
+        if file_path: # maybe is empty
+            file_path = os.path.normcase(file_path)
+            if domain:
+                file_extension = pathlib.Path(file_path).suffix
+                valid_value = False
+                for domain_value in domain:
+                    if domain_value.casefold() == file_extension.casefold():
+                        valid_value = True
+                        break
+                if not valid_value:
+                    str_error = (
+                        'Layers Set Parameter: {} file:\n{}\nis not in domain values: {}'
+                        .format(self.label, file_path, domain))
+                    return str_error
+            if (str_file_mode.casefold() == defs_pars.FILE_MODE_READ.casefold()
+                    or str_file_mode.casefold() == defs_pars.FILE_MODE_APPEND.casefold()):
+                if not os.path.isfile(file_path):
+                    # str_error = ('Vector Layer Parameter: {} not exists file for read/append:\n{}'
+                    #              .format(self.label, file_path))
+                    # return str_error
+                    is_error = None
+            else:
+                if os.path.isfile(file_path):
+                    os.remove(file_path)
+                    if os.path.isfile(file_path):
+                        str_error = ('Layers Set Parameter: {} error removing existing file for write:\n{}'
+                                     .format(self.label, file_path))
+                        return str_error
+        self.value = value
+        self.file_mode = str_file_mode.casefold()
+        if domain:
+            self.domain = domain
+        self.parameters_manager = parameters_manager
+        self.layers_parameter_manager = layers_parameters_manager
         return str_error
 
     def set_value(self, value):
