@@ -82,25 +82,15 @@ class ParametersManagerDialog(QDialog):
         column = item.column()
         if column != 1:
             return
-        current_text = item.text()
+        str_value = item.text()
         parameter_label =  self.tableWidget.item(row, 0).text()
         label = self.tableWidget.horizontalHeaderItem(column).text()
         tool_tip_text = self.tableWidget.horizontalHeaderItem(column).toolTip()
-        self.set_value(row)
-
-        # dialog = ParameterDialog(self.parameters_manager, parameter_label, self)
-        # dialog_result = dialog.exec()
-
-        # title = "Parameter: " + parameter_label
-        # current_text = label.replace('\n', ' ') + ':\n\n' + current_text
-        # dialog = SimpleTextEditDialog(title, current_text, True)
-        # ret = dialog.exec()
-        # # if ret == QDialog.Accepted:
-        # #     text = dialog.get_text()
-        # #     self.descriptionLineEdit.setText(text)
-        # # text = dialog.get_text()
-        # # if text != current_text:
-        # #     self.descriptionLineEdit.setText(text)
+        str_error = self.set_value(row)
+        if str_error:
+            str_error = ('Setting parameter: {}, error:\n{}'.
+                         format(parameter_label, str_error))
+            QMessageBox.information(self, 'Information', str_value, str_error)
         return
 
     def save(self):
@@ -109,7 +99,7 @@ class ParametersManagerDialog(QDialog):
             str_value = self.tableWidget.item(i, 1).text()
             str_error = self.parameters_manager.set_value(parameter_label, str_value)
             if str_error:
-                str_error = ('Saving parameter: {}, value: {}\nError: {}\nError:\n{}'.
+                str_error = ('Saving parameter: {}, error:\n{}'.
                              format(parameter_label, str_error))
                 QMessageBox.information(self, 'Information', str_value, str_error)
                 # return
@@ -160,6 +150,7 @@ class ParametersManagerDialog(QDialog):
         return
 
     def set_value(self, row):
+        str_error = ''
         parameter_label =  self.tableWidget.item(row, 0).text()
         self.selected_parameter_label = parameter_label
         str_value = self.tableWidget.item(row, 1).text()
@@ -316,7 +307,7 @@ class ParametersManagerDialog(QDialog):
                                      self.qgis_iface, self.settings,  self)
             if dialog.str_error:
                 QMessageBox.information(self, 'Information', dialog.str_error)
-                return
+                return str_error
             new_str_value = str_value
             while True:
                 dialog_result = dialog.exec()
@@ -336,7 +327,7 @@ class ParametersManagerDialog(QDialog):
                                     self.qgis_iface, self.settings,  self)
             if dialog.str_error:
                 QMessageBox.information(self, 'Information', dialog.str_error)
-                return
+                return str_error
             new_str_value = str_value
             while True:
                 dialog_result = dialog.exec()
@@ -428,7 +419,7 @@ class ParametersManagerDialog(QDialog):
                         self.quantity_unit_combo_box = None
                         self.quantity_previous_selected_unit = None
                         self.quantity_value_edit = None
-                        return
+                        return str_error
                     real_value = None
                     try:
                         real_value = float(new_str_value)
@@ -441,7 +432,7 @@ class ParametersManagerDialog(QDialog):
                         self.quantity_unit_combo_box = None
                         self.quantity_previous_selected_unit = None
                         self.quantity_value_edit = None
-                        return
+                        return str_error
                     quantity_selected_unit = defs_pars.ureg.Quantity
                     try:
                         quantity_selected_unit = quantity_selected_unit(real_value, new_unit)
@@ -466,7 +457,7 @@ class ParametersManagerDialog(QDialog):
                         self.quantity_unit_combo_box = None
                         self.quantity_previous_selected_unit = None
                         self.quantity_value_edit = None
-                        return
+                        return str_error
                     str_value = str(eval(parameter.output_format.format(new_ui_value)))
                     # if str_ui_unit:
                     #     str_value += " " + str_ui_unit
@@ -540,12 +531,12 @@ class ParametersManagerDialog(QDialog):
                         msg = ('Value must be a real number in domain: [{}, {}]'
                                .format(str_min_value, str_max_value))
                         QMessageBox.information(self, 'Information', msg)
-                        return
+                        return str_error
                     if real_value < domain[0] or real_value > domain[1]:
                         msg = ('Value must be a real number in domain: [{}, {}]'
                                .format(str_min_value, str_max_value))
                         QMessageBox.information(self, 'Information', msg)
-                        return
+                        return str_error
                     str_value = str(eval(parameter.output_format.format(real_value)))
                     if not str_value and mandatory:
                         msg = ('Parameter: {} is mandatory'.format(parameter_label))
@@ -593,7 +584,7 @@ class ParametersManagerDialog(QDialog):
                                        self.qgis_iface, self.settings,  self)
             if dialog.str_error:
                 QMessageBox.information(self, 'Information', dialog.str_error)
-                return
+                return str_error
             new_str_value = str_value
             while True:
                 dialog_result = dialog.exec()
@@ -613,7 +604,7 @@ class ParametersManagerDialog(QDialog):
                                        self.qgis_iface, self.settings,  self)
             if dialog.str_error:
                 QMessageBox.information(self, 'Information', dialog.str_error)
-                return
+                return str_error
             new_str_value = str_value
             while True:
                 dialog_result = dialog.exec()
@@ -633,7 +624,7 @@ class ParametersManagerDialog(QDialog):
                                             self.qgis_iface, self.settings,  self)
             if dialog.str_error:
                 QMessageBox.information(self, 'Information', dialog.str_error)
-                return
+                return str_error
             new_str_value = str_value
             while True:
                 dialog_result = dialog.exec()
@@ -658,7 +649,7 @@ class ParametersManagerDialog(QDialog):
                     QMessageBox.information(self, 'Information', msg)
                     self.set_value(row)
                 self.tableWidget.item(row, 1).setText(str_value)
-        return
+        return str_error
 
     def update_gui(self):
         self.tableWidget.setRowCount(0)
