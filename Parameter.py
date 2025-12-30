@@ -508,7 +508,7 @@ class LayersSetParameter(Parameter):
     def __init__(self, label, description, output_format, mandatory, output, enabled = True):
         super().__init__(label, description, output_format, mandatory, output, enabled)
         self.parameters_manager = None
-        self.layers_parameter_manager = []
+        self.layers_parameters_manager = []
 
     def get_value(self):
         return self.value
@@ -589,7 +589,7 @@ class LayersSetParameter(Parameter):
         if domain:
             self.domain = domain
         self.parameters_manager = parameters_manager
-        self.layers_parameter_manager = layers_parameters_manager
+        self.layers_parameters_manager = layers_parameters_manager
         return str_error
 
     def set_value(self, value):

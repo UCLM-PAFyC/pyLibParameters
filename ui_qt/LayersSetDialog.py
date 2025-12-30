@@ -57,6 +57,8 @@ class LayersSetDialog(QDialog):
         # self.layer_names_selected = []
         self.file_path_selected = None
         self.layer_names = []
+        self.layer_names_selected = []
+        self.parameters_by_layer_name_selected = {}
         # self.layer_geometry_ogr_wkb_type = []
         self.layer_type_by_name = {}
         self.parameter_def_by_column = {}
@@ -132,21 +134,39 @@ class LayersSetDialog(QDialog):
         for layer_name in self.layer_names:
             rowPosition = self.tableWidget.rowCount()
             self.tableWidget.insertRow(rowPosition)
+            used_layer = False
+            if os.path.normpath(self.file_path_selected) == os.path.normpath(file_path):
+                for j in range(len(self.layer_names_selected)):
+                    layer_name_selected = self.layer_names_selected[j]
+                    if layer_name_selected.casefold() == layer_name.casefold():
+                        used_layer = True
+                        break
             for col in self.parameter_def_by_column:
                 parameter_label = self.parameter_def_by_column[col][defs_pars.PARAMETER_FIELD_LABEL]
                 if parameter_label.casefold() == defs_pars.TAG_LAYER_NAME_VALUE.casefold():
                     item = QTableWidgetItem(layer_name)
                     item.setTextAlignment(Qt.AlignCenter)
-                    item.setCheckState(QtCore.Qt.Unchecked)
-                    # item.setCheckState(QtCore.Qt.Checked)
+                    if not used_layer:
+                        item.setCheckState(QtCore.Qt.Unchecked)
+                    else:
+                        item.setCheckState(QtCore.Qt.Checked)
                     currentState = item.checkState()
                     item.setData(QtCore.Qt.UserRole, currentState)
                     self.tableWidget.setItem(rowPosition, col, item)
+                    break
+            for col in self.parameter_def_by_column:
+                parameter_label = self.parameter_def_by_column[col][defs_pars.PARAMETER_FIELD_LABEL]
+                if parameter_label.casefold() == defs_pars.TAG_LAYER_NAME_VALUE.casefold():
                     continue
-                parameter_def = self.parameter.parameters_manager.parameters[parameter_label]
-                yo = 1
-        if os.path.normcase(file_path) == os.path.normcase(self.file_path_selected):
-            yo = 1
+                parameter_to_use = None
+                if not used_layer:
+                    parameter_to_use = self.parameter.parameters_manager.parameters[parameter_label]
+                else:
+                    parameter_to_use = self.parameters_by_layer_name_selected[layer_name][parameter_label]
+                str_value = str(parameter_to_use)
+                item = QTableWidgetItem(str_value)
+                item.setTextAlignment(Qt.AlignCenter)
+                self.tableWidget.setItem(rowPosition, col, item)
         return
 
     def initialize(self):
@@ -169,19 +189,30 @@ class LayersSetDialog(QDialog):
             str_error = ('Layers Set Parameter: {} value must contain {}'
                          .format(self.label, defs_pars.TAG_FILE_PATH))
             return str_error
+        if not defs_pars.TAG_LAYERS in value:
+            str_error = ('Layers Set Parameter: {} value must contain {}'
+                         .format(self.label, defs_pars.TAG_LAYERS))
+            return str_error
         file_name = value[defs_pars.TAG_FILE_PATH]
-        if not os.path.exists(file_name):
-            msg = ('Not exists file:\n{}'.format(file_name))
-            QMessageBox.information(self, 'Information', msg)
-            file_name = ''
-        self.file_path = file_name
-        self.file_path_selected = file_name
-        if self.file_path:
-            self.fileComboBox.addItem(self.file_path)
+        if file_name:
+            if not os.path.exists(file_name):
+                msg = ('Not exists file:\n{}'.format(file_name))
+                QMessageBox.information(self, 'Information', msg)
+                file_name = ''
+            self.file_path = file_name
+            self.file_path_selected = file_name
+            if self.file_path:
+                self.fileComboBox.addItem(self.file_path)
+            for i in range(len(self.parameter.layers_parameters_manager)):
+                layer_parameter_manager = self.parameter.layers_parameters_manager[i]
+                layer_parameters = layer_parameter_manager.parameters
+                layer_name = str(layer_parameters[defs_pars.TAG_LAYER_NAME_VALUE])
+                self.layer_names_selected.append(layer_name)
+                self.parameters_by_layer_name_selected[layer_name] = layer_parameters
         self.fileComboBox.setEnabled(True)
         self.fileComboBox.currentIndexChanged.connect(self.file_changed)
         if self.file_path:
             self.fileComboBox.setCurrentIndex(1)
-            self.file_changed()
+            # self.file_changed()
         self.addFilePushButton.clicked.connect(self.add_file)
         return str_error
