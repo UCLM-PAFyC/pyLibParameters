@@ -311,12 +311,16 @@ class ParametersManagerDialog(QDialog):
             new_str_value = str_value
             while True:
                 dialog_result = dialog.exec()
-                if dialog_result == QDialog.Accepted:
-                    str_error, new_str_value = dialog.get_value_as_string()
-                    if str_error:
-                        QMessageBox.information(self, 'Information', str_error)
-                    else:
-                        break
+                dialog_result = dialog.accepted
+                # if dialog_result == QDialog.Accepted:
+                if dialog_result == True:
+                    new_str_value = str(parameter)
+                    break
+                    # str_error, new_str_value = dialog.get_value_as_string()
+                    # if str_error:
+                    #     QMessageBox.information(self, 'Information', str_error)
+                    # else:
+                    #     break
                 else:
                     break
             if new_str_value != str_value:

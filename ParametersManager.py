@@ -202,8 +202,6 @@ class ParametersManager:
                 str_aux_error = parameter_parameters_manager.initialize(parameter_parameters_dictionary_list)
                 if str_aux_error:
                     str_error = ('ParametersManager.initialize\n')
-                    str_error += ("In process from file:\n{}".
-                                  format(process_file))
                     str_error += ("\nError:\n{}".
                                   format(str_aux_error))
                     return str_error

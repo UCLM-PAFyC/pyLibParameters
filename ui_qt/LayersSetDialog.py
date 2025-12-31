@@ -19,6 +19,7 @@ from PyQt5.QtGui import QStandardItemModel
 
 import defs_pars
 from Parameter import *
+from ParametersManager import ParametersManager
 from .ParameterDialog import ParameterDialog
 
 from pyLibCRSs import CRSsDefines as defs_crs
@@ -70,6 +71,12 @@ class LayersSetDialog(QDialog):
         self.layer_type_by_name = {}
         self.parameter_def_by_column = {}
         self.str_error = self.initialize()
+        self.accepted = False
+
+    def accept(self):
+        self.save()
+        self.accepted = True
+        self.close()
 
     def add_file(self):
         last_path = self.settings.value("last_path")
@@ -192,6 +199,25 @@ class LayersSetDialog(QDialog):
                     item_flags &= ~QtCore.Qt.ItemIsEnabled
                 item.setFlags(item_flags)
         return
+    #
+    # def get_value_as_string(self):
+    #     str_error = ''
+    #     str_value = ''
+    #     file_path = ''
+    #     layers = None
+    #     file_path = self.fileComboBox.currentText()
+    #     if file_path == defs_pars.NO_COMBO_SELECT:
+    #         if self.mandatory:
+    #             str_error = ('No file selected')
+    #             return str_error, self.value_as_string
+    #         else:
+    #             file_path = ''
+    #     else:
+    #         layers = self.layerComboBox.get_checked_texts()
+    #     self.value_as_dict[defs_pars.TAG_FILE_PATH] = file_path
+    #     self.value_as_dict[defs_pars.TAG_LAYERS] = layers
+    #     self.value_as_string = json.dumps(self.value_as_dict)
+    #     return str_error, self.value_as_string
 
     def initialize(self):
         str_error = ''
@@ -241,6 +267,8 @@ class LayersSetDialog(QDialog):
         self.tableWidget.itemDoubleClicked.connect(self.on_click)
         self.tableWidget.itemClicked.connect(self.on_click)
         self.addFilePushButton.clicked.connect(self.add_file)
+        self.dialogButtonBox.accepted.connect(self.accept)
+        self.dialogButtonBox.rejected.connect(self.reject)
         return str_error
 
     @QtCore.pyqtSlot(QtWidgets.QTableWidgetItem)
@@ -270,6 +298,51 @@ class LayersSetDialog(QDialog):
             str_error = ('Setting parameter: {}, error:\n{}'.
                          format(parameter_label, str_error))
             QMessageBox.information(self, 'Information', str_value, str_error)
+        return
+
+    def save(self):
+        parameter_value = {}
+        file_path = self.fileComboBox.currentText()
+        layers = []
+        layers_parameters_manager = []
+        if file_path == defs_pars.NO_COMBO_SELECT:
+            file_path = None
+        for row in range(self.tableWidget.rowCount()):
+            item_layer_name = self.tableWidget.item(row, self.layer_name_column)
+            if item_layer_name.checkState() == Qt.CheckState.Unchecked:
+                continue
+            layer_name = item_layer_name.text()
+            layer = []
+            parameters_dictionary_list = []
+            for col in self.parameter_def_by_column:
+                parameter_label = self.parameter_def_by_column[col][defs_pars.PARAMETER_FIELD_LABEL]
+                # parameter = self.parameters_by_layer_name_selected[layer_name][parameter_label]
+                parameter = self.parameter_by_row_by_column[row][col]
+                str_value = self.tableWidget.item(row, col).text()
+                parameter_as_dict = None
+                for aux_parameter_as_dict in self.parameter.parameters_manager.parameters_as_list_of_dict:
+                    if parameter.label.casefold() == aux_parameter_as_dict[defs_pars.PARAMETER_FIELD_LABEL].casefold():
+                        parameter_as_dict = aux_parameter_as_dict
+                        break
+                parameter.set_value(str_value)
+                if isinstance(parameter, DateParameter):
+                    parameter_as_dict[defs_pars.PARAMETER_FIELD_VALUE] = str(parameter)
+                else:
+                    parameter_as_dict[defs_pars.PARAMETER_FIELD_VALUE] = parameter.value
+                parameter_as_string = json.dumps(parameter_as_dict)
+                # layer.append(parameter_as_string)
+                layer.append(parameter_as_dict)
+                parameters_dictionary_list.append(parameter_as_dict)
+            layers.append(layer)
+            layer_parameters_manager = ParametersManager()
+            str_aux_error = layer_parameters_manager.initialize(parameters_dictionary_list)
+            if str_aux_error:
+                yo = 1
+            layers_parameters_manager.append(layer_parameters_manager)
+        parameter_value[defs_pars.TAG_FILE_PATH] = file_path
+        parameter_value[defs_pars.TAG_LAYERS] = layers
+        self.parameter.value = parameter_value
+        self.parameter.layers_parameters_manager = layers_parameters_manager
         return
 
     def set_value(self, row, col):
