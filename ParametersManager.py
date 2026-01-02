@@ -431,6 +431,13 @@ class ParametersManager:
         parameter = self.parameters[label]
         parameter_str_value = str(parameter)
         if str_value.casefold() == parameter_str_value.casefold():
+            if isinstance(parameter, LayersSetParameter):  # equal because is updated before
+                value = json.loads(str_value)
+                for i in range(len(self.parameters_as_list_of_dict)):
+                    parameter_label = self.parameters_as_list_of_dict[i][defs_pars.PARAMETER_FIELD_LABEL]
+                    if parameter_label.casefold() == label.casefold():
+                        self.parameters_as_list_of_dict[i][defs_pars.PARAMETER_FIELD_VALUE] = value
+                        break
             return str_error
         value = None
         if isinstance(parameter, BooleanParameter):

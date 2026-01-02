@@ -5,6 +5,7 @@ import os
 import sys
 import math
 import json
+import copy
 
 current_path = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.join(current_path, '..'))
@@ -319,10 +320,10 @@ class LayersSetDialog(QDialog):
                 # parameter = self.parameters_by_layer_name_selected[layer_name][parameter_label]
                 parameter = self.parameter_by_row_by_column[row][col]
                 str_value = self.tableWidget.item(row, col).text()
-                parameter_as_dict = None
+                parameter_as_dict = {}
                 for aux_parameter_as_dict in self.parameter.parameters_manager.parameters_as_list_of_dict:
                     if parameter.label.casefold() == aux_parameter_as_dict[defs_pars.PARAMETER_FIELD_LABEL].casefold():
-                        parameter_as_dict = aux_parameter_as_dict
+                        parameter_as_dict = copy.deepcopy(aux_parameter_as_dict)
                         break
                 parameter.set_value(str_value)
                 if isinstance(parameter, DateParameter):
@@ -333,6 +334,7 @@ class LayersSetDialog(QDialog):
                 # layer.append(parameter_as_string)
                 layer.append(parameter_as_dict)
                 parameters_dictionary_list.append(parameter_as_dict)
+                yo = 1
             layers.append(layer)
             layer_parameters_manager = ParametersManager()
             str_aux_error = layer_parameters_manager.initialize(parameters_dictionary_list)
