@@ -107,6 +107,9 @@ SCALE_DEFAULT_VALUE = 1.0
 OFFSET_DEFAULT_VALUE = 0.0
 SCALE_STRING_FORMAT = '{:.3E}'
 OFFSET_STRING_FORMAT = '{:.2E}'
+TAG_LAYER_TYPE_VALUE = 'Layer type'
+TAG_LAYER_STYLE_VALUE = 'Layer style'
+TAG_USE_LAYER_STYLE_VALUE = 'Use layer style'
 
 parameter_fields_by_type = {}
 parameter_fields_by_type[PARAMETER_TYPE_REAL] = []

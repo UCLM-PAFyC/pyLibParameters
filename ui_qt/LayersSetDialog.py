@@ -67,10 +67,14 @@ class LayersSetDialog(QDialog):
         self.layer_names_selected = []
         self.parameter_by_row_by_column = {}
         self.layer_name_column = -1
+        self.layer_type_column = -1
+        self.layer_style_column = -1
+        self.use_layer_style_column = -1
         self.parameters_by_layer_name_selected = {}
         # self.layer_geometry_ogr_wkb_type = []
         self.layer_type_by_name = {}
         self.parameter_def_by_column = {}
+        self.layer_style_by_layer_name = {}
         self.str_error = self.initialize()
         self.accepted = False
 
@@ -117,6 +121,9 @@ class LayersSetDialog(QDialog):
         self.layer_names.clear()
         self.parameter_by_row_by_column = {}
         self.layer_name_column = -1
+        self.layer_type_column = -1
+        self.layer_style_column = -1
+        self.use_layer_style_column = -1
         self.tableWidget.setRowCount(0)
         if file_path == defs_pars.NO_COMBO_SELECT:
             return
@@ -150,6 +157,36 @@ class LayersSetDialog(QDialog):
             layer_name = raster_layer_names[i]
             self.layer_type_by_name[layer_name] = defs_gdal.GDAL_ALIAS_RASTER
             self.layer_names.append(layer_name)
+        str_error, exists_styles = GDALTools.exists_layer(file_path, defs_gdal.GEOPACKAGE_TABLE_LAYER_STYLES)
+        if str_error:
+            str_error = ('Getting if exists styles from file:\n{}\nError:\n{}'.format(file_path, str_error))
+            QMessageBox.information(self, 'Information', str_error)
+            return
+        self.layer_style_by_layer_name = {}
+        if exists_styles:
+            fields = {}
+            field_name = defs_gdal.GEOPACKAGE_TABLE_LAYER_STYLES_FIELD_LAYER_NAME
+            fields[field_name] = defs_gdal.type_by_name['string']
+            field_name = defs_gdal.GEOPACKAGE_TABLE_LAYER_STYLES_FIELD_LAYER_STYLE_NAME
+            fields[field_name] = defs_gdal.type_by_name['string']
+            # field_geometry = defs_project.LOCATIONS_FIELD_GEOMETRY
+            # fields[field_geometry] = defs_project.fields_by_layer[defs_project.LOCATIONS_LAYER_NAME][field_geometry]
+            filter_fields = None
+            str_error, features = GDALTools.get_features(file_path,
+                                                         defs_gdal.GEOPACKAGE_TABLE_LAYER_STYLES,
+                                                         fields,
+                                                         filter_fields,
+                                                         wfs = None)
+            if str_error:
+                str_error = ('Getting styles from file:\n{}\nError:\n{}'.format(file_path, str_error))
+                QMessageBox.information(self, 'Information', str_error)
+                self.fileComboBox.setCurrentIndex(0)
+                return
+            for i in range(len(features)):
+                layer_name = features[i][defs_gdal.GEOPACKAGE_TABLE_LAYER_STYLES_FIELD_LAYER_NAME]
+                layer_style = features[i][defs_gdal.GEOPACKAGE_TABLE_LAYER_STYLES_FIELD_LAYER_STYLE_NAME]
+                self.layer_style_by_layer_name[layer_name] = layer_style
+        need_to_save = False
         for layer_name in self.layer_names:
             rowPosition = self.tableWidget.rowCount()
             self.tableWidget.insertRow(rowPosition)
@@ -173,7 +210,8 @@ class LayersSetDialog(QDialog):
                     currentState = item.checkState()
                     item.setData(QtCore.Qt.UserRole, currentState)
                     self.tableWidget.setItem(rowPosition, col, item)
-                    self.layer_name_column = col
+                    if self.layer_name_column == -1:
+                        self.layer_name_column = col
                     break
             for col in self.parameter_def_by_column:
                 parameter_label = self.parameter_def_by_column[col][defs_pars.PARAMETER_FIELD_LABEL]
@@ -186,6 +224,18 @@ class LayersSetDialog(QDialog):
                 if parameter_label.casefold() == defs_pars.TAG_LAYER_NAME_VALUE.casefold():
                     continue
                 str_value = str(parameter_to_use)
+                if parameter_label.casefold() == defs_pars.TAG_LAYER_TYPE_VALUE.casefold():
+                    str_value = self.layer_type_by_name[layer_name]
+                    if self.layer_type_column == -1:
+                        self.layer_type_column = col
+                if parameter_label.casefold() == defs_pars.TAG_LAYER_STYLE_VALUE.casefold():
+                    if self.layer_style_column == -1:
+                        self.layer_style_column = col
+                if parameter_label.casefold() == defs_pars.TAG_USE_LAYER_STYLE_VALUE.casefold():
+                    if not used_layer:
+                        str_value = 'false'
+                    if self.use_layer_style_column == -1:
+                        self.use_layer_style_column = col
                 item = QTableWidgetItem(str_value)
                 item.setTextAlignment(Qt.AlignCenter)
                 self.tableWidget.setItem(rowPosition, col, item)
@@ -194,11 +244,40 @@ class LayersSetDialog(QDialog):
                     continue
                 item = self.tableWidget.item(rowPosition, col)
                 item_flags = item.flags()
-                if used_layer:
+                if used_layer and col != self.layer_type_column and col != self.layer_style_column:
                     item_flags |= QtCore.Qt.ItemIsEnabled
                 else:
                     item_flags &= ~QtCore.Qt.ItemIsEnabled
                 item.setFlags(item_flags)
+            if not used_layer:
+                self.tableWidget.item(rowPosition, self.use_layer_style_column).setText('False')
+                self.tableWidget.item(rowPosition, self.layer_style_column).setText('')
+                continue
+            str_item_use_layer_style = self.tableWidget.item(rowPosition, self.use_layer_style_column).text()
+            use_layer_style = False
+            if str_item_use_layer_style.casefold() == 'True'.casefold():
+                use_layer_style = True
+            str_item_layer_style = self.tableWidget.item(rowPosition, self.layer_style_column).text()
+            if not use_layer_style:
+                if str_item_layer_style:
+                    self.tableWidget.item(rowPosition, self.layer_style_column).setText('')
+                    if not need_to_save:
+                        need_to_save = True
+            else:
+                if not layer_name in self.layer_style_by_layer_name:
+                    self.tableWidget.item(rowPosition, self.layer_style_column).setText('')
+                    self.tableWidget.item(rowPosition, self.use_layer_style_column).setText('False')
+                    if not need_to_save:
+                        need_to_save = True
+                else:
+                    layer_style = self.layer_style_by_layer_name[layer_name]
+                    if layer_style.casefold() != str_item_layer_style.casefold():
+                        self.tableWidget.item(rowPosition, self.layer_style_column).setText(layer_style)
+                        if not need_to_save:
+                            need_to_save = True
+        if need_to_save:
+            self.save()
+            self.file_changed()
         return
     #
     # def get_value_as_string(self):
@@ -299,6 +378,17 @@ class LayersSetDialog(QDialog):
             str_error = ('Setting parameter: {}, error:\n{}'.
                          format(parameter_label, str_error))
             QMessageBox.information(self, 'Information', str_value, str_error)
+        if col == self.use_layer_style_column:
+            layer_name = item_layer_name.text()
+            if layer_name in self.layer_style_by_layer_name:
+                item_layer_style = self.tableWidget.item(row, self.layer_style_column)
+                str_item_use_layer_style = self.tableWidget.item(row, col).text()
+                if str_item_use_layer_style.casefold() == 'true'.casefold():
+                    layer_style = self.layer_style_by_layer_name[layer_name]
+                    item_layer_style.setText(layer_style)
+                else:
+                    item.setText('False')
+                    item_layer_style.setText('')
         return
 
     def save(self):
