@@ -174,8 +174,10 @@ class ParametersManagerDialog(QDialog):
             layout = QVBoxLayout()
             message = QLabel("Input a date")
             layout.addWidget(message)
-            str_parameter_date = str_value
-            parameter_date = datetime.datetime.strptime(str_parameter_date, parameter.date_format).date()
+            parameter_date = datetime.date.today()
+            if str_value and str_value != 'None':
+                str_parameter_date = str_value
+                parameter_date = datetime.datetime.strptime(str_parameter_date, parameter.date_format).date()
             # parameter_date = self.parameter.value
             parameter_date_year = parameter_date.year
             parameter_date_month = parameter_date.month
@@ -278,8 +280,16 @@ class ParametersManagerDialog(QDialog):
             # else:
             #     return
         elif isinstance(parameter, IntegerParameter):
-            current_value = int(str_value)
             domain = parameter.domain
+            current_value = 0
+            if len(domain) == 2:
+                current_value = domain[0]
+            try:
+                current_value = int(str_value)
+            except ValueError as verr:
+                pass  # do job to handle: s does not contain anything convertible to int
+            except Exception as ex:
+                pass
             if len(domain) == 2:
                 int_value, ok = QInputDialog.getInt(self, title, defs_pars.PARAMETER_FIELD_VALUE_TAG,
                                                            current_value, domain[0], domain[1], 1)
@@ -519,8 +529,22 @@ class ParametersManagerDialog(QDialog):
                 if ok and item:
                     self.tableWidget.item(row, 1).setText(item)
         elif isinstance(parameter, RealParameter):
-            current_value = float(str_value)
             domain = parameter.domain
+            current_value = 0
+            if len(domain) == 2:
+                str_min_value = str(eval(parameter.output_format.format(domain[0])))
+                try:
+                    current_value = float(str_min_value)
+                except ValueError as verr:
+                    pass  # do job to handle: s does not contain anything convertible to int
+                except Exception as ex:
+                    pass
+            try:
+                current_value = float(str_value)
+            except ValueError as verr:
+                pass  # do job to handle: s does not contain anything convertible to int
+            except Exception as ex:
+                pass
             if len(domain) == 2:
                 str_min_value = str(eval(parameter.output_format.format(domain[0])))
                 str_max_value = str(eval(parameter.output_format.format(domain[1])))

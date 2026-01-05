@@ -233,7 +233,7 @@ class LayersSetDialog(QDialog):
                         self.layer_style_column = col
                 if parameter_label.casefold() == defs_pars.TAG_USE_LAYER_STYLE_VALUE.casefold():
                     if not used_layer:
-                        str_value = 'false'
+                        str_value = 'False'
                     if self.use_layer_style_column == -1:
                         self.use_layer_style_column = col
                 item = QTableWidgetItem(str_value)
@@ -364,7 +364,8 @@ class LayersSetDialog(QDialog):
                     continue
                 item = self.tableWidget.item(row, col)
                 item_flags = item.flags()
-                if currentState == Qt.CheckState.Checked:
+                if (currentState == Qt.CheckState.Checked
+                        and col != self.layer_type_column and col != self.layer_style_column):
                     item_flags |= QtCore.Qt.ItemIsEnabled
                 else:
                     item_flags &= ~QtCore.Qt.ItemIsEnabled
@@ -461,8 +462,10 @@ class LayersSetDialog(QDialog):
             layout = QVBoxLayout()
             message = QLabel("Input a date")
             layout.addWidget(message)
-            str_parameter_date = str_value
-            parameter_date = datetime.datetime.strptime(str_parameter_date, parameter.date_format).date()
+            parameter_date = datetime.date.today()
+            if str_value and str_value != 'None':
+                str_parameter_date = str_value
+                parameter_date = datetime.datetime.strptime(str_parameter_date, parameter.date_format).date()
             # parameter_date = self.parameter.value
             parameter_date_year = parameter_date.year
             parameter_date_month = parameter_date.month
@@ -565,8 +568,16 @@ class LayersSetDialog(QDialog):
             # else:
             #     return
         elif isinstance(parameter, IntegerParameter):
-            current_value = int(str_value)
             domain = parameter.domain
+            current_value = 0
+            if len(domain) == 2:
+                current_value = domain[0]
+            try:
+                current_value = int(str_value)
+            except ValueError as verr:
+                pass  # do job to handle: s does not contain anything convertible to int
+            except Exception as ex:
+                pass
             if len(domain) == 2:
                 int_value, ok = QInputDialog.getInt(self, title, defs_pars.PARAMETER_FIELD_VALUE_TAG,
                                                            current_value, domain[0], domain[1], 1)
@@ -802,8 +813,22 @@ class LayersSetDialog(QDialog):
                 if ok and item:
                     self.tableWidget.item(row, col).setText(item)
         elif isinstance(parameter, RealParameter):
-            current_value = float(str_value)
             domain = parameter.domain
+            current_value = 0
+            if len(domain) == 2:
+                str_min_value = str(eval(parameter.output_format.format(domain[0])))
+                try:
+                    current_value = float(str_min_value)
+                except ValueError as verr:
+                    pass  # do job to handle: s does not contain anything convertible to int
+                except Exception as ex:
+                    pass
+            try:
+                current_value = float(str_value)
+            except ValueError as verr:
+                pass  # do job to handle: s does not contain anything convertible to int
+            except Exception as ex:
+                pass
             if len(domain) == 2:
                 str_min_value = str(eval(parameter.output_format.format(domain[0])))
                 str_max_value = str(eval(parameter.output_format.format(domain[1])))
@@ -849,10 +874,10 @@ class LayersSetDialog(QDialog):
                 # if ok and text != '' and text != str_value:
                 if ok and text != str_value:
                     str_value = text
-                    if not str_value and mandatory:
-                        msg = ('Parameter: {} is mandatory'.format(parameter_label))
-                        QMessageBox.information(self, 'Information', msg)
-                        self.set_value(row, col)
+                    # if not str_value and mandatory:
+                    #     msg = ('Parameter: {} is mandatory'.format(parameter_label))
+                    #     QMessageBox.information(self, 'Information', msg)
+                    #     self.set_value(row, col)
                     self.tableWidget.item(row, col).setText(str_value)
             else:
                 items = []
