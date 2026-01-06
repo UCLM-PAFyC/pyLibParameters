@@ -78,10 +78,11 @@ class LayersSetDialog(QDialog):
         self.str_error = self.initialize()
         self.accepted = False
 
-    def accept(self):
-        self.save()
-        self.accepted = True
-        self.close()
+    def on_accept(self):
+        if self.save():
+            self.accepted = True
+            self.accept()
+        return
 
     def add_file(self):
         last_path = self.settings.value("last_path")
@@ -192,7 +193,7 @@ class LayersSetDialog(QDialog):
             self.tableWidget.insertRow(rowPosition)
             self.parameter_by_row_by_column[rowPosition] = {}
             used_layer = False
-            if os.path.normpath(self.file_path_selected) == os.path.normpath(file_path):
+            if self.file_path_selected and os.path.normpath(self.file_path_selected) == os.path.normpath(file_path):
                 for j in range(len(self.layer_names_selected)):
                     layer_name_selected = self.layer_names_selected[j]
                     if layer_name_selected.casefold() == layer_name.casefold():
@@ -247,6 +248,8 @@ class LayersSetDialog(QDialog):
                 if used_layer and col != self.layer_type_column and col != self.layer_style_column:
                     item_flags |= QtCore.Qt.ItemIsEnabled
                 else:
+                    item_flags &= ~QtCore.Qt.ItemIsEnabled
+                if not exists_styles and col == self.use_layer_style_column:
                     item_flags &= ~QtCore.Qt.ItemIsEnabled
                 item.setFlags(item_flags)
             if not used_layer:
@@ -347,8 +350,7 @@ class LayersSetDialog(QDialog):
         self.tableWidget.itemDoubleClicked.connect(self.on_click)
         self.tableWidget.itemClicked.connect(self.on_click)
         self.addFilePushButton.clicked.connect(self.add_file)
-        self.dialogButtonBox.accepted.connect(self.accept)
-        self.dialogButtonBox.rejected.connect(self.reject)
+        self.acceptPushButton.clicked.connect(self.on_accept)
         return str_error
 
     @QtCore.pyqtSlot(QtWidgets.QTableWidgetItem)
@@ -368,6 +370,8 @@ class LayersSetDialog(QDialog):
                         and col != self.layer_type_column and col != self.layer_style_column):
                     item_flags |= QtCore.Qt.ItemIsEnabled
                 else:
+                    item_flags &= ~QtCore.Qt.ItemIsEnabled
+                if not bool(self.layer_style_by_layer_name) and col == self.use_layer_style_column:
                     item_flags &= ~QtCore.Qt.ItemIsEnabled
                 item.setFlags(item_flags)
             return
@@ -395,6 +399,7 @@ class LayersSetDialog(QDialog):
     def save(self):
         parameter_value = {}
         file_path = self.fileComboBox.currentText()
+        original_parameters_manager = copy.deepcopy(self.parameter.parameters_manager)
         layers = []
         layers_parameters_manager = []
         if file_path == defs_pars.NO_COMBO_SELECT:
@@ -425,18 +430,21 @@ class LayersSetDialog(QDialog):
                 # layer.append(parameter_as_string)
                 layer.append(parameter_as_dict)
                 parameters_dictionary_list.append(parameter_as_dict)
-                yo = 1
             layers.append(layer)
             layer_parameters_manager = ParametersManager()
-            str_aux_error = layer_parameters_manager.initialize(parameters_dictionary_list)
-            if str_aux_error:
-                yo = 1
+            str_error = layer_parameters_manager.initialize(parameters_dictionary_list)
+            if str_error:
+                msg = ('Saving layer: {}, error:\n{}'.format(layer_name, str_error))
+                QMessageBox.information(self, 'Information', msg)
+                self.parameter.parameters_manager = original_parameters_manager
+                return False
             layers_parameters_manager.append(layer_parameters_manager)
         parameter_value[defs_pars.TAG_FILE_PATH] = file_path
         parameter_value[defs_pars.TAG_LAYERS] = layers
         self.parameter.value = parameter_value
         self.parameter.layers_parameters_manager = layers_parameters_manager
-        return
+        self.parameter.parameters_manager = original_parameters_manager
+        return True
 
     def set_value(self, row, col):
         str_error = ''
