@@ -74,7 +74,8 @@ class LayersSetDialog(QDialog):
         # self.layer_geometry_ogr_wkb_type = []
         self.layer_type_by_name = {}
         self.parameter_def_by_column = {}
-        self.layer_style_by_layer_name = {}
+        self.layer_styles_by_layer_name = {}
+        self.layer_style_used_as_default_by_layer_name = {}
         self.str_error = self.initialize()
         self.accepted = False
 
@@ -126,6 +127,8 @@ class LayersSetDialog(QDialog):
         self.layer_style_column = -1
         self.use_layer_style_column = -1
         self.tableWidget.setRowCount(0)
+        self.layer_styles_by_layer_name = {}
+        self.layer_style_used_as_default_by_layer_name = {}
         if file_path == defs_pars.NO_COMBO_SELECT:
             return
         str_error, driver_name = GDALTools.get_driver_name_from_file(file_path)
@@ -163,12 +166,13 @@ class LayersSetDialog(QDialog):
             str_error = ('Getting if exists styles from file:\n{}\nError:\n{}'.format(file_path, str_error))
             QMessageBox.information(self, 'Information', str_error)
             return
-        self.layer_style_by_layer_name = {}
         if exists_styles:
             fields = {}
             field_name = defs_gdal.GEOPACKAGE_TABLE_LAYER_STYLES_FIELD_LAYER_NAME
             fields[field_name] = defs_gdal.type_by_name['string']
             field_name = defs_gdal.GEOPACKAGE_TABLE_LAYER_STYLES_FIELD_LAYER_STYLE_NAME
+            fields[field_name] = defs_gdal.type_by_name['string']
+            field_name = defs_gdal.GEOPACKAGE_TABLE_LAYER_STYLES_FIELD_USE_AS_DEFAULT
             fields[field_name] = defs_gdal.type_by_name['string']
             # field_geometry = defs_project.LOCATIONS_FIELD_GEOMETRY
             # fields[field_geometry] = defs_project.fields_by_layer[defs_project.LOCATIONS_LAYER_NAME][field_geometry]
@@ -186,7 +190,14 @@ class LayersSetDialog(QDialog):
             for i in range(len(features)):
                 layer_name = features[i][defs_gdal.GEOPACKAGE_TABLE_LAYER_STYLES_FIELD_LAYER_NAME]
                 layer_style = features[i][defs_gdal.GEOPACKAGE_TABLE_LAYER_STYLES_FIELD_LAYER_STYLE_NAME]
-                self.layer_style_by_layer_name[layer_name] = layer_style
+                use_as_default = features[i][defs_gdal.GEOPACKAGE_TABLE_LAYER_STYLES_FIELD_USE_AS_DEFAULT]
+                if not layer_name in self.layer_styles_by_layer_name:
+                    self.layer_styles_by_layer_name[layer_name] = []
+                    # self.layer_styles_by_layer_name[layer_name].append('')
+                    self.layer_style_used_as_default_by_layer_name[layer_name] = ''
+                self.layer_styles_by_layer_name[layer_name].append(layer_style)
+                if use_as_default == '1':
+                    self.layer_style_used_as_default_by_layer_name[layer_name] = layer_style
         need_to_save = False
         for layer_name in self.layer_names:
             rowPosition = self.tableWidget.rowCount()
@@ -245,7 +256,7 @@ class LayersSetDialog(QDialog):
                     continue
                 item = self.tableWidget.item(rowPosition, col)
                 item_flags = item.flags()
-                if used_layer and col != self.layer_type_column and col != self.layer_style_column:
+                if used_layer and col != self.layer_type_column:# and col != self.layer_style_column:
                     item_flags |= QtCore.Qt.ItemIsEnabled
                 else:
                     item_flags &= ~QtCore.Qt.ItemIsEnabled
@@ -267,13 +278,14 @@ class LayersSetDialog(QDialog):
                     if not need_to_save:
                         need_to_save = True
             else:
-                if not layer_name in self.layer_style_by_layer_name:
+                if not layer_name in self.layer_styles_by_layer_name:
                     self.tableWidget.item(rowPosition, self.layer_style_column).setText('')
                     self.tableWidget.item(rowPosition, self.use_layer_style_column).setText('False')
                     if not need_to_save:
                         need_to_save = True
                 else:
-                    layer_style = self.layer_style_by_layer_name[layer_name]
+                    # if self.layer_style_used_as_default_by_layer_name[layer_name]:
+                    layer_style = self.layer_style_used_as_default_by_layer_name[layer_name]# '' or style name
                     if layer_style.casefold() != str_item_layer_style.casefold():
                         self.tableWidget.item(rowPosition, self.layer_style_column).setText(layer_style)
                         if not need_to_save:
@@ -367,11 +379,11 @@ class LayersSetDialog(QDialog):
                 item = self.tableWidget.item(row, col)
                 item_flags = item.flags()
                 if (currentState == Qt.CheckState.Checked
-                        and col != self.layer_type_column and col != self.layer_style_column):
+                        and col != self.layer_type_column): # and col != self.layer_style_column):
                     item_flags |= QtCore.Qt.ItemIsEnabled
                 else:
                     item_flags &= ~QtCore.Qt.ItemIsEnabled
-                if not bool(self.layer_style_by_layer_name) and col == self.use_layer_style_column:
+                if not bool(self.layer_styles_by_layer_name) and col == self.use_layer_style_column:
                     item_flags &= ~QtCore.Qt.ItemIsEnabled
                 item.setFlags(item_flags)
             return
@@ -385,11 +397,11 @@ class LayersSetDialog(QDialog):
             QMessageBox.information(self, 'Information', str_value, str_error)
         if col == self.use_layer_style_column:
             layer_name = item_layer_name.text()
-            if layer_name in self.layer_style_by_layer_name:
+            if layer_name in self.layer_styles_by_layer_name:
                 item_layer_style = self.tableWidget.item(row, self.layer_style_column)
                 str_item_use_layer_style = self.tableWidget.item(row, col).text()
                 if str_item_use_layer_style.casefold() == 'true'.casefold():
-                    layer_style = self.layer_style_by_layer_name[layer_name]
+                    layer_style = self.layer_style_used_as_default_by_layer_name[layer_name]
                     item_layer_style.setText(layer_style)
                 else:
                     item.setText('False')
@@ -453,6 +465,16 @@ class LayersSetDialog(QDialog):
         parameter = self.parameter_by_row_by_column[row][col]
         mandatory = parameter.mandatory
         title = "Input " + defs_pars.PARAMETER_FIELD_VALUE_TAG
+        if col == self.layer_style_column:
+            layer_name = self.tableWidget.item(row, self.layer_name_column).text()
+            if not layer_name in self.layer_styles_by_layer_name:
+                return
+            items = self.layer_styles_by_layer_name[layer_name]
+            current_pos = items.index(str_value)
+            item, ok = QInputDialog.getItem(self, title, defs_pars.PARAMETER_FIELD_VALUE_TAG, items, current_pos, False)
+            if ok:# and item:
+                self.tableWidget.item(row, col).setText(item)
+            return
         if isinstance(parameter, BooleanParameter):
             items = ['True', 'False']
             current_pos = 0
