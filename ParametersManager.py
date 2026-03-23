@@ -214,6 +214,15 @@ class ParametersManager:
                     str_error = ('ParametersManager.initialize\n')
                     str_error += str_aux_error
                     return str_error
+            elif parameter_type.casefold() == defs_pars.PARAMETER_TYPE_PATH.casefold():
+                parameter = PathParameter(parameter_label, parameter_argparser, parameter_description,
+                                          parameter_output_format, parameter_mandatory, parameter_output)
+                parameter_value = parameter_fields[defs_pars.PARAMETER_FIELD_VALUE]
+                str_aux_error = parameter.initialize(parameter_value)
+                if str_aux_error:
+                    str_error = ('ParametersManager.initialize\n')
+                    str_error += str_aux_error
+                    return str_error
             elif parameter_type == defs_pars.PARAMETER_TYPE_FILE:
                 parameter_file_mode = parameter_fields[defs_pars.PARAMETER_FIELD_FILE_MODE]
                 parameter = FileParameter(parameter_label, parameter_argparser, parameter_description,
@@ -449,6 +458,11 @@ class ParametersManager:
                 return str_error
         elif isinstance(parameter, DateParameter):
             str_error = parameter.set_value(str_value, parameter.date_format)
+            if str_error:
+                return str_error
+            value = str_value
+        elif isinstance(parameter, PathParameter):
+            str_error = parameter.set_value(str_value)
             if str_error:
                 return str_error
             value = str_value

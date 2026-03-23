@@ -201,6 +201,19 @@ class ParametersManagerDialog(QDialog):
                     QMessageBox.information(self, 'Information', msg)
                     self.set_value(row)
                 self.tableWidget.item(row, 1).setText(str_value)
+        elif isinstance(parameter, PathParameter):
+            previous_path = str_value
+            path = None
+            if not previous_path or not os.path.exists(previous_path):
+                previous_path = self.settings.value("last_path")
+                if not previous_path:
+                    previous_path = QDir.currentPath()
+            path = QFileDialog.getExistingDirectory(self, "Select directory", previous_path,
+                                                      QFileDialog.ShowDirsOnly | QFileDialog.DontResolveSymlinks)
+            if path:
+                self.settings.setValue("last_path", path)
+                self.settings.sync()
+                self.tableWidget.item(row, 1).setText(path)
         elif isinstance(parameter, FileParameter):
             previous_file = str_value
             path = None

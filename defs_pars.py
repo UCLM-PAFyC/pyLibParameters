@@ -77,6 +77,7 @@ PARAMETER_TYPE_DATE = 'date'
 PARAMETER_TYPE_STRING = 'string'
 PARAMETER_TYPE_BOOLEAN = 'boolean'
 PARAMETER_TYPE_FILE = 'file'
+PARAMETER_TYPE_PATH = 'path'
 # PARAMETER_TYPE_FILE_READ = 'file_read'
 # PARAMETER_TYPE_FILE_WRITE = 'file_write'
 # PARAMETER_TYPE_FILE_APPEND = 'file_append'
@@ -120,6 +121,7 @@ parameter_fields_by_type[PARAMETER_TYPE_DATE] = []
 parameter_fields_by_type[PARAMETER_TYPE_DATE].append(PARAMETER_FIELD_DATE_FORMAT)
 parameter_fields_by_type[PARAMETER_TYPE_STRING] = []
 parameter_fields_by_type[PARAMETER_TYPE_BOOLEAN] = []
+parameter_fields_by_type[PARAMETER_TYPE_PATH] = []
 parameter_fields_by_type[PARAMETER_TYPE_FILE] = []
 parameter_fields_by_type[PARAMETER_TYPE_FILE].append(PARAMETER_FIELD_DOMAIN)
 parameter_fields_by_type[PARAMETER_TYPE_FILE].append(PARAMETER_TYPE_FILE_MODE)
@@ -153,6 +155,7 @@ parameter_optional_fields_by_type[PARAMETER_TYPE_DATE] = []
 parameter_optional_fields_by_type[PARAMETER_TYPE_STRING] = []
 parameter_optional_fields_by_type[PARAMETER_TYPE_STRING].append(PARAMETER_FIELD_DOMAIN)
 parameter_optional_fields_by_type[PARAMETER_TYPE_BOOLEAN] = []
+parameter_optional_fields_by_type[PARAMETER_TYPE_PATH] = []
 parameter_optional_fields_by_type[PARAMETER_TYPE_FILE] = []
 parameter_optional_fields_by_type[PARAMETER_TYPE_FILE].append(PARAMETER_FIELD_DOMAIN)
 parameter_optional_fields_by_type[PARAMETER_TYPE_LAYER_SET] = []

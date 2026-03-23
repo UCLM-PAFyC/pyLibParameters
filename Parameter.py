@@ -620,14 +620,18 @@ class PathParameter(Parameter):
     def get_value(self):
         return self.value
 
-    def initialize(self):
+    def initialize(self, value):
         str_error = ''
+        if value is None:
+            str_error = ('Path Parameter value is None')
+            return str_error
+        self.value = value
         return str_error
 
     def set_value(self, value):
         str_error = ''
         if value is None:
-            str_error = ('Real Parameter value is None')
+            str_error = ('Path Parameter value is None')
             return str_error
         if not isinstance(value, str):
             str_error = ('Path Parameter: {} value must be a string and is: {}'.
