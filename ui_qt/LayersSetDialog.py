@@ -14,13 +14,13 @@ sys.path.append(os.path.join(current_path, '../..'))
 # sys.path.insert(0, '..')
 # sys.path.insert(0, '../..')
 
-from PyQt5 import QtCore, QtWidgets
-from PyQt5.uic import loadUi
-from PyQt5.QtWidgets import (QApplication, QMessageBox, QDialog, QInputDialog, QHBoxLayout, QDoubleSpinBox,
+from qgis.PyQt import QtCore, QtWidgets
+from qgis.PyQt.uic import loadUi
+from qgis.PyQt.QtWidgets import (QApplication, QMessageBox, QDialog, QInputDialog, QHBoxLayout, QDoubleSpinBox,
                              QFileDialog, QPushButton, QComboBox, QPlainTextEdit, QLineEdit, QDateEdit,
                              QDialogButtonBox, QVBoxLayout, QTableWidget, QTableWidgetItem, QLabel, QAbstractItemView)
-from PyQt5.QtCore import QDir, QFileInfo, QFile, QSize, Qt, QDate
-from PyQt5.QtGui import QStandardItemModel
+from qgis.PyQt.QtCore import QDir, QFileInfo, QFile, QSize, Qt, QDate
+from qgis.PyQt.QtGui import QStandardItemModel
 
 import defs_pars
 from Parameter import *
