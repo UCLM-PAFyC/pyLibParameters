@@ -37,6 +37,7 @@ class VectorLayerDialog(QDialog):
                  label,
                  str_value,
                  domain,
+                 file_mode,
                  mandatory,
                  qgis_iface,
                  settings,
@@ -45,6 +46,7 @@ class VectorLayerDialog(QDialog):
         loadUi(os.path.join(os.path.dirname(__file__), 'VectorLayerDialog.ui'), self)
         self.label = label
         self.domain = domain
+        self.file_mode = file_mode
         self.mandatory = mandatory
         self.qgis_iface = qgis_iface
         self.settings = settings
@@ -68,11 +70,28 @@ class VectorLayerDialog(QDialog):
             self.settings.setValue("last_path", last_path)
             self.settings.sync()
         title = "Select Vector File"
+        str_files = '(*.*)'
+        if isinstance(self.domain, list):
+            if len(self.domain) > 0:
+                str_files = 'Files ('
+                for i in range(len(self.domain)):
+                    if i > 0:
+                        str_files += ' '
+                    str_files += ("*" + self.domain[i])
+                str_files += ')'
         dlg = QFileDialog()
+        dlg.setWindowTitle(title)
         dlg.setDirectory(last_path)
-        # dlg.setFileMode(QFileDialog.AnyFile)
-        dlg.setFileMode(QFileDialog.ExistingFiles)
-        dlg.setNameFilter("Vector File (*.*)")
+        dlg.setNameFilter(str_files)
+        if self.file_mode == defs_pars.FILE_MODE_READ:
+            dlg.setFileMode(QFileDialog.ExistingFile)
+            # file_name, aux = QFileDialog.getOpenFileName(self, title, path, str_files)
+        elif self.file_mode == defs_pars.FILE_MODE_APPEND:
+            dlg.setFileMode(QFileDialog.ExistingFile)
+            # file_name, aux = QFileDialog.getOpenFileName(self, title, path, str_files)
+        elif self.file_mode == defs_pars.FILE_MODE_WRITE:
+            dlg.setFileMode(QFileDialog.AnyFile)
+            # file_name, aux = QFileDialog.getSaveFileName(self, title, path, str_files)
         if dlg.exec_():
             file_names = dlg.selectedFiles()
             file_name = file_names[0]
@@ -97,6 +116,11 @@ class VectorLayerDialog(QDialog):
         self.layerComboBox.setEnabled(False)
         self.newLayerPushButton.setEnabled(False)
         if file_path == defs_pars.NO_COMBO_SELECT:
+            return
+        self.newLayerPushButton.setEnabled(True)
+        if not os.path.exists(file_path): # new file
+            # if self.layerComboBox.count() > 1:
+            #     self.layerComboBox.setEnabled(True)
             return
         current_position = 0
         if file_path == defs_qgis.QGIS_PROJECT_TAG:
@@ -195,10 +219,11 @@ class VectorLayerDialog(QDialog):
                              .format(self.label, defs_pars.TAG_FILE_PATH))
                 return str_error
             file_name = value[defs_pars.TAG_FILE_PATH]
-            if not os.path.exists(file_name):
-                msg = ('Not exists file:\n{}'.format(file_name))
-                QMessageBox.information(self, 'Information', msg)
-                file_name = ''
+            if self.file_mode == defs_pars.FILE_MODE_READ or self.file_mode == defs_pars.FILE_MODE_APPEND:
+                if not os.path.exists(file_name):
+                    msg = ('Not exists file:\n{}'.format(file_name))
+                    QMessageBox.information(self, 'Information', msg)
+                    file_name = ''
             self.file_path = file_name
             if not defs_pars.TAG_LAYER_NAME in value:
                 str_error = ('Vector Layer Parameter: {} value must contain {}'
@@ -246,20 +271,25 @@ class VectorLayerDialog(QDialog):
 
         self.layerComboBox.clear()
         self.layerComboBox.addItem(defs_pars.NO_COMBO_SELECT)
-        # if self.layer_name:
-        #     self.layerComboBox.addItem(self.layer_name)
         self.layerComboBox.setEnabled(False)
-
-        self.fileComboBox.currentIndexChanged.connect(self.file_changed)
-        self.layerComboBox.currentIndexChanged.connect(self.layer_changed)
-
-        if self.file_path:
-            self.fileComboBox.setCurrentIndex(1)
+        if self.layer_name:
+            self.layerComboBox.addItem(self.layer_name)
+            self.layerComboBox.setEnabled(True)
 
         self.addFilePushButton.clicked.connect(self.add_file)
         self.newLayerPushButton.clicked.connect(self.new_layer)
-        self.newLayerPushButton.setEnabled(False)
         self.metadataTreeView.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.newLayerPushButton.setEnabled(False)
+
+        if self.file_path:
+            self.fileComboBox.setCurrentIndex(1)
+            self.newLayerPushButton.setEnabled(True)
+
+        if self.layer_name:
+            self.layerComboBox.setCurrentIndex(1)
+
+        self.fileComboBox.currentIndexChanged.connect(self.file_changed)
+        self.layerComboBox.currentIndexChanged.connect(self.layer_changed)
         return str_error
 
     def layer_changed(self):
@@ -283,6 +313,8 @@ class VectorLayerDialog(QDialog):
                 QMessageBox.information(self, 'Information', str_error)
                 self.fileComboBox.setCurrentIndex(0)
                 return
+        if not os.path.exists(file_path): # new file
+            return
         str_error, metadata = GDALTools.ogrinfo_as_json(file_path, layer_name)
         if str_error:
             QMessageBox.information(self, 'Information', str_error)
@@ -297,4 +329,15 @@ class VectorLayerDialog(QDialog):
         return
 
     def new_layer(self):
+        title = 'Input name for new layer'
+        text, ok = QInputDialog.getText(self, title, 'Layer name',
+                                        QLineEdit.Normal)
+        # if ok and text != '' and text != str_value:
+        if ok:
+            value = text.strip()
+            if self.layerComboBox.findText(value) == -1:
+                self.layerComboBox.addItem(value)
+            self.layerComboBox.setCurrentIndex(self.layerComboBox.findText(value))
+        if self.layerComboBox.count() > 1:
+            self.layerComboBox.setEnabled(True)
         return

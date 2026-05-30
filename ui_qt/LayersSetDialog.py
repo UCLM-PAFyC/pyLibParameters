@@ -946,7 +946,8 @@ class LayersSetDialog(QDialog):
                 self.tableWidget.item(row, col).setText(new_str_value)
         elif isinstance(parameter, VectorLayerParameter):
             domain = parameter.domain
-            dialog = VectorLayerDialog(title, parameter_label, str_value, domain, mandatory,
+            file_mode = parameter.file_mode
+            dialog = VectorLayerDialog(title, parameter_label, str_value, domain, file_mode, mandatory,
                                        self.qgis_iface, self.settings,  self)
             if dialog.str_error:
                 QMessageBox.information(self, 'Information', dialog.str_error)
