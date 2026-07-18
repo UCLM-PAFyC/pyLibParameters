@@ -136,7 +136,7 @@ class ParameterDialog(QDialog):
     def set_description(self):
         title = "Parameter: " + self.label_line_edit.text()
         current_text = self.description_line_edit.text()
-        dialog = SimpleTextEditDialog(title, current_text, False)
+        dialog = SimpleTextEditDialog(title, current_text, False, self)
         ret = dialog.exec()
         text = dialog.get_text()
         if text != self.description_line_edit.text():
