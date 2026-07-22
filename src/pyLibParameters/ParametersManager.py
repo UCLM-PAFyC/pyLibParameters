@@ -1,7 +1,7 @@
 import os
 import sys
 
-from Parameter import *
+from .Parameter import *
 
 class ParametersManager:
     def __init__(self):

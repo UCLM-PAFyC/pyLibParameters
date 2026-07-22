@@ -10,7 +10,7 @@ from qgis.PyQt.QtWidgets import (QMessageBox, QDialog, QInputDialog,
 from qgis.PyQt.QtCore import QDate
 from qgis.PyQt.QtCore import QDir
 
-from src.pyLibParameters.Parameter import *
+from ..Parameter import *
 
 from pyLibQtTools.Tools import SimpleTextEditDialog
 

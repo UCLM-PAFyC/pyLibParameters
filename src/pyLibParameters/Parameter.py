@@ -5,9 +5,9 @@ import os
 import math
 import pathlib
 import datetime
-
-import defs_pars
 import json
+
+from . import defs_pars
 
 #
 # from pint import UnitRegistry

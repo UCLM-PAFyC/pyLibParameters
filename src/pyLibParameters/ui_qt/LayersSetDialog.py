@@ -11,16 +11,16 @@ from qgis.PyQt.QtWidgets import (QMessageBox, QDialog, QInputDialog, QHBoxLayout
                                  QDialogButtonBox, QVBoxLayout, QTableWidgetItem, QLabel)
 from qgis.PyQt.QtCore import QDir, QFileInfo, Qt, QDate
 
-from src.pyLibParameters.Parameter import *
-from src.pyLibParameters.ParametersManager import ParametersManager
+from ..Parameter import *
+from ..ParametersManager import ParametersManager
 
 from pyLibGDAL import defs_gdal
 from pyLibGDAL.GDALTools import GDALTools
 from pyLibQGIS import defs_qgis
-from src.pyLibParameters.ui_qt.VectorLayerFieldDialog import VectorLayerFieldDialog
-from src.pyLibParameters.ui_qt.VectorLayerDialog import VectorLayerDialog
-from src.pyLibParameters.ui_qt.RasterLayerDialog import RasterLayerDialog
-from src.pyLibParameters.ui_qt.LayerSetDialog import LayerSetDialog
+from . import VectorLayerFieldDialog
+from . import VectorLayerDialog
+from . import RasterLayerDialog
+from . import LayerSetDialog
 
 
 # from pyLibQGIS.QGISTools import QGISTools

@@ -8,7 +8,7 @@ from qgis.PyQt.uic import loadUi
 from qgis.PyQt.QtWidgets import (QMessageBox, QDialog, QFileDialog, QAbstractItemView)
 from qgis.PyQt.QtCore import QDir, QFileInfo
 
-from src.pyLibParameters.Parameter import *
+from ..Parameter import *
 
 from pyLibGDAL import defs_gdal
 from pyLibGDAL.GDALTools import GDALTools
