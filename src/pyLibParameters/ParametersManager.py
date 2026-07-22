@@ -1,14 +1,6 @@
 import os
 import sys
-import math
-import random
-import re
 
-here = os.path.dirname(__file__)
-sys.path.append(os.path.join(here, '.'))
-
-import json
-import defs_pars
 from Parameter import *
 
 class ParametersManager:
@@ -360,14 +352,14 @@ class ParametersManager:
                 if not defs_pars.TAG_LAYERS in parameter_value:
                     str_error = ('ParametersManager.initialize\n')
                     str_error += ('\nLayers Set Parameter: {} value must contain {}'
-                                 .format(parameter_label, defs_pars.TAG_LAYERS))
+                                  .format(parameter_label, defs_pars.TAG_LAYERS))
                     return str_error
                 layers = parameter_value[defs_pars.TAG_LAYERS]
                 if not isinstance(layers, list):
                     str_error = ('ParametersManager.initialize\n')
                     str_error += ('\nLayers Set Parameter: {} value: {} must be a list and is: {}'
-                                 .format(parameter_label, defs_pars.TAG_LAYERS,
-                                         str(type(parameter_value[defs_pars.TAG_LAYERS]))))
+                                  .format(parameter_label, defs_pars.TAG_LAYERS,
+                                          str(type(parameter_value[defs_pars.TAG_LAYERS]))))
                     return str_error
                 layers_parameters_manager = []
                 for layer_pos in range(len(layers)):

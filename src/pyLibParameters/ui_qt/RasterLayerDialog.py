@@ -3,35 +3,17 @@
 
 import os
 import sys
-import math
-import json
 
-current_path = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(current_path, '..'))
-
-from qgis.PyQt import QtCore, QtWidgets
 from qgis.PyQt.uic import loadUi
-from qgis.PyQt.QtWidgets import (QApplication, QMessageBox, QDialog, QInputDialog, QHBoxLayout, QDoubleSpinBox,
-                             QFileDialog, QPushButton, QComboBox, QPlainTextEdit, QLineEdit, QDateEdit,
-                             QDialogButtonBox, QVBoxLayout, QTableWidget, QTableWidgetItem, QLabel, QHeaderView,
-                             QAbstractItemView)
-from qgis.PyQt.QtCore import QDir, QFileInfo, QFile, QSize, Qt, QDate
+from qgis.PyQt.QtWidgets import (QMessageBox, QDialog, QInputDialog, QFileDialog, QLineEdit, QAbstractItemView)
+from qgis.PyQt.QtCore import QDir, QFileInfo
 
-import defs_pars
-from Parameter import *
-from .ParameterDialog import ParameterDialog
+from src.pyLibParameters.Parameter import *
 
-from pyLibCRSs import CRSsDefines as defs_crs
-from pyLibCRSs.CRSsTools import CRSsTools
-from pyLibGDAL import defs_gdal
 from pyLibGDAL.GDALTools import GDALTools
 from pyLibQGIS import defs_qgis
 # from pyLibQGIS.QGISTools import QGISTools
 from pyLibQtTools.JsonModel import JsonModel
-
-
-
-from pyLibQtTools.Tools import SimpleTextEditDialog
 
 
 class RasterLayerDialog(QDialog):

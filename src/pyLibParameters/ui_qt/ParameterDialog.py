@@ -3,25 +3,14 @@
 
 import os
 import sys
-import math
-import datetime
 
-current_path = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(current_path, '..'))
+from qgis.PyQt.QtWidgets import (QMessageBox, QDialog, QInputDialog,
+                                 QFileDialog, QLineEdit,
+                                 QDialogButtonBox, QVBoxLayout, QLabel, QPushButton, QGridLayout, QDateEdit)
+from qgis.PyQt.QtCore import QDate
+from qgis.PyQt.QtCore import QDir
 
-from qgis.PyQt import QtCore, QtWidgets
-from qgis.PyQt.uic import loadUi
-from qgis.PyQt.QtWidgets import (QApplication, QMessageBox, QDialog, QInputDialog,
-                             QFileDialog, QPushButton, QComboBox, QPlainTextEdit, QLineEdit,
-                             QDialogButtonBox, QVBoxLayout, QTableWidget, QTableWidgetItem,
-                             QFrame, QLabel, QPushButton, QGridLayout, QSizePolicy, QDateEdit)
-from qgis.PyQt.QtCore import QDir, QFileInfo, QFile, QSize, Qt, QDate
-from qgis.PyQt.QtCore import QDir, Qt
-from qgis.PyQt.QtGui import QFont, QPalette, QFontMetrics, QFont
-
-import defs_pars
-from ParametersManager import ParametersManager
-from Parameter import *
+from src.pyLibParameters.Parameter import *
 
 from pyLibQtTools.Tools import SimpleTextEditDialog
 
@@ -249,7 +238,7 @@ class ParameterDialog(QDialog):
             domain = self.parameter.domain
             if len(domain) == 2:
                 int_value, ok = QInputDialog.getInt(self, title, defs_pars.PARAMETER_FIELD_VALUE_TAG,
-                                                           current_value, domain[0], domain[1], 1)
+                                                    current_value, domain[0], domain[1], 1)
                 if ok:
                     str_value = str(eval(self.parameter.output_format.format(int_value)))
                     self.value_line_edit.setText(str_value)

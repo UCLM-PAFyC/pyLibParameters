@@ -3,43 +3,26 @@
 
 import os
 import sys
-import math
-import json
 import copy
-
-current_path = os.path.dirname(os.path.realpath(__file__))
-# current_path = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(current_path, '..'))
-sys.path.append(os.path.join(current_path, '../..'))
-# sys.path.insert(0, '..')
-# sys.path.insert(0, '../..')
 
 from qgis.PyQt import QtCore, QtWidgets
 from qgis.PyQt.uic import loadUi
-from qgis.PyQt.QtWidgets import (QApplication, QMessageBox, QDialog, QInputDialog, QHBoxLayout, QDoubleSpinBox,
-                             QFileDialog, QPushButton, QComboBox, QPlainTextEdit, QLineEdit, QDateEdit,
-                             QDialogButtonBox, QVBoxLayout, QTableWidget, QTableWidgetItem, QLabel, QAbstractItemView)
-from qgis.PyQt.QtCore import QDir, QFileInfo, QFile, QSize, Qt, QDate
-from qgis.PyQt.QtGui import QStandardItemModel
+from qgis.PyQt.QtWidgets import (QMessageBox, QDialog, QInputDialog, QHBoxLayout, QFileDialog, QComboBox, QLineEdit, QDateEdit,
+                                 QDialogButtonBox, QVBoxLayout, QTableWidgetItem, QLabel)
+from qgis.PyQt.QtCore import QDir, QFileInfo, Qt, QDate
 
-import defs_pars
-from Parameter import *
-from ParametersManager import ParametersManager
-from .ParameterDialog import ParameterDialog
+from src.pyLibParameters.Parameter import *
+from src.pyLibParameters.ParametersManager import ParametersManager
 
-from pyLibCRSs import CRSsDefines as defs_crs
-from pyLibCRSs.CRSsTools import CRSsTools
 from pyLibGDAL import defs_gdal
 from pyLibGDAL.GDALTools import GDALTools
 from pyLibQGIS import defs_qgis
-from ui_qt.VectorLayerFieldDialog import VectorLayerFieldDialog
-from ui_qt.VectorLayerDialog import VectorLayerDialog
-from ui_qt.RasterLayerDialog import RasterLayerDialog
-from ui_qt.LayerSetDialog import LayerSetDialog
-from pyLibQtTools.Tools import SimpleTextEditDialog
-from pyLibQtTools.JsonModel import JsonModel
-from pyLibQtTools.Tools import SimpleTextEditDialog
-from pyLibQtTools.CheckableComboBox import CheckableComboBox
+from src.pyLibParameters.ui_qt.VectorLayerFieldDialog import VectorLayerFieldDialog
+from src.pyLibParameters.ui_qt.VectorLayerDialog import VectorLayerDialog
+from src.pyLibParameters.ui_qt.RasterLayerDialog import RasterLayerDialog
+from src.pyLibParameters.ui_qt.LayerSetDialog import LayerSetDialog
+
+
 # from pyLibQGIS.QGISTools import QGISTools
 
 class LayersSetDialog(QDialog):
@@ -614,7 +597,7 @@ class LayersSetDialog(QDialog):
                 pass
             if len(domain) == 2:
                 int_value, ok = QInputDialog.getInt(self, title, defs_pars.PARAMETER_FIELD_VALUE_TAG,
-                                                           current_value, domain[0], domain[1], 1)
+                                                    current_value, domain[0], domain[1], 1)
                 if ok:
                     str_value = str(eval(parameter.output_format.format(int_value)))
                     if not str_value and mandatory:

@@ -3,28 +3,19 @@
 
 import os
 import sys
-import math
-
-current_path = os.path.dirname(os.path.realpath(__file__))
-sys.path.append(os.path.join(current_path, '..'))
 
 from qgis.PyQt import QtCore, QtWidgets
 from qgis.PyQt.uic import loadUi
-from qgis.PyQt.QtWidgets import (QApplication, QMessageBox, QDialog, QInputDialog, QHBoxLayout, QDoubleSpinBox,
-                             QFileDialog, QPushButton, QComboBox, QPlainTextEdit, QLineEdit, QDateEdit,
-                             QDialogButtonBox, QVBoxLayout, QTableWidget, QTableWidgetItem, QLabel)
-from qgis.PyQt.QtCore import QDir, QFileInfo, QFile, QSize, Qt, QDate
+from qgis.PyQt.QtWidgets import (QMessageBox, QDialog, QInputDialog, QHBoxLayout, QFileDialog, QComboBox, QLineEdit, QDateEdit,
+                                 QDialogButtonBox, QVBoxLayout, QTableWidgetItem, QLabel)
+from qgis.PyQt.QtCore import QDir, QFileInfo, Qt, QDate
 
-import defs_pars
-from ParametersManager import ParametersManager
-from Parameter import *
-from .ParameterDialog import ParameterDialog
-from ui_qt.VectorLayerFieldDialog import VectorLayerFieldDialog
-from ui_qt.VectorLayerDialog import VectorLayerDialog
-from ui_qt.RasterLayerDialog import RasterLayerDialog
-from ui_qt.LayerSetDialog import LayerSetDialog
-from ui_qt.LayersSetDialog import LayersSetDialog
-from pyLibQtTools.Tools import SimpleTextEditDialog
+from src.pyLibParameters.Parameter import *
+from src.pyLibParameters.ui_qt.VectorLayerFieldDialog import VectorLayerFieldDialog
+from src.pyLibParameters.ui_qt.VectorLayerDialog import VectorLayerDialog
+from src.pyLibParameters.ui_qt.RasterLayerDialog import RasterLayerDialog
+from src.pyLibParameters.ui_qt.LayerSetDialog import LayerSetDialog
+from src.pyLibParameters.ui_qt.LayersSetDialog import LayersSetDialog
 
 
 class ParametersManagerDialog(QDialog):
@@ -305,7 +296,7 @@ class ParametersManagerDialog(QDialog):
                 pass
             if len(domain) == 2:
                 int_value, ok = QInputDialog.getInt(self, title, defs_pars.PARAMETER_FIELD_VALUE_TAG,
-                                                           current_value, domain[0], domain[1], 1)
+                                                    current_value, domain[0], domain[1], 1)
                 if ok:
                     str_value = str(eval(parameter.output_format.format(int_value)))
                     if not str_value and mandatory:

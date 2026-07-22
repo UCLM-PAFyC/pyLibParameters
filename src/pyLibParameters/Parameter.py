@@ -3,7 +3,6 @@
 
 import os
 import math
-import defs_pars
 import pathlib
 import datetime
 
