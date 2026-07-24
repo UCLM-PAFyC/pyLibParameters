@@ -11,11 +11,11 @@ from qgis.PyQt.QtWidgets import (QMessageBox, QDialog, QInputDialog, QHBoxLayout
 from qgis.PyQt.QtCore import QDir, QFileInfo, Qt, QDate
 
 from ..Parameter import *
-from . import VectorLayerFieldDialog
-from . import VectorLayerDialog
-from . import RasterLayerDialog
-from . import LayerSetDialog
-from . import LayersSetDialog
+from .LayerSetDialog import LayerSetDialog
+from .LayersSetDialog import LayersSetDialog
+from .RasterLayerDialog import RasterLayerDialog
+from .VectorLayerDialog import VectorLayerDialog
+from .VectorLayerFieldDialog import VectorLayerFieldDialog
 
 
 class ParametersManagerDialog(QDialog):
