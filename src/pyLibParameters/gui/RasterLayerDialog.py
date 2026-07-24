@@ -1,19 +1,16 @@
 # authors:
 # David Hernandez Lopez, david.hernandez@uclm.es
 
-import os, sys
-
 from qgis.PyQt.uic import loadUi
 from qgis.PyQt.QtWidgets import (QMessageBox, QDialog, QInputDialog, QFileDialog, QLineEdit, QAbstractItemView)
 from qgis.PyQt.QtCore import QDir, QFileInfo
 
 from ..Parameter import *
 
-from pyLibGDAL.GDALTools import GDALTools
-from pyLibQtTools.JsonModel import JsonModel
+from pyLibGDAL import GDALTools
+from pyLibQtTools import JsonModel
 
 class RasterLayerDialog(QDialog):
-
     def __init__(self,
                  title,
                  label,

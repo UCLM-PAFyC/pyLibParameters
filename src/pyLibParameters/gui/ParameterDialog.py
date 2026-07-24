@@ -1,9 +1,6 @@
 # authors:
 # David Hernandez Lopez, david.hernandez@uclm.es
 
-import os
-import sys
-
 from qgis.PyQt.QtWidgets import (QMessageBox, QDialog, QInputDialog,
                                  QFileDialog, QLineEdit,
                                  QDialogButtonBox, QVBoxLayout, QLabel, QPushButton, QGridLayout, QDateEdit)
@@ -12,8 +9,7 @@ from qgis.PyQt.QtCore import QDir
 
 from ..Parameter import *
 
-from pyLibQtTools.Tools import SimpleTextEditDialog
-
+from pyLibQtTools import SimpleTextEditDialog
 
 class ParameterDialog(QDialog):
     def __init__(self,

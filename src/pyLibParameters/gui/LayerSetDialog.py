@@ -1,9 +1,6 @@
 # authors:
 # David Hernandez Lopez, david.hernandez@uclm.es
 
-import os
-import sys
-
 from qgis.PyQt.uic import loadUi
 from qgis.PyQt.QtWidgets import (QMessageBox, QDialog, QFileDialog, QAbstractItemView)
 from qgis.PyQt.QtCore import QDir, QFileInfo, Qt
@@ -11,14 +8,11 @@ from qgis.PyQt.QtCore import QDir, QFileInfo, Qt
 from ..Parameter import *
 
 from pyLibGDAL import defs_gdal
-from pyLibGDAL.GDALTools import GDALTools
-from pyLibQGIS import defs_qgis
-from pyLibQtTools.JsonModel import JsonModel
-from pyLibQtTools.CheckableComboBox import CheckableComboBox
-# from pyLibQGIS.QGISTools import QGISTools
+from pyLibGDAL import GDALTools
+from pyLibQtTools import JsonModel
+from pyLibQtTools import CheckableComboBox
 
 class LayerSetDialog(QDialog):
-
     def __init__(self,
                  title,
                  label,

@@ -1,5 +1,5 @@
-import os
-import sys
+# authors:
+# David Hernandez Lopez, david.hernandez@uclm.es
 
 from .Parameter import *
 
