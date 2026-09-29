@@ -201,6 +201,13 @@ class ParametersManagerDialog(QDialog):
                 self.settings.setValue("last_path", path)
                 self.settings.sync()
                 self.tableWidget.item(row, 1).setText(path)
+            else:
+                if mandatory:
+                    msg = ('Parameter: {} is mandatory'.format(parameter_label))
+                    QMessageBox.information(self, 'Information', msg)
+                    self.set_value(row)
+                else:
+                    self.tableWidget.item(row, 1).setText(path)
         elif isinstance(parameter, FileParameter):
             previous_file = str_value
             path = None

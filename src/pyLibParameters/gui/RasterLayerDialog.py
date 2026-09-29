@@ -189,10 +189,11 @@ class RasterLayerDialog(QDialog):
                              .format(self.label, defs_pars.TAG_FILE_PATH))
                 return str_error
             file_name = value[defs_pars.TAG_FILE_PATH]
-            if not os.path.exists(file_name):
-                msg = ('Not exists file:\n{}'.format(file_name))
-                QMessageBox.information(self, 'Information', msg)
-                file_name = ''
+            if file_name:
+                if not os.path.exists(file_name):
+                    msg = ('Not exists file:\n{}'.format(file_name))
+                    QMessageBox.information(self, 'Information', msg)
+                    file_name = ''
             self.file_path = file_name
             if not defs_pars.TAG_LAYER_INDEX in value:
                 str_error = ('Raster Layer Parameter: {} value must contain {}'
